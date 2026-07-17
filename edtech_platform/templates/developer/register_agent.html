@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register New Agent — ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  .register-container { max-width: 680px; margin: 0 auto; animation: fadeIn 0.4s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block; font-size: 0.875rem; font-weight: 600; color: #1A1A2E; margin-bottom: 6px;
+  }
+  .form-input, .form-select {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-input);
+    font-size: 0.875rem; transition: border-color 0.15s ease;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(83,74,183,0.1);
+  }
+  .checkbox-grid {
+    display: grid; grid-template-cols: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;
+    padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-input);
+  }
+  .checkbox-item {
+    display: flex; align-items: center; gap: 8px; font-size: 0.8125rem; color: var(--text-primary);
+  }
+  .checkbox-item input {
+    width: 16px; height: 16px; accent-color: var(--primary);
+  }
+</style>
+
+<div class="register-container">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <a href="{% url 'developer:portal' %}" class="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#534AB7] mb-3 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Portal
+      </a>
+      <h1 class="text-2xl font-bold text-[#1A1A2E]">Register a New Agent</h1>
+      <p class="text-sm text-[#6B7280] mt-1">Specify metadata, input types, and output formats for validation cross-checking.</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding:28px;">
+    <form method="POST" id="register-form">
+      {% csrf_token %}
+
+      <!-- Name -->
+      <div class="form-group">
+        <label class="form-label" for="id_name">Agent Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <p class="text-xs text-red-500 mt-1">{{ form.name.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Input Type (Single Select) -->
+      <div class="form-group">
+        <label class="form-label" for="id_input_type">Input Format Type</label>
+        {{ form.input_type }}
+        <p class="text-xs text-[#9CA3AF] mt-1">The format of task input payloads this agent accepts.</p>
+        {% if form.input_type.errors %}
+          <p class="text-xs text-red-500 mt-1">{{ form.input_type.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Output Types (Multiple Choice) -->
+      <div class="form-group">
+        <label class="form-label">Approved Output Format Types</label>
+        <div class="checkbox-grid" id="output-types-container">
+          {% for choice in form.output_types.field.choices %}
+            <label class="checkbox-item">
+              <input type="checkbox" name="output_types" value="{{ choice.0 }}" id="output_type_{{ choice.0 }}">
+              <span>{{ choice.1 }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <p class="text-xs text-[#9CA3AF] mt-1">Select all formats this agent can output. At least one output format must be chosen.</p>
+        {% if form.output_types.errors %}
+          <p class="text-xs text-red-500 mt-1">{{ form.output_types.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Subject Areas -->
+      <div class="form-group">
+        <label class="form-label" for="id_subject_areas">Subject Areas</label>
+        {{ form.subject_areas }}
+        <p class="text-xs text-[#9CA3AF] mt-1">Comma-separated topics of expertise (e.g. Mathematics, Algebra, Calculus).</p>
+      </div>
+
+      <!-- Age Groups -->
+      <div class="form-group">
+        <label class="form-label" for="id_age_groups">Target Age Groups</label>
+        {{ form.age_groups }}
+        <p class="text-xs text-[#9CA3AF] mt-1">Comma-separated audience age categories (e.g. 9-12, 13-15, 16-18).</p>
+      </div>
+
+      <!-- Capabilities -->
+      <div class="form-group">
+        <label class="form-label" for="id_capabilities">Special Capabilities</label>
+        {{ form.capabilities }}
+        <p class="text-xs text-[#9CA3AF] mt-1">Descriptive tags for search categorization (e.g. step-by-step, realtime-feedback).</p>
+      </div>
+
+      <div class="mt-8 flex gap-4">
+        <a href="{% url 'developer:portal' %}" class="btn btn-outline" style="flex:1; text-align:center;">Cancel</a>
+        <button type="submit" id="submit-btn" class="btn btn-primary" style="flex:2;" disabled>Register Agent</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    const nameInput = document.getElementById('id_name');
+    const inputTypeSelect = document.getElementById('id_input_type');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function checkFormValidity() {
+      const nameVal = nameInput.value.trim();
+      const inputTypeVal = inputTypeSelect.value;
+      const checkedOutputs = document.querySelectorAll('input[name="output_types"]:checked');
+
+      if (nameVal && inputTypeVal && checkedOutputs.length > 0) {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    }
+
+    nameInput.addEventListener('input', checkFormValidity);
+    inputTypeSelect.addEventListener('change', checkFormValidity);
+    
+    // Add change listener to all checkboxes
+    document.querySelectorAll('input[name="output_types"]').forEach(cb => {
+      cb.addEventListener('change', checkFormValidity);
+    });
+  });
+</script>
+{% endblock %}

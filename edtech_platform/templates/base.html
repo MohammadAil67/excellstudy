@@ -1,0 +1,607 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ExcellStudy{% endblock %}</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Platform CSS -->
+  <link rel="stylesheet" href="{% static 'css/platform.css' %}">
+
+  <style>
+    /* ── CSS Variables ── */
+    :root {
+      --primary: #534AB7;
+      --primary-light: #6B63C7;
+      --primary-dark: #3D3590;
+      --accent: #1D9E75;
+      --accent-light: #25C290;
+      --highlight: #BA7517;
+      --highlight-light: #D4891E;
+      --error: #E05252;
+      --bg: #F8F7FF;
+      --bg-card: #FFFFFF;
+      --text-primary: #1A1A2E;
+      --text-secondary: #6B7280;
+      --border: #E5E4F0;
+      --shadow: 0 2px 12px rgba(83,74,183,0.08);
+      --shadow-hover: 0 8px 24px rgba(83,74,183,0.15);
+      --radius-card: 12px;
+      --radius-input: 8px;
+      --radius-pill: 20px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+    @keyframes slideOutRight {
+      from { transform: translateX(0);    opacity: 1; }
+      to   { transform: translateX(100%); opacity: 0; }
+    }
+    @keyframes slideInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.05); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position:  200% 0; }
+    }
+
+    .animate-fade-in         { animation: fadeIn 0.5s ease-out forwards; }
+    .animate-slide-in-right  { animation: slideInRight 0.3s ease-out forwards; }
+    .animate-slide-out-right { animation: slideOutRight 0.3s ease-out forwards; }
+    .animate-slide-in-up     { animation: slideInUp 0.4s ease-out forwards; }
+
+    /* ── Body & page transition ── */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── Custom scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(83, 74, 183, 0.2);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(83, 74, 183, 0.35);
+    }
+
+    /* ── Interactive element transitions ── */
+    a, button, [role="button"] {
+      transition: color 0.2s ease, background-color 0.2s ease,
+                  border-color 0.2s ease, box-shadow 0.2s ease,
+                  transform 0.15s ease, opacity 0.2s ease;
+    }
+
+    /* ── Sidebar nav item base ── */
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      margin: 2px 12px;
+      border-radius: var(--radius-input);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      position: relative;
+      white-space: nowrap;
+    }
+    .sidebar-nav-item:hover {
+      background: var(--bg);
+      color: var(--primary);
+    }
+    .sidebar-nav-item.active {
+      background: rgba(83, 74, 183, 0.1);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* ── Sidebar label transition ── */
+    .sidebar-label {
+      transition: opacity 0.2s ease, width 0.2s ease;
+      overflow: hidden;
+    }
+
+    /* ── Navbar link ── */
+    .nav-link {
+      position: relative;
+      padding: 6px 12px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover {
+      color: var(--primary);
+    }
+    .nav-link.active {
+      color: var(--primary);
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 1px;
+    }
+
+    /* ── User dropdown ── */
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-hover);
+      z-index: 60;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .user-dropdown.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .dropdown-item:hover {
+      background: var(--bg);
+    }
+    .dropdown-item.danger {
+      color: var(--error);
+    }
+
+    /* ── Toast styles ── */
+    .toast-enter {
+      animation: slideInRight 0.3s ease-out forwards;
+    }
+    .toast-exit {
+      animation: slideOutRight 0.3s ease-out forwards;
+    }
+
+    /* ── Shimmer placeholder ── */
+    .shimmer {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    /* ── Card utility ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    /* ── Pill button ── */
+    .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-light);
+      box-shadow: 0 4px 14px rgba(83, 74, 183, 0.3);
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-accent:hover {
+      background: var(--accent-light);
+      box-shadow: 0 4px 14px rgba(29, 158, 117, 0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(83, 74, 183, 0.04);
+    }
+
+    /* ── Input ── */
+    .input {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+    }
+    .input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F8F7FF] font-['Inter'] text-[#1A1A2E]">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       TOP NAVIGATION BAR
+       ════════════════════════════════════════════════════════════════════ -->
+  <nav id="top-navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E4F0]" style="height:64px; box-shadow: var(--shadow);">
+    <div class="flex items-center justify-between h-full px-6">
+
+      <!-- LEFT: Logo -->
+      <a href="/" class="flex items-center gap-2 select-none" style="text-decoration:none;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
+          <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
+          <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
+          <line x1="22" y1="11" x2="22" y2="20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M20 20 L22 22 L24 20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="text-lg tracking-tight" style="line-height:1;">
+          <span class="font-bold" style="color:#534AB7;">Excell</span><span class="font-bold" style="color:#1D9E75;">Study</span>
+        </span>
+      </a>
+
+      <!-- CENTER: Navigation links -->
+      <div class="hidden md:flex items-center gap-1">
+        <a href="/learner/" class="nav-link active" data-nav="dashboard">Dashboard</a>
+        <a href="/learner/" class="nav-link" data-nav="courses">Courses</a>
+        <a href="/learner/" class="nav-link" data-nav="sessions">Sessions</a>
+        <a href="/playground/" class="nav-link" data-nav="playground">Playground</a>
+        <a href="/marketplace/" class="nav-link" data-nav="marketplace">Marketplace</a>
+      </div>
+
+      <!-- RIGHT: Toggle, Notifications, User -->
+      <div class="flex items-center gap-3">
+
+
+
+        {% if user.is_authenticated %}
+        <!-- Notification bell -->
+        <button id="notification-bell" class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" aria-label="Notifications">
+          <i data-lucide="bell" class="w-5 h-5 text-gray-500"></i>
+          <span class="absolute -top-0.5 -right-0.5 flex items-center justify-center bg-[#E05252] text-white text-[10px] font-bold rounded-full" style="width:18px;height:18px;">3</span>
+        </button>
+
+        <!-- User avatar & dropdown -->
+        <div id="user-menu" class="relative">
+          <button id="avatar-btn" onclick="toggleDropdown()" class="flex items-center justify-center rounded-full font-semibold text-white select-none focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30" style="width:40px;height:40px;background:var(--primary);font-size:0.875rem;">
+            {{ user.first_name|default:'A'|make_list|first }}{{ user.last_name|default:'L'|make_list|first }}
+          </button>
+
+          <div id="user-dropdown" class="user-dropdown">
+            <!-- User info header -->
+            <div class="px-4 py-3 border-b border-[#E5E4F0]">
+              <p class="text-sm font-semibold text-[#1A1A2E]">{{ user.first_name|default:'User' }} {{ user.last_name|default:'' }}</p>
+              <p class="text-xs text-[#6B7280] mt-0.5">{{ user.email|default:'' }}</p>
+            </div>
+            <div class="py-1">
+              <a href="#" class="dropdown-item">
+                <i data-lucide="user" class="w-4 h-4"></i> Profile
+              </a>
+              <a href="#" class="dropdown-item">
+                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+              </a>
+            </div>
+            <div class="border-t border-[#E5E4F0]"></div>
+            <div class="py-1">
+              <a href="{% url 'logout' %}" class="dropdown-item danger">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <!-- Login / Sign Up (unauthenticated) -->
+        <a href="{% url 'login' %}" class="btn-pill btn-outline text-sm">Log In</a>
+        <a href="{% url 'signup' %}" class="btn-pill btn-primary text-sm">Sign Up</a>
+        {% endif %}
+
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ════════════════════════════════════════════════════════════════════ -->
+  <aside id="sidebar" class="fixed left-0 bg-white border-r border-[#E5E4F0] z-40 flex flex-col" style="top:64px; width:240px; height:calc(100vh - 64px); transition: width 0.3s ease;">
+
+    <div class="py-6 flex-1 flex flex-col">
+
+      {% if user.is_authenticated and user.developer_profile or not user.is_authenticated and user_type == 'developer' %}
+      <!-- Developer nav items -->
+      <div id="nav-developer">
+        <a href="/developer/" class="sidebar-nav-item active" data-sidebar="portal">
+          <i data-lucide="terminal" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Portal</span>
+        </a>
+        <a href="/developer/" class="sidebar-nav-item" data-sidebar="agents">
+          <i data-lucide="bot" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">My Agents</span>
+        </a>
+        <a href="/developer/pipeline/job-demo/" class="sidebar-nav-item" data-sidebar="pipeline">
+          <i data-lucide="git-branch" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Pipeline</span>
+        </a>
+        <a href="/playground/" class="sidebar-nav-item" data-sidebar="playground">
+          <i data-lucide="code-2" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Playground</span>
+        </a>
+        <a href="/marketplace/" class="sidebar-nav-item" data-sidebar="marketplace">
+          <i data-lucide="store" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Marketplace</span>
+        </a>
+      </div>
+      {% else %}
+      <!-- Learner nav items -->
+      <div id="nav-learner">
+        <a href="/learner/" class="sidebar-nav-item active" data-sidebar="dashboard">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/learner/" class="sidebar-nav-item" data-sidebar="courses">
+          <i data-lucide="book-open" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">My Courses</span>
+        </a>
+        <a href="/learner/" class="sidebar-nav-item" data-sidebar="sessions">
+          <i data-lucide="message-circle" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Sessions</span>
+        </a>
+        <a href="/playground/" class="sidebar-nav-item" data-sidebar="playground">
+          <i data-lucide="code-2" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Playground</span>
+        </a>
+        <a href="/marketplace/" class="sidebar-nav-item" data-sidebar="marketplace">
+          <i data-lucide="store" class="w-5 h-5 flex-shrink-0"></i>
+          <span class="sidebar-label">Marketplace</span>
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+
+      <!-- Collapse button -->
+      <button id="sidebar-collapse-btn" onclick="toggleSidebar()" class="flex items-center justify-center w-full py-3 border-t border-[#E5E4F0] text-[#6B7280] hover:text-[#534AB7] hover:bg-[#F8F7FF] transition-all duration-200" aria-label="Collapse sidebar">
+        <i data-lucide="chevrons-left" class="w-5 h-5" id="collapse-icon"></i>
+      </button>
+    </div>
+  </aside>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+       ════════════════════════════════════════════════════════════════════ -->
+  <div id="main-content" class="animate-fade-in" style="margin-left:240px; margin-top:64px; padding:24px 32px; min-height:calc(100vh - 64px); transition: margin-left 0.3s ease;">
+    {% block content %}{% endblock %}
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATION CONTAINER
+       ════════════════════════════════════════════════════════════════════ -->
+  <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:12px; align-items:flex-end;"></div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCRIPTS
+       ════════════════════════════════════════════════════════════════════ -->
+  <script>
+    // ── Initialize Lucide icons ──
+    document.addEventListener('DOMContentLoaded', function () {
+      lucide.createIcons();
+    });
+
+    // ── Sidebar toggle ──
+    let sidebarCollapsed = false;
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      sidebarCollapsed = !sidebarCollapsed;
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '72px';
+        mainContent.style.marginLeft = '72px';
+        labels.forEach(function (label) {
+          label.style.opacity = '0';
+          label.style.width = '0';
+          label.style.overflow = 'hidden';
+        });
+        collapseIcon.setAttribute('data-lucide', 'chevrons-right');
+      } else {
+        sidebar.style.width = '240px';
+        mainContent.style.marginLeft = '240px';
+        labels.forEach(function (label) {
+          label.style.opacity = '1';
+          label.style.width = 'auto';
+          label.style.overflow = 'visible';
+        });
+        collapseIcon.setAttribute('data-lucide', 'chevrons-left');
+      }
+
+      // Re-render the collapse icon
+      lucide.createIcons();
+    }
+
+    // ── User dropdown toggle ──
+    function toggleDropdown() {
+      var dropdown = document.getElementById('user-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('open');
+      }
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function (e) {
+      var userMenu = document.getElementById('user-menu');
+      var dropdown = document.getElementById('user-dropdown');
+      if (userMenu && dropdown && !userMenu.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+
+
+    // ── Toast notification system ──
+    function showToast(message, type) {
+      type = type || 'info';
+
+      var container = document.getElementById('toast-container');
+
+      var config = {
+        success: { border: '#1D9E75', icon: 'check-circle', iconColor: '#1D9E75' },
+        error:   { border: '#E05252', icon: 'x-circle',     iconColor: '#E05252' },
+        warning: { border: '#BA7517', icon: 'alert-triangle', iconColor: '#BA7517' },
+        info:    { border: '#534AB7', icon: 'info',          iconColor: '#534AB7' }
+      };
+
+      var c = config[type] || config.info;
+
+      // Create toast element
+      var toast = document.createElement('div');
+      toast.className = 'toast-enter';
+      toast.style.cssText = [
+        'display:flex',
+        'align-items:center',
+        'gap:12px',
+        'padding:16px 20px',
+        'background:#fff',
+        'border-radius:12px',
+        'box-shadow:0 8px 24px rgba(0,0,0,0.12)',
+        'border-left:4px solid ' + c.border,
+        'max-width:380px',
+        'min-width:280px',
+        'pointer-events:auto'
+      ].join(';');
+
+      // Icon
+      var iconEl = document.createElement('i');
+      iconEl.setAttribute('data-lucide', c.icon);
+      iconEl.style.cssText = 'width:20px;height:20px;flex-shrink:0;color:' + c.iconColor;
+      toast.appendChild(iconEl);
+
+      // Message
+      var msgEl = document.createElement('span');
+      msgEl.style.cssText = 'flex:1;font-size:0.875rem;color:#1A1A2E;font-weight:500;';
+      msgEl.textContent = message;
+      toast.appendChild(msgEl);
+
+      // Close button
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;opacity:0.5;padding:2px;display:flex;';
+      closeBtn.onmouseenter = function () { closeBtn.style.opacity = '1'; };
+      closeBtn.onmouseleave = function () { closeBtn.style.opacity = '0.5'; };
+      var closeIcon = document.createElement('i');
+      closeIcon.setAttribute('data-lucide', 'x');
+      closeIcon.style.cssText = 'width:16px;height:16px;color:#6B7280;';
+      closeBtn.appendChild(closeIcon);
+      closeBtn.onclick = function () { dismissToast(toast); };
+      toast.appendChild(closeBtn);
+
+      container.appendChild(toast);
+
+      // Render Lucide icons inside the toast
+      lucide.createIcons();
+
+      // Auto-dismiss after 4 seconds
+      var autoTimer = setTimeout(function () { dismissToast(toast); }, 4000);
+      toast._autoTimer = autoTimer;
+    }
+
+    function dismissToast(toast) {
+      if (toast._dismissed) return;
+      toast._dismissed = true;
+      clearTimeout(toast._autoTimer);
+      toast.className = 'toast-exit';
+      setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

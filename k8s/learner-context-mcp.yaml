@@ -1,0 +1,93 @@
+# ── Learner Context MCP Server ────────────────────────────────────────────────
+# Namespace: platform  |  Port: 8001
+# Exposes learner profile reads and skill progress writes to agent containers.
+# Only reachable by pods in the platform and agent namespaces (NetworkPolicy).
+# ─────────────────────────────────────────────────────────────────────────────
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learner-context-mcp-server
+  namespace: platform
+  labels:
+    app: learner-context-mcp-server
+    component: mcp-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: learner-context-mcp-server
+  template:
+    metadata:
+      labels:
+        app: learner-context-mcp-server
+        component: mcp-server
+    spec:
+      containers:
+        - name: learner-context-mcp
+          image: platform/learner-context-mcp:v1
+          ports:
+            - containerPort: 8001
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: MCP_SERVER_PORT
+              value: "8001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learner-context-mcp-server
+  namespace: platform
+spec:
+  selector:
+    app: learner-context-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: learner-context-mcp-ingress
+  namespace: platform
+spec:
+  podSelector:
+    matchLabels:
+      app: learner-context-mcp-server
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from other platform namespace pods (e.g. other MCP servers)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: platform
+    # Allow traffic from agent namespaces (built-in and third-party agents)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              role: agent-namespace

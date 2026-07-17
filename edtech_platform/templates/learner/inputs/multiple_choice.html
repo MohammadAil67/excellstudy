@@ -1,0 +1,22 @@
+<form id="agent-input-form" data-input-type="multiple_choice">
+  <div class="space-y-3 mb-4">
+    {% if agent.options %}
+      {% for option in agent.options %}
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-[#E5E4F0] cursor-pointer hover:border-[#534AB7] hover:bg-[#534AB7]/5 transition-all">
+          <input type="radio" name="selected_index" value="{{ forloop.index0 }}" class="w-4 h-4 accent-[#534AB7]" {% if forloop.first %}checked{% endif %}>
+          <span class="text-sm font-medium">{{ option }}</span>
+        </label>
+      {% endfor %}
+    {% else %}
+      {% for choice in "ABCD"|make_list %}
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-[#E5E4F0] cursor-pointer hover:border-[#534AB7] hover:bg-[#534AB7]/5 transition-all">
+          <input type="radio" name="selected_index" value="{{ forloop.index0 }}" class="w-4 h-4 accent-[#534AB7]" {% if forloop.first %}checked{% endif %}>
+          <span class="text-sm font-medium">Option {{ choice }}</span>
+        </label>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div class="flex justify-end">
+    <button type="submit" class="btn btn-primary" style="padding:10px 28px;">Submit Answer</button>
+  </div>
+</form>

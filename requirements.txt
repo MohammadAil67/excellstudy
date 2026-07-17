@@ -1,0 +1,22 @@
+django>=5.0
+djangorestframework
+django-cors-headers
+django-redis
+channels
+channels-redis
+celery
+python-dotenv
+psycopg2-binary
+anthropic
+httpx
+whitenoise
+gunicorn
+redis
+fastmcp>=2.0
+neo4j
+asyncpg
+
+# Testing
+pytest
+pytest-django
+pytest-asyncio

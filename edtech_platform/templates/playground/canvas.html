@@ -1,0 +1,642 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agent Playground — ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  /* Override base layout - full width, no sidebar margin */
+  #sidebar { display: none !important; }
+  #main-content { margin-left: 0 !important; padding: 0 !important; }
+
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  .playground-wrap {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 64px); overflow: hidden;
+    animation: fadeIn 0.4s ease;
+  }
+
+  /* Top bar */
+  .pg-topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; background: #fff;
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .pg-topbar input[type="text"] {
+    border: 1px solid var(--border); border-radius: var(--radius-input);
+    padding: 7px 12px; font-size: 0.875rem; font-weight: 600;
+    outline: none; width: 220px;
+  }
+  .pg-topbar input:focus { border-color: var(--primary); }
+  .version-badge {
+    background: #f3f4f6; color: #6B7280; padding: 4px 12px;
+    border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600;
+  }
+
+  /* Toggle switch */
+  .toggle-switch {
+    position: relative; width: 40px; height: 22px; display: inline-block;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: #d1d5db; border-radius: 22px;
+    cursor: pointer; transition: 0.3s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 16px; height: 16px;
+    left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+  /* Three-column layout */
+  .pg-main {
+    display: flex; flex: 1; overflow: hidden;
+  }
+
+  /* Left palette */
+  .pg-palette {
+    width: 220px; background: #fff; border-right: 1px solid var(--border);
+    padding: 16px; overflow-y: auto; flex-shrink: 0;
+  }
+  .palette-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-input);
+    margin-bottom: 6px; cursor: grab; transition: all 0.15s;
+    font-size: 0.8125rem; font-weight: 600; color: #fff;
+    user-select: none;
+  }
+  .palette-item:hover { transform: scale(1.03); box-shadow: var(--shadow); }
+  .palette-item:active { cursor: grabbing; }
+  .palette-item.outline-style {
+    background: transparent !important; color: var(--accent);
+    border: 2px dashed var(--accent);
+  }
+
+  /* Center canvas */
+  .pg-canvas-wrap {
+    flex: 1; position: relative; overflow: hidden;
+  }
+  .pg-canvas {
+    width: 100%; height: 100%; position: relative;
+    background-color: #1A1A2E;
+    background-image: radial-gradient(circle, #2A2A4E 1px, transparent 1px);
+    background-size: 20px 20px;
+    overflow: auto;
+  }
+
+  /* Canvas nodes */
+  .canvas-node {
+    position: absolute; background: #fff; border-radius: 10px;
+    padding: 14px 16px; min-width: 160px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); cursor: move;
+    transition: box-shadow 0.2s; user-select: none; z-index: 5;
+  }
+  .canvas-node:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  .canvas-node.selected {
+    box-shadow: 0 0 0 3px var(--primary), 0 6px 24px rgba(83,74,183,0.4);
+  }
+  .node-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .node-type-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .node-label { font-size: 0.8125rem; font-weight: 600; color: #1A1A2E; }
+  .node-id { font-size: 0.65rem; color: #9CA3AF; }
+
+  /* Ports */
+  .port {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #d1d5db; border: 2px solid #fff;
+    position: absolute; cursor: crosshair; z-index: 10;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .port:hover { transform: scale(1.3); background: var(--primary); }
+  .port-in { top: -6px; left: 50%; transform: translateX(-50%); }
+  .port-out { bottom: -6px; left: 50%; transform: translateX(-50%); }
+  .port-in:hover, .port-out:hover { transform: translateX(-50%) scale(1.3); }
+
+  /* SVG connections */
+  #connections-svg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 3;
+  }
+
+  /* Right config panel */
+  .pg-config {
+    width: 260px; background: #fff; border-left: 1px solid var(--border);
+    padding: 16px; overflow-y: auto; flex-shrink: 0;
+  }
+  .config-section { display: none; }
+  .config-section.active { display: block; }
+  .config-field { margin-bottom: 14px; }
+  .config-field label {
+    display: block; font-size: 0.75rem; font-weight: 600;
+    color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .config-field select,
+  .config-field input,
+  .config-field textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: var(--radius-input); font-size: 0.8125rem;
+    background: #fff; outline: none; color: var(--text-primary);
+  }
+  .config-field select:focus,
+  .config-field input:focus,
+  .config-field textarea:focus { border-color: var(--primary); }
+  .config-field textarea { resize: vertical; min-height: 80px; font-family: monospace; font-size: 0.75rem; }
+
+  .slider-wrap { display: flex; align-items: center; gap: 8px; }
+  .slider-wrap input[type="range"] {
+    flex: 1; accent-color: var(--primary); height: 4px; padding: 0; border: 0;
+  }
+  .slider-val {
+    font-size: 0.75rem; font-weight: 600; color: var(--primary);
+    min-width: 30px; text-align: center;
+  }
+
+  /* Bottom console */
+  .pg-console {
+    height: 180px; background: #1A1A2E; flex-shrink: 0;
+    border-top: 1px solid #2A2A4E; display: flex; flex-direction: column;
+  }
+  .console-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; border-bottom: 1px solid #2A2A4E;
+  }
+  .console-header span { color: #9CA3AF; font-size: 0.75rem; font-weight: 600; }
+  .console-output {
+    flex: 1; overflow-y: auto; padding: 10px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem; line-height: 1.8; color: #e2e8f0;
+  }
+  .console-output .success { color: #22C55E; }
+  .console-output .error { color: #E05252; }
+  .console-output .info { color: #6B7280; }
+  .console-output .timestamp { color: #6B7280; }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  }
+  .status-dot.connected { background: #22C55E; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+  .status-dot.disconnected { background: #E05252; }
+</style>
+
+<div class="playground-wrap">
+
+  <!-- Top Bar -->
+  <div class="pg-topbar">
+    <input type="text" value="My Agent Flow" id="agent-name-input" placeholder="Agent name...">
+    <span class="version-badge">v1.0.0</span>
+    <div style="flex:1;"></div>
+    <label class="flex items-center gap-2 text-sm text-[#6B7280]">
+      Make Public
+      <label class="toggle-switch">
+        <input type="checkbox">
+        <span class="toggle-slider"></span>
+      </label>
+    </label>
+    <button class="btn-pill btn-outline" style="padding:7px 16px; font-size:0.8125rem;">
+      <i data-lucide="save" class="w-4 h-4"></i> Save
+    </button>
+    <button id="run-btn" class="btn-pill btn-accent" style="padding:7px 20px; font-size:0.8125rem;" onclick="runGraph()">
+      <i data-lucide="play" class="w-4 h-4"></i> Run ▶
+    </button>
+  </div>
+
+  <div class="pg-main">
+
+    <!-- Left: Node Palette -->
+    <div class="pg-palette">
+      <h3 class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Components</h3>
+      <div class="palette-item" draggable="true" data-type="llm" style="background:#534AB7;"
+           ondragstart="onPaletteDrag(event, 'llm')">
+        <i data-lucide="brain" class="w-4 h-4"></i> LLM Call
+      </div>
+      <div class="palette-item" draggable="true" data-type="tool" style="background:#1D9E75;"
+           ondragstart="onPaletteDrag(event, 'tool')">
+        <i data-lucide="wrench" class="w-4 h-4"></i> Tool
+      </div>
+      <div class="palette-item" draggable="true" data-type="condition" style="background:#BA7517;"
+           ondragstart="onPaletteDrag(event, 'condition')">
+        <i data-lucide="git-branch" class="w-4 h-4"></i> Condition
+      </div>
+      <div class="palette-item" draggable="true" data-type="memory" style="background:#6B7280;"
+           ondragstart="onPaletteDrag(event, 'memory')">
+        <i data-lucide="database" class="w-4 h-4"></i> Memory
+      </div>
+      <div class="palette-item" draggable="true" data-type="human" style="background:#E07B5E;"
+           ondragstart="onPaletteDrag(event, 'human')">
+        <i data-lucide="user" class="w-4 h-4"></i> Human Input
+      </div>
+      <div class="palette-item outline-style" draggable="true" data-type="agent"
+           ondragstart="onPaletteDrag(event, 'agent')">
+        <i data-lucide="bot" class="w-4 h-4"></i> Platform Agent
+      </div>
+    </div>
+
+    <!-- Center: Canvas -->
+    <div class="pg-canvas-wrap">
+      <div class="pg-canvas" id="playground-canvas"
+           ondragover="event.preventDefault(); event.dataTransfer.dropEffect='copy';"
+           ondrop="onCanvasDrop(event)">
+        <svg id="connections-svg"></svg>
+        <!-- Demo nodes will be placed here by JS -->
+      </div>
+    </div>
+
+    <!-- Right: Config Panel -->
+    <div class="pg-config">
+      <h3 class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-4">Configuration</h3>
+
+      <!-- Empty state -->
+      <div id="config-empty" class="text-center py-8">
+        <i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto mb-3" style="color:#d1d5db;"></i>
+        <p class="text-sm text-[#9CA3AF]">Select a node on the canvas to configure it</p>
+      </div>
+
+      <!-- LLM Config -->
+      <div id="config-llm" class="config-section">
+        <div class="config-field">
+          <label>Model</label>
+          <select>
+            <option>GPT-4o</option><option>Claude 3.5 Sonnet</option>
+            <option>Gemini Pro</option><option>Llama 3 70B</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <label>System Prompt</label>
+          <textarea placeholder="You are a helpful tutor...">You are a helpful mathematics tutor. Break down problems step by step.</textarea>
+        </div>
+        <div class="config-field">
+          <label>Temperature</label>
+          <div class="slider-wrap">
+            <input type="range" min="0" max="200" value="70" oninput="this.nextElementSibling.textContent=(this.value/100).toFixed(2)">
+            <span class="slider-val">0.70</span>
+          </div>
+        </div>
+        <div class="config-field">
+          <label>Max Tokens</label>
+          <input type="number" value="1024" min="1" max="8192">
+        </div>
+        <button class="btn-pill btn-primary w-full justify-center mt-2" style="padding:8px;">Apply</button>
+      </div>
+
+      <!-- Tool Config -->
+      <div id="config-tool" class="config-section">
+        <div class="config-field">
+          <label>Tool Type</label>
+          <select>
+            <option>Web Search</option><option>Calculator</option>
+            <option>Code Executor</option><option>Platform APIs</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <label>Configuration</label>
+          <textarea placeholder='{"timeout": 30}'></textarea>
+        </div>
+        <button class="btn-pill btn-primary w-full justify-center mt-2" style="padding:8px;">Apply</button>
+      </div>
+
+      <!-- Condition Config -->
+      <div id="config-condition" class="config-section">
+        <div class="config-field">
+          <label>Condition Expression</label>
+          <input type="text" placeholder="score >= 70" value="score >= 70">
+        </div>
+        <div class="config-field">
+          <label>True Branch Label</label>
+          <input type="text" value="Pass" placeholder="True branch">
+        </div>
+        <div class="config-field">
+          <label>False Branch Label</label>
+          <input type="text" value="Review" placeholder="False branch">
+        </div>
+        <button class="btn-pill btn-primary w-full justify-center mt-2" style="padding:8px;">Apply</button>
+      </div>
+
+      <!-- Generic Config (memory, human, agent) -->
+      <div id="config-generic" class="config-section">
+        <div class="config-field">
+          <label>Node Label</label>
+          <input type="text" id="generic-label" placeholder="Node name">
+        </div>
+        <div class="config-field">
+          <label>Notes</label>
+          <textarea placeholder="Add notes..."></textarea>
+        </div>
+        <button class="btn-pill btn-primary w-full justify-center mt-2" style="padding:8px;">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: Console -->
+  <div class="pg-console">
+    <div class="console-header">
+      <div class="flex items-center gap-2">
+        <span>Output Console</span>
+        <span class="status-dot disconnected" id="ws-status-dot"></span>
+        <span class="text-[10px]" id="ws-status-text" style="color:#9CA3AF;">Disconnected</span>
+      </div>
+      <button onclick="clearConsole()" style="background:none; border:1px solid #2A2A4E; color:#9CA3AF; padding:3px 10px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
+        Clear
+      </button>
+    </div>
+    <div class="console-output" id="console-output">
+      <div><span class="timestamp">[17:30:00]</span> <span class="info">Welcome to ExcellStudy Agent Playground</span></div>
+      <div><span class="timestamp">[17:30:00]</span> <span class="info">Drag components from the left palette onto the canvas</span></div>
+      <div><span class="timestamp">[17:30:01]</span> <span class="success">✓ Canvas initialized with demo nodes</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  lucide.createIcons();
+
+  // ── Node type definitions ──
+  var NODE_TYPES = {
+    llm:       { label: 'LLM Call',        color: '#534AB7', icon: 'brain' },
+    tool:      { label: 'Tool',            color: '#1D9E75', icon: 'wrench' },
+    condition: { label: 'Condition',        color: '#BA7517', icon: 'git-branch' },
+    memory:    { label: 'Memory',           color: '#6B7280', icon: 'database' },
+    human:     { label: 'Human Input',      color: '#E07B5E', icon: 'user' },
+    agent:     { label: 'Platform Agent',   color: '#1D9E75', icon: 'bot' }
+  };
+
+  var nodes = {};
+  var connections = [];
+  var selectedNodeId = null;
+  var nodeCounter = 0;
+  var isDraggingNode = false;
+  var dragOffset = { x: 0, y: 0 };
+  var dragNodeEl = null;
+
+  // ── Palette drag ──
+  function onPaletteDrag(e, type) {
+    e.dataTransfer.setData('nodeType', type);
+    e.dataTransfer.effectAllowed = 'copy';
+  }
+
+  // ── Canvas drop ──
+  function onCanvasDrop(e) {
+    e.preventDefault();
+    var type = e.dataTransfer.getData('nodeType');
+    if (!type || !NODE_TYPES[type]) return;
+    var canvas = document.getElementById('playground-canvas');
+    var rect = canvas.getBoundingClientRect();
+    var x = e.clientX - rect.left + canvas.scrollLeft - 80;
+    var y = e.clientY - rect.top + canvas.scrollTop - 30;
+    createNode(type, x, y);
+    logConsole('Node created: ' + NODE_TYPES[type].label, 'success');
+  }
+
+  // ── Create node ──
+  function createNode(type, x, y) {
+    nodeCounter++;
+    var id = 'node-' + nodeCounter;
+    var info = NODE_TYPES[type];
+    nodes[id] = { id: id, type: type, x: x, y: y, config: {} };
+
+    var el = document.createElement('div');
+    el.className = 'canvas-node';
+    el.id = id;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.borderLeft = '4px solid ' + info.color;
+    el.innerHTML =
+      '<div class="port port-in" data-node="' + id + '" data-port="in"></div>' +
+      '<div class="node-header">' +
+        '<div class="node-type-dot" style="background:' + info.color + ';"></div>' +
+        '<span class="node-label">' + info.label + '</span>' +
+      '</div>' +
+      '<div class="node-id">#' + id + '</div>' +
+      '<div class="port port-out" data-node="' + id + '" data-port="out"></div>';
+
+    // Node click to select
+    el.addEventListener('mousedown', function(ev) {
+      if (ev.target.classList.contains('port')) return;
+      selectNode(id);
+      isDraggingNode = true;
+      dragNodeEl = el;
+      dragOffset.x = ev.clientX - el.offsetLeft;
+      dragOffset.y = ev.clientY - el.offsetTop;
+      ev.preventDefault();
+    });
+
+    // Port click for connections
+    var ports = el.querySelectorAll('.port');
+    ports.forEach(function(port) {
+      port.addEventListener('mousedown', function(ev) {
+        ev.stopPropagation();
+        var nodeId = port.getAttribute('data-node');
+        var portType = port.getAttribute('data-port');
+        if (portType === 'out') {
+          window._connStart = nodeId;
+          logConsole('Connection started from ' + nodeId, 'info');
+        }
+      });
+      port.addEventListener('mouseup', function(ev) {
+        ev.stopPropagation();
+        var nodeId = port.getAttribute('data-node');
+        var portType = port.getAttribute('data-port');
+        if (portType === 'in' && window._connStart && window._connStart !== nodeId) {
+          connections.push({ from: window._connStart, to: nodeId });
+          drawConnections();
+          logConsole('Connected ' + window._connStart + ' → ' + nodeId, 'success');
+          window._connStart = null;
+        }
+      });
+    });
+
+    document.getElementById('playground-canvas').appendChild(el);
+    lucide.createIcons();
+    return id;
+  }
+
+  // ── Node dragging ──
+  document.addEventListener('mousemove', function(e) {
+    if (!isDraggingNode || !dragNodeEl) return;
+    var canvas = document.getElementById('playground-canvas');
+    var rect = canvas.getBoundingClientRect();
+    var x = e.clientX - dragOffset.x;
+    var y = e.clientY - dragOffset.y;
+    dragNodeEl.style.left = Math.max(0, x) + 'px';
+    dragNodeEl.style.top = Math.max(0, y) + 'px';
+    nodes[dragNodeEl.id].x = x;
+    nodes[dragNodeEl.id].y = y;
+    drawConnections();
+  });
+  document.addEventListener('mouseup', function() {
+    isDraggingNode = false;
+    dragNodeEl = null;
+    window._connStart = null;
+  });
+
+  // ── Select node ──
+  function selectNode(id) {
+    // Deselect previous
+    document.querySelectorAll('.canvas-node.selected').forEach(function(n) { n.classList.remove('selected'); });
+    selectedNodeId = id;
+    var el = document.getElementById(id);
+    if (el) el.classList.add('selected');
+
+    var node = nodes[id];
+    if (!node) return;
+
+    // Show correct config panel
+    document.querySelectorAll('.config-section').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById('config-empty').style.display = 'none';
+
+    var configId = 'config-' + node.type;
+    var panel = document.getElementById(configId);
+    if (panel) {
+      panel.classList.add('active');
+    } else {
+      document.getElementById('config-generic').classList.add('active');
+      document.getElementById('generic-label').value = NODE_TYPES[node.type].label;
+    }
+  }
+
+  // ── Draw SVG connections ──
+  function drawConnections() {
+    var svg = document.getElementById('connections-svg');
+    svg.innerHTML = '';
+    connections.forEach(function(conn) {
+      var fromEl = document.getElementById(conn.from);
+      var toEl = document.getElementById(conn.to);
+      if (!fromEl || !toEl) return;
+
+      var fromPort = fromEl.querySelector('.port-out');
+      var toPort = toEl.querySelector('.port-in');
+
+      var x1 = fromEl.offsetLeft + fromEl.offsetWidth / 2;
+      var y1 = fromEl.offsetTop + fromEl.offsetHeight;
+      var x2 = toEl.offsetLeft + toEl.offsetWidth / 2;
+      var y2 = toEl.offsetTop;
+
+      var midY = (y1 + y2) / 2;
+      var color = NODE_TYPES[nodes[conn.from].type].color;
+
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + x1 + ',' + midY + ' ' + x2 + ',' + midY + ' ' + x2 + ',' + y2);
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke-opacity', '0.7');
+      svg.appendChild(path);
+
+      // Arrow head
+      var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      arrow.setAttribute('cx', x2);
+      arrow.setAttribute('cy', y2);
+      arrow.setAttribute('r', '4');
+      arrow.setAttribute('fill', color);
+      svg.appendChild(arrow);
+    });
+  }
+
+  // ── Canvas click to deselect ──
+  document.getElementById('playground-canvas').addEventListener('click', function(e) {
+    if (e.target === this || e.target.tagName === 'svg') {
+      document.querySelectorAll('.canvas-node.selected').forEach(function(n) { n.classList.remove('selected'); });
+      selectedNodeId = null;
+      document.querySelectorAll('.config-section').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById('config-empty').style.display = 'block';
+    }
+  });
+
+  // ── Console ──
+  function logConsole(msg, type) {
+    var output = document.getElementById('console-output');
+    var now = new Date();
+    var ts = now.toLocaleTimeString('en-US', { hour12: false });
+    var cls = type || '';
+    output.innerHTML += '<div><span class="timestamp">[' + ts + ']</span> <span class="' + cls + '">' + msg + '</span></div>';
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function clearConsole() {
+    document.getElementById('console-output').innerHTML = '';
+    logConsole('Console cleared', 'info');
+  }
+
+  // ── Run graph ──
+  function runGraph() {
+    var nodeCount = Object.keys(nodes).length;
+    if (nodeCount === 0) {
+      logConsole('Error: No nodes on canvas', 'error');
+      return;
+    }
+    logConsole('Compiling graph with ' + nodeCount + ' nodes...', 'info');
+    logConsole('Validating connections...', 'info');
+
+    // Simulate streaming output
+    var outputs = [
+      { text: '✓ Graph validated successfully', type: 'success', delay: 500 },
+      { text: 'Initializing LLM node...', type: '', delay: 1000 },
+      { text: 'Sending prompt to model...', type: '', delay: 1500 },
+      { text: 'Receiving response tokens...', type: '', delay: 2000 },
+      { text: '"The solution to x² + 5x + 6 = 0 is..."', type: '', delay: 2500 },
+      { text: '✓ Execution complete (1.2s)', type: 'success', delay: 3500 },
+    ];
+    outputs.forEach(function(o) {
+      setTimeout(function() { logConsole(o.text, o.type); }, o.delay);
+    });
+  }
+
+  // ── WebSocket (attempt connection) ──
+  try {
+    var wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var ws = new WebSocket(wsProtocol + '//' + location.host + '/ws/playground/demo-session/');
+    ws.onopen = function() {
+      document.getElementById('ws-status-dot').className = 'status-dot connected';
+      document.getElementById('ws-status-text').textContent = 'Connected';
+      logConsole('WebSocket connected', 'success');
+    };
+    ws.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      logConsole(data.content || JSON.stringify(data), data.type === 'error' ? 'error' : '');
+    };
+    ws.onclose = function() {
+      document.getElementById('ws-status-dot').className = 'status-dot disconnected';
+      document.getElementById('ws-status-text').textContent = 'Disconnected';
+    };
+  } catch(e) {
+    logConsole('WebSocket not available (standalone mode)', 'info');
+  }
+
+  // ── Demo: pre-populate nodes ──
+  (function() {
+    var id1 = createNode('llm', 120, 60);
+    var id2 = createNode('condition', 120, 230);
+    var id3 = createNode('tool', 350, 60);
+    connections.push({ from: id1, to: id2 });
+    connections.push({ from: id3, to: id2 });
+    drawConnections();
+    logConsole('Demo graph loaded with 3 nodes', 'info');
+  })();
+
+  // Delete node with Delete key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Delete' && selectedNodeId) {
+      var el = document.getElementById(selectedNodeId);
+      if (el) el.remove();
+      connections = connections.filter(function(c) {
+        return c.from !== selectedNodeId && c.to !== selectedNodeId;
+      });
+      delete nodes[selectedNodeId];
+      drawConnections();
+      logConsole('Node deleted: ' + selectedNodeId, 'info');
+      selectedNodeId = null;
+      document.querySelectorAll('.config-section').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById('config-empty').style.display = 'block';
+    }
+  });
+</script>
+{% endblock %}

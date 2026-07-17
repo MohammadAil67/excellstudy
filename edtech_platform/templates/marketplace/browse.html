@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agent Marketplace — ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  .agent-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card);
+    padding: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 0.5s ease both;
+  }
+  .agent-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .featured-card {
+    min-width: 320px; padding: 24px; border-radius: var(--radius-card);
+    background: #fff; position: relative; overflow: hidden;
+    border: 2px solid transparent;
+    background-image: linear-gradient(#fff, #fff), linear-gradient(135deg, var(--primary), var(--accent));
+    background-origin: border-box; background-clip: padding-box, border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .featured-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+  .subject-pill {
+    display: inline-flex; padding: 3px 10px; border-radius: var(--radius-pill);
+    font-size: 0.7rem; font-weight: 600; background: rgba(83,74,183,0.1);
+    color: var(--primary);
+  }
+
+  .star-filled { color: #F59E0B; }
+  .star-empty { color: #D1D5DB; }
+
+  .filter-section { margin-bottom: 20px; }
+  .filter-section h4 {
+    font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 10px; cursor: pointer; display: flex; align-items: center;
+    justify-content: space-between;
+  }
+  .filter-section h4 .chevron { transition: transform 0.2s; }
+  .filter-section.collapsed .filter-options { max-height: 0; overflow: hidden; }
+  .filter-section .filter-options {
+    max-height: 300px; overflow: hidden; transition: max-height 0.3s ease;
+  }
+
+  .filter-checkbox {
+    display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer;
+    font-size: 0.8125rem; color: var(--text-secondary);
+  }
+  .filter-checkbox input[type="checkbox"],
+  .filter-checkbox input[type="radio"] {
+    accent-color: var(--primary); width: 15px; height: 15px;
+  }
+
+  .search-bar {
+    position: relative; margin-bottom: 28px;
+  }
+  .search-bar input {
+    width: 100%; padding: 14px 20px 14px 48px; border-radius: var(--radius-pill);
+    border: 2px solid var(--border); font-size: 0.9375rem;
+    background: #fff; color: var(--text-primary); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-bar input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(83,74,183,0.1);
+  }
+  .search-bar .search-icon {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--text-secondary);
+  }
+
+  .scroll-container {
+    display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  }
+  .scroll-container::-webkit-scrollbar { height: 4px; }
+  .scroll-container::-webkit-scrollbar-track { background: transparent; }
+  .scroll-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .featured-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: var(--radius-pill);
+    background: rgba(186,117,23,0.12); color: var(--highlight);
+    font-size: 0.7rem; font-weight: 700;
+  }
+</style>
+
+<!-- Search Bar -->
+<div class="search-bar" style="animation: fadeInUp 0.4s ease both;">
+  <i data-lucide="search" class="search-icon w-5 h-5"></i>
+  <input type="text" placeholder="Search agents by name, subject, or capability..." id="search-input"
+         onkeyup="filterAgents()">
+</div>
+
+<!-- Featured Agents -->
+<div style="animation: fadeInUp 0.4s ease 0.1s both;" class="mb-8">
+  <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="sparkles" class="w-5 h-5" style="color:var(--highlight);"></i>
+    Featured Agents
+  </h2>
+  <div class="scroll-container">
+    {% for agent in featured_agents %}
+    <div class="featured-card" style="scroll-snap-align:start;">
+      <div class="flex items-center justify-between mb-3">
+        <span class="featured-badge">⭐ Featured</span>
+        <div class="flex gap-0.5"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span></div>
+      </div>
+      <h3 class="text-lg font-bold mb-1">{{ agent.name }}</h3>
+      <p class="text-xs text-[#6B7280] mb-2">@{{ agent.developer.user.username }}</p>
+      <p class="text-sm text-[#6B7280] mb-3">Capabilities: {{ agent.capabilities|join:", " }}</p>
+      <div class="flex gap-1.5 flex-wrap">
+        {% for subject in agent.subject_areas %}
+          <span class="subject-pill">{{ subject }}</span>
+        {% endfor %}
+      </div>
+      <div class="flex items-center justify-between mt-4">
+        <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
+        <a href="{% url 'learner:agent-session' agent.slug %}" class="btn-pill btn-accent" style="padding:6px 16px; font-size:0.8125rem; text-decoration:none;">Start Session</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="w-full text-center p-6 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0]">
+      No featured agents at this time.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Main Content: Filters + Grid -->
+<div class="flex gap-6" style="animation: fadeInUp 0.4s ease 0.2s both;">
+
+  <!-- Filter Sidebar -->
+  <div class="flex-shrink-0" style="width:260px;">
+    <div class="card" style="padding:20px; position:sticky; top:88px;">
+      <h3 class="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-4">Filters</h3>
+
+      <form id="filter-form" hx-post="/marketplace/" hx-target="#agent-grid" hx-swap="innerHTML" hx-trigger="submit">
+
+        <div class="filter-section">
+          <h4 onclick="toggleFilter(this)">Subject Area <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i></h4>
+          <div class="filter-options">
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="math"> Mathematics</label>
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="science"> Science</label>
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="english"> English</label>
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="history"> History</label>
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="cs"> Computer Science</label>
+            <label class="filter-checkbox"><input type="checkbox" name="subject" value="art"> Art</label>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h4 onclick="toggleFilter(this)">Age Group <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i></h4>
+          <div class="filter-options">
+            <label class="filter-checkbox"><input type="checkbox" name="age" value="6-8"> 6–8 years</label>
+            <label class="filter-checkbox"><input type="checkbox" name="age" value="9-12"> 9–12 years</label>
+            <label class="filter-checkbox"><input type="checkbox" name="age" value="13-15"> 13–15 years</label>
+            <label class="filter-checkbox"><input type="checkbox" name="age" value="16-18"> 16–18 years</label>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h4 onclick="toggleFilter(this)">Capabilities <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i></h4>
+          <div class="filter-options">
+            <label class="filter-checkbox"><input type="checkbox" name="cap" value="tutoring"> Tutoring</label>
+            <label class="filter-checkbox"><input type="checkbox" name="cap" value="assessment"> Assessment</label>
+            <label class="filter-checkbox"><input type="checkbox" name="cap" value="practice"> Practice</label>
+            <label class="filter-checkbox"><input type="checkbox" name="cap" value="game"> Game-based</label>
+            <label class="filter-checkbox"><input type="checkbox" name="cap" value="project"> Project-based</label>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h4 onclick="toggleFilter(this)">Pricing <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i></h4>
+          <div class="filter-options">
+            <label class="filter-checkbox"><input type="radio" name="pricing" value="all" checked> All</label>
+            <label class="filter-checkbox"><input type="radio" name="pricing" value="free"> Free</label>
+            <label class="filter-checkbox"><input type="radio" name="pricing" value="paid"> Paid</label>
+            <label class="filter-checkbox"><input type="radio" name="pricing" value="freemium"> Freemium</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-pill btn-primary w-full justify-center mt-2" style="padding:10px 20px;">
+          Apply Filters
+        </button>
+        <button type="reset" onclick="resetFilters()" class="w-full text-center text-xs text-[#6B7280] hover:text-[#534AB7] mt-2 cursor-pointer" style="background:none;border:none;">
+          Clear All
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Agent Grid -->
+  <div class="flex-1">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">All Agents</h2>
+      <span class="text-sm text-[#6B7280]">{{ agents.count|default:0 }} agent{{ agents.count|pluralize }} found</span>
+    </div>
+    <div id="agent-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      {% for agent in agents %}
+      <div class="agent-card" style="animation-delay:0.05s;" data-name="{{ agent.name }}" data-subject="{{ agent.subject_areas|join:',' }}">
+        <h3 class="font-bold text-base mb-0.5">{{ agent.name }}</h3>
+        <p class="text-xs text-[#6B7280] mb-3">@{{ agent.developer.user.username }}</p>
+        <div class="flex gap-1.5 flex-wrap mb-3">
+          {% for subject in agent.subject_areas %}
+            <span class="subject-pill">{{ subject }}</span>
+          {% endfor %}
+        </div>
+        <div class="flex gap-0.5 mb-2"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span></div>
+        <p class="text-xs text-[#6B7280] mb-2">Capabilities: {{ agent.capabilities|join:", " }}</p>
+        <p class="text-sm font-semibold mb-4" style="color:var(--accent);">Free</p>
+        <div class="flex gap-2">
+          <a href="/playground/?agent={{ agent.slug }}" class="btn-pill btn-outline flex-1 justify-center text-center" style="padding:7px 12px; font-size:0.8125rem;">Try in Playground</a>
+          <a href="{% url 'learner:agent-session' agent.slug %}" class="btn-pill btn-accent flex-1 justify-center text-center" style="padding:7px 12px; font-size:0.8125rem; text-decoration:none;">Start Session</a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0] w-full">
+        <i data-lucide="bot-off" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
+        No registered agents found in the marketplace.
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  lucide.createIcons();
+
+  function toggleFilter(header) {
+    var section = header.parentElement;
+    section.classList.toggle('collapsed');
+    var chevron = header.querySelector('.chevron');
+    if (chevron) chevron.style.transform = section.classList.contains('collapsed') ? 'rotate(-90deg)' : '';
+  }
+
+  function resetFilters() {
+    document.getElementById('filter-form').reset();
+  }
+
+  function filterAgents() {
+    var query = document.getElementById('search-input').value.toLowerCase();
+    var cards = document.querySelectorAll('.agent-card');
+    cards.forEach(function(card) {
+      var name = (card.getAttribute('data-name') || '').toLowerCase();
+      var subject = (card.getAttribute('data-subject') || '').toLowerCase();
+      var text = card.textContent.toLowerCase();
+      card.style.display = (text.indexOf(query) !== -1) ? '' : 'none';
+    });
+  }
+</script>
+{% endblock %}

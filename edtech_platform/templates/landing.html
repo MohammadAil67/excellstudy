@@ -1,0 +1,753 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExcellStudy — AI-Powered Learning Platform</title>
+  <meta name="description" content="ExcellStudy connects learners with AI teaching agents that adapt to every student's pace, style, and skill level.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #534AB7;
+      --primary-light: #6B63C7;
+      --primary-dark: #3D3590;
+      --accent: #1D9E75;
+      --accent-light: #25C290;
+      --highlight: #BA7517;
+      --highlight-light: #D4891E;
+      --error: #E05252;
+      --bg: #F8F7FF;
+      --bg-card: #FFFFFF;
+      --text-primary: #1A1A2E;
+      --text-secondary: #6B7280;
+      --border: #E5E4F0;
+      --shadow: 0 2px 12px rgba(83,74,183,0.08);
+      --shadow-hover: 0 8px 24px rgba(83,74,183,0.15);
+      --radius-card: 12px;
+      --radius-input: 8px;
+      --radius-pill: 20px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes slide-in-left {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slide-in-right {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes count-up {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes orbit {
+      from { transform: rotate(0deg) translateX(140px) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(140px) rotate(-360deg); }
+    }
+
+    .anim-fade-up { animation: fadeInUp 0.7s ease both; }
+    .anim-delay-1 { animation-delay: 0.1s; }
+    .anim-delay-2 { animation-delay: 0.2s; }
+    .anim-delay-3 { animation-delay: 0.3s; }
+    .anim-delay-4 { animation-delay: 0.4s; }
+    .anim-delay-5 { animation-delay: 0.5s; }
+    .anim-delay-6 { animation-delay: 0.6s; }
+
+    /* Intersection Observer reveal */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #F8F7FF 0%, #EDE9FF 40%, #F0FFF8 100%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(83,74,183,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .hero-glow {
+      position: absolute; width: 600px; height: 600px; border-radius: 50%;
+      filter: blur(120px); opacity: 0.35; pointer-events: none;
+    }
+    .hero-glow-1 { top: -100px; right: -100px; background: var(--primary); }
+    .hero-glow-2 { bottom: -200px; left: -100px; background: var(--accent); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: var(--radius-pill);
+      font-size: 0.9375rem; font-weight: 600; cursor: pointer;
+      transition: all 0.3s ease; text-decoration: none; border: none;
+    }
+    .btn-primary {
+      background: var(--primary); color: #fff;
+      box-shadow: 0 4px 20px rgba(83,74,183,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--primary-light);
+      box-shadow: 0 8px 30px rgba(83,74,183,0.4);
+      transform: translateY(-2px);
+    }
+    .btn-accent {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 20px rgba(29,158,117,0.3);
+    }
+    .btn-accent:hover {
+      background: var(--accent-light);
+      box-shadow: 0 8px 30px rgba(29,158,117,0.4);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent; color: var(--primary);
+      border: 2px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      background: rgba(83,74,183,0.04);
+      transform: translateY(-2px);
+    }
+
+    /* ── Feature Cards ── */
+    .feature-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 32px;
+      transition: all 0.35s ease; position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 4px; background: var(--primary);
+      transform: scaleX(0); transition: transform 0.35s ease;
+      transform-origin: left;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    /* ── Step Cards ── */
+    .step-card {
+      text-align: center; position: relative;
+    }
+    .step-number {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; font-weight: 800; margin: 0 auto 16px;
+      position: relative; z-index: 2;
+    }
+    .step-connector {
+      position: absolute; top: 24px; left: calc(50% + 28px);
+      width: calc(100% - 56px); height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0.3;
+    }
+
+    /* ── Agent Showcase ── */
+    .agent-orbit-wrap {
+      position: relative; width: 360px; height: 360px;
+      margin: 0 auto;
+    }
+    .orbit-center {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 40px rgba(83,74,183,0.3);
+      z-index: 5;
+    }
+    .orbit-ring {
+      position: absolute; top: 50%; left: 50%;
+      width: 280px; height: 280px;
+      margin: -140px 0 0 -140px;
+      border-radius: 50%;
+      border: 1px dashed rgba(83,74,183,0.15);
+    }
+    .orbit-item {
+      position: absolute; top: 50%; left: 50%;
+      margin: -24px 0 0 -24px;
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 3;
+    }
+
+    /* ── Stats ── */
+    .stat-number {
+      font-size: 2.75rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1;
+    }
+
+    /* ── Navbar ── */
+    .landing-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      transition: all 0.3s ease;
+    }
+    .landing-nav.scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: #1A1A2E; color: #9CA3AF; padding: 60px 0 30px;
+    }
+    .footer a { color: #9CA3AF; text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: #fff; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero-content h1 { font-size: 2.5rem !important; }
+      .step-connector { display: none; }
+      .agent-orbit-wrap { width: 280px; height: 280px; }
+      .orbit-ring { width: 220px; height: 220px; margin: -110px 0 0 -110px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════ NAVBAR ═══════ -->
+  <nav class="landing-nav" id="landing-nav">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between" style="height:72px;">
+      <a href="/" class="flex items-center gap-2 select-none" style="text-decoration:none;">
+        <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+          <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
+          <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
+          <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
+          <line x1="22" y1="11" x2="22" y2="20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M20 20 L22 22 L24 20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="text-xl tracking-tight">
+          <span class="font-bold" style="color:#534AB7;">Excell</span><span class="font-bold" style="color:#1D9E75;">Study</span>
+        </span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-medium text-gray-600 hover:text-[#534AB7] transition-colors">Features</a>
+        <a href="#how-it-works" class="text-sm font-medium text-gray-600 hover:text-[#534AB7] transition-colors">How It Works</a>
+        <a href="#agents" class="text-sm font-medium text-gray-600 hover:text-[#534AB7] transition-colors">Agents</a>
+        <a href="#developers" class="text-sm font-medium text-gray-600 hover:text-[#534AB7] transition-colors">Developers</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="{% url 'login' %}" class="btn btn-outline" style="padding:10px 24px; font-size:0.8125rem;">Log In</a>
+        <a href="{% url 'signup' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ═══════ HERO SECTION ═══════ -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10" style="padding-top:100px;">
+
+      <!-- Left: Text -->
+      <div>
+        <div class="anim-fade-up anim-delay-1 inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:rgba(83,74,183,0.08); border:1px solid rgba(83,74,183,0.15);">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+          <span class="text-sm font-semibold" style="color:var(--primary);">Now in Open Beta</span>
+        </div>
+
+        <h1 class="anim-fade-up anim-delay-2" style="font-size:3.5rem; font-weight:800; line-height:1.1; letter-spacing:-0.03em; margin-bottom:24px;">
+          Learning that<br>
+          <span style="background:linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">adapts to you</span>
+        </h1>
+
+        <p class="anim-fade-up anim-delay-3 text-lg mb-8" style="color:var(--text-secondary); max-width:480px; line-height:1.7;">
+          ExcellStudy connects learners with AI teaching agents that adapt to every student's pace, style, and skill level. Built by educators, powered by the latest AI.
+        </p>
+
+        <div class="anim-fade-up anim-delay-4 flex flex-wrap gap-4 mb-10">
+          <a href="{% url 'signup' %}" class="btn btn-primary">
+            <i data-lucide="sparkles" class="w-5 h-5"></i> Start Learning Free
+          </a>
+          <a href="/developer/" class="btn btn-outline">
+            <i data-lucide="code-2" class="w-5 h-5"></i> Build an Agent
+          </a>
+        </div>
+
+        <div class="anim-fade-up anim-delay-5 flex items-center gap-6">
+          <div class="flex -space-x-2">
+            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white" style="background:#534AB7;">A</div>
+            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white" style="background:#1D9E75;">M</div>
+            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white" style="background:#BA7517;">S</div>
+            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white" style="background:#E07B5E;">K</div>
+          </div>
+          <div>
+            <p class="text-sm font-semibold">2,400+ learners</p>
+            <p class="text-xs" style="color:var(--text-secondary);">already using ExcellStudy</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Visual -->
+      <div class="anim-fade-up anim-delay-3 hidden lg:block">
+        <div class="agent-orbit-wrap" style="animation: float 6s ease-in-out infinite;">
+          <!-- Center logo -->
+          <div class="orbit-center">
+            <svg width="44" height="44" viewBox="0 0 28 28" fill="none">
+              <polygon points="14,2 26,10 14,14 2,10" fill="#fff" opacity="0.9"/>
+              <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="rgba(255,255,255,0.6)"/>
+              <line x1="14" y1="14" x2="14" y2="24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="14" cy="24" r="1.8" fill="#fff"/>
+            </svg>
+          </div>
+          <!-- Orbit ring -->
+          <div class="orbit-ring"></div>
+          <!-- Orbiting agents -->
+          <div class="orbit-item" style="background:#534AB7; animation: orbit 12s linear infinite;">
+            <i data-lucide="brain" class="w-5 h-5"></i>
+          </div>
+          <div class="orbit-item" style="background:#1D9E75; animation: orbit 12s linear infinite 3s;">
+            <i data-lucide="flask-conical" class="w-5 h-5"></i>
+          </div>
+          <div class="orbit-item" style="background:#BA7517; animation: orbit 12s linear infinite 6s;">
+            <i data-lucide="code" class="w-5 h-5"></i>
+          </div>
+          <div class="orbit-item" style="background:#E07B5E; animation: orbit 12s linear infinite 9s;">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 anim-fade-up anim-delay-6 flex flex-col items-center gap-2">
+      <span class="text-xs" style="color:var(--text-secondary);">Scroll to explore</span>
+      <div style="width:24px;height:40px;border:2px solid var(--border);border-radius:12px;display:flex;justify-content:center;padding-top:8px;">
+        <div style="width:4px;height:8px;border-radius:2px;background:var(--primary);animation:float 1.5s ease-in-out infinite;"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ STATS BAR ═══════ -->
+  <section style="background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div class="reveal">
+        <div class="stat-number">2.4K</div>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Active Learners</p>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <div class="stat-number">45+</div>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">AI Agents</p>
+      </div>
+      <div class="reveal" style="transition-delay:0.2s;">
+        <div class="stat-number">12</div>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Subject Areas</p>
+      </div>
+      <div class="reveal" style="transition-delay:0.3s;">
+        <div class="stat-number">98%</div>
+        <p class="text-sm mt-2" style="color:var(--text-secondary);">Satisfaction Rate</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ FEATURES ═══════ -->
+  <section id="features" class="py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(29,158,117,0.1); color:var(--accent);">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i> Platform Features
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Everything you need to <span style="color:var(--primary);">excel</span></h2>
+        <p class="text-base mx-auto" style="color:var(--text-secondary); max-width:560px;">
+          A comprehensive ecosystem where AI agents, learners, and developers come together to create personalized learning experiences.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <div class="feature-card reveal">
+          <div class="feature-icon" style="background:rgba(83,74,183,0.1);">
+            <i data-lucide="brain" class="w-7 h-7" style="color:var(--primary);"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Adaptive AI Tutoring</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            AI agents adjust difficulty, pace, and teaching style in real-time based on each learner's profile.
+          </p>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.1s;">
+          <div class="feature-icon" style="background:rgba(29,158,117,0.1);">
+            <i data-lucide="store" class="w-7 h-7" style="color:var(--accent);"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Agent Marketplace</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            Browse and add specialized AI agents for every subject — from math to creative writing.
+          </p>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.2s;">
+          <div class="feature-icon" style="background:rgba(186,117,23,0.1);">
+            <i data-lucide="code-2" class="w-7 h-7" style="color:var(--highlight);"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Visual Playground</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            Build and test agent workflows with a drag-and-drop canvas — no coding required.
+          </p>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.3s;">
+          <div class="feature-icon" style="background:rgba(224,82,82,0.1);">
+            <i data-lucide="shield-check" class="w-7 h-7" style="color:var(--error);"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Safety Pipeline</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            Every agent passes schema validation, security scans, and smoke tests before going live.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ HOW IT WORKS ═══════ -->
+  <section id="how-it-works" class="py-24" style="background:#fff;">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(83,74,183,0.1); color:var(--primary);">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i> How It Works
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Start learning in <span style="color:var(--accent);">3 steps</span></h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="step-card reveal">
+          <div class="step-connector hidden md:block"></div>
+          <div class="step-number" style="background:rgba(83,74,183,0.1); color:var(--primary);">1</div>
+          <i data-lucide="user-plus" class="w-10 h-10 mx-auto mb-4" style="color:var(--primary);"></i>
+          <h3 class="text-lg font-bold mb-2">Create Your Profile</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            Tell us your age, grade, subjects, and how you like to learn. We'll build your personalized learning map.
+          </p>
+        </div>
+
+        <div class="step-card reveal" style="transition-delay:0.15s;">
+          <div class="step-connector hidden md:block"></div>
+          <div class="step-number" style="background:rgba(29,158,117,0.1); color:var(--accent);">2</div>
+          <i data-lucide="bot" class="w-10 h-10 mx-auto mb-4" style="color:var(--accent);"></i>
+          <h3 class="text-lg font-bold mb-2">Meet Your Agents</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            We match you with AI agents that specialize in your subjects and adapt to your learning style.
+          </p>
+        </div>
+
+        <div class="step-card reveal" style="transition-delay:0.3s;">
+          <div class="step-number" style="background:rgba(186,117,23,0.1); color:var(--highlight);">3</div>
+          <i data-lucide="trending-up" class="w-10 h-10 mx-auto mb-4" style="color:var(--highlight);"></i>
+          <h3 class="text-lg font-bold mb-2">Learn & Grow</h3>
+          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+            Work through modules, get real-time feedback, track your progress, and watch your skills level up.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ AGENT SHOWCASE ═══════ -->
+  <section id="agents" class="py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(186,117,23,0.1); color:var(--highlight);">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Featured Agents
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Meet your AI <span style="color:var(--primary);">teaching team</span></h2>
+        <p class="text-base mx-auto" style="color:var(--text-secondary); max-width:480px;">
+          Specialized agents built by top educators and developers, ready to help you excel.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="feature-card reveal" style="border-left:4px solid var(--primary);">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(83,74,183,0.1);">
+              <i data-lucide="calculator" class="w-6 h-6" style="color:var(--primary);"></i>
+            </div>
+            <div>
+              <h3 class="font-bold">MathMentor AI</h3>
+              <p class="text-xs" style="color:var(--text-secondary);">@edu-labs · v2.1.0</p>
+            </div>
+          </div>
+          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Step-by-step problem solving with adaptive difficulty. From basic arithmetic to calculus.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★★</div>
+            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
+          </div>
+        </div>
+
+        <div class="feature-card reveal" style="border-left:4px solid var(--accent); transition-delay:0.1s;">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(29,158,117,0.1);">
+              <i data-lucide="flask-conical" class="w-6 h-6" style="color:var(--accent);"></i>
+            </div>
+            <div>
+              <h3 class="font-bold">ScienceExplorer</h3>
+              <p class="text-xs" style="color:var(--text-secondary);">@sci-team · v1.3.0</p>
+            </div>
+          </div>
+          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Interactive experiments, visual concept maps, and hands-on learning for K-12 science.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★☆</div>
+            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
+          </div>
+        </div>
+
+        <div class="feature-card reveal" style="border-left:4px solid var(--highlight); transition-delay:0.2s;">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(186,117,23,0.1);">
+              <i data-lucide="code" class="w-6 h-6" style="color:var(--highlight);"></i>
+            </div>
+            <div>
+              <h3 class="font-bold">CodeMaster Pro</h3>
+              <p class="text-xs" style="color:var(--text-secondary);">@dev-edu · v1.0.0</p>
+            </div>
+          </div>
+          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Learn Python, JavaScript, and more with real-time feedback, challenges, and project-based paths.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★★</div>
+            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center mt-10 reveal">
+        <a href="/marketplace/" class="btn btn-outline">
+          <i data-lucide="store" class="w-5 h-5"></i> Browse All Agents
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ DEVELOPER CTA ═══════ -->
+  <section id="developers" class="py-24" style="background: linear-gradient(135deg, #1A1A2E 0%, #2D2B55 100%);">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      <div class="reveal">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-6" style="background:rgba(83,74,183,0.2); color:var(--primary-light);">
+          <i data-lucide="terminal" class="w-3.5 h-3.5"></i> For Developers
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4" style="letter-spacing:-0.02em;">
+          Build agents that<br>teach millions
+        </h2>
+        <p class="text-base mb-8" style="color:#9CA3AF; line-height:1.7; max-width:440px;">
+          Deploy your AI teaching agents on ExcellStudy's platform. Get API access, Kubernetes hosting, and reach thousands of learners through our marketplace.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="/developer/" class="btn btn-accent">
+            <i data-lucide="rocket" class="w-5 h-5"></i> Developer Portal
+          </a>
+          <a href="/playground/" class="btn" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15);">
+            <i data-lucide="code-2" class="w-5 h-5"></i> Try the Playground
+          </a>
+        </div>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.2s;">
+        <div style="background:#0D0D1A; border-radius:var(--radius-card); padding:24px; border:1px solid rgba(255,255,255,0.06); font-family:'JetBrains Mono',monospace; font-size:0.8125rem; line-height:1.8; color:#e2e8f0; overflow-x:auto;">
+          <div class="flex items-center gap-2 mb-4 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="width:12px;height:12px;border-radius:50%;background:#E05252;"></div>
+            <div style="width:12px;height:12px;border-radius:50%;background:#BA7517;"></div>
+            <div style="width:12px;height:12px;border-radius:50%;background:#1D9E75;"></div>
+            <span class="ml-3" style="color:#6B7280; font-size:0.75rem;">terminal</span>
+          </div>
+<pre style="margin:0;"><span style="color:#6B7280;"># Register your agent</span>
+<span style="color:#1D9E75;">$</span> curl -X POST /api/v1/agents/register \
+    -H <span style="color:#BA7517;">"Authorization: Bearer $API_KEY"</span> \
+    -d @manifest.json
+
+<span style="color:#6B7280;"># Response</span>
+{
+  <span style="color:#8B5CF6;">"status"</span>: <span style="color:#1D9E75;">"accepted"</span>,
+  <span style="color:#8B5CF6;">"pipeline_id"</span>: <span style="color:#1D9E75;">"job-a7f3c2"</span>,
+  <span style="color:#8B5CF6;">"message"</span>: <span style="color:#1D9E75;">"Running safety checks..."</span>
+}</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════ FINAL CTA ═══════ -->
+  <section class="py-24 text-center">
+    <div class="max-w-3xl mx-auto px-6 reveal">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">
+        Ready to <span style="background:linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">transform</span> your learning?
+      </h2>
+      <p class="text-base mb-8" style="color:var(--text-secondary); max-width:480px; margin:0 auto;">
+        Join thousands of learners and developers building the future of education.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="{% url 'signup' %}" class="btn btn-primary" style="padding:16px 40px; font-size:1rem;">
+          <i data-lucide="sparkles" class="w-5 h-5"></i> Get Started Free
+        </a>
+        <a href="/marketplace/" class="btn btn-outline" style="padding:16px 40px; font-size:1rem;">
+          Explore Marketplace
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="footer">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+              <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
+              <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
+              <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
+            </svg>
+            <span class="text-white font-bold">ExcellStudy</span>
+          </div>
+          <p class="text-sm" style="line-height:1.7;">AI-powered personalized learning for every student.</p>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-semibold mb-4">Platform</h4>
+          <div class="space-y-2">
+            <a href="/learner/" class="block text-sm">Dashboard</a>
+            <a href="/marketplace/" class="block text-sm">Marketplace</a>
+            <a href="/playground/" class="block text-sm">Playground</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-semibold mb-4">Developers</h4>
+          <div class="space-y-2">
+            <a href="/developer/" class="block text-sm">Portal</a>
+            <a href="#" class="block text-sm">API Docs</a>
+            <a href="#" class="block text-sm">SDK</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-semibold mb-4">Company</h4>
+          <div class="space-y-2">
+            <a href="#" class="block text-sm">About</a>
+            <a href="#" class="block text-sm">Blog</a>
+            <a href="#" class="block text-sm">Contact</a>
+          </div>
+        </div>
+      </div>
+      <div class="pt-6" style="border-top:1px solid rgba(255,255,255,0.08);">
+        <p class="text-xs text-center">&copy; 2026 ExcellStudy. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ═══════ SCRIPTS ═══════ -->
+  <script>
+    // Init Lucide icons
+    lucide.createIcons();
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      var nav = document.getElementById('landing-nav');
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Intersection Observer for reveal animations
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      observer.observe(el);
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

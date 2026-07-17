@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — ExcellStudy</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #534AB7;
+      --primary-light: #6B63C7;
+      --primary-dark: #3D3590;
+      --accent: #1D9E75;
+      --accent-light: #25C290;
+      --bg: #F8F7FF;
+      --bg-card: #FFFFFF;
+      --text-primary: #1A1A2E;
+      --text-secondary: #6B7280;
+      --border: #E5E4F0;
+      --shadow: 0 4px 20px rgba(83, 74, 183, 0.08);
+      --radius-card: 12px;
+      --radius-input: 8px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .signup-container {
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+    }
+
+    /* Role selection cards */
+    .role-card {
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .role-card.active {
+      border-color: var(--primary);
+      background: rgba(83, 74, 183, 0.04);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+  <!-- Background decorative glows -->
+  <div class="absolute w-[400px] h-[400px] rounded-full filter blur-[100px] opacity-20 pointer-events-none -top-20 -left-20" style="background:var(--primary);"></div>
+  <div class="absolute w-[400px] h-[400px] rounded-full filter blur-[100px] opacity-20 pointer-events-none -bottom-20 -right-20" style="background:var(--accent);"></div>
+
+  <div class="signup-container w-full max-w-[460px] bg-white rounded-2xl border border-[#E5E4F0] p-8 relative z-10" style="box-shadow: var(--shadow);">
+    
+    <!-- Header Logo -->
+    <a href="/" class="flex items-center justify-center gap-2 select-none mb-6" style="text-decoration:none;">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
+        <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
+        <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
+      </svg>
+      <span class="text-xl tracking-tight">
+        <span class="font-bold" style="color:#534AB7;">Excell</span><span class="font-bold" style="color:#1D9E75;">Study</span>
+      </span>
+    </a>
+
+    <h2 class="text-xl font-bold text-center mb-1">Create your account</h2>
+    <p class="text-xs text-center text-gray-500 mb-6">Join thousands of learners and developers today</p>
+
+    <!-- Django Messages -->
+    {% if messages %}
+      <div class="mb-4 space-y-2">
+        {% for message in messages %}
+          <div class="p-3 rounded-lg text-xs font-semibold flex items-center gap-2 {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% else %}bg-green-50 text-green-600 border border-green-100{% endif %}">
+            {% if message.tags == 'error' %}
+              <i data-lucide="alert-circle" class="w-4 h-4"></i>
+            {% else %}
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'signup' %}" class="space-y-4">
+      {% csrf_token %}
+      
+      <!-- Role choice -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">I want to join as a</label>
+        <div class="grid grid-cols-2 gap-3">
+          <div onclick="selectRole('learner')" id="role-card-learner" class="role-card active p-4 rounded-xl border-2 flex flex-col items-center justify-center text-center">
+            <i data-lucide="graduation-cap" class="w-6 h-6 mb-1.5" style="color:var(--primary);"></i>
+            <span class="text-sm font-bold">Learner</span>
+          </div>
+          <div onclick="selectRole('developer')" id="role-card-developer" class="role-card p-4 rounded-xl border-2 flex flex-col items-center justify-center text-center">
+            <i data-lucide="code" class="w-6 h-6 mb-1.5" style="color:var(--accent);"></i>
+            <span class="text-sm font-bold">Developer</span>
+          </div>
+        </div>
+        <input type="hidden" name="role" id="role-input" value="learner">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Username</label>
+        <div class="relative">
+          <input type="text" name="username" required class="input-field pl-10" placeholder="yourusername">
+          <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Email Address</label>
+        <div class="relative">
+          <input type="email" name="email" required class="input-field pl-10" placeholder="you@example.com">
+          <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Password</label>
+          <div class="relative">
+            <input type="password" name="password" required class="input-field pl-10" placeholder="••••••••">
+            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Confirm</label>
+          <div class="relative">
+            <input type="password" name="password_confirm" required class="input-field pl-10" placeholder="••••••••">
+            <i data-lucide="lock-keyhole" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full py-3 rounded-lg text-sm font-bold text-white transition-all select-none hover:shadow-lg mt-2" style="background:var(--primary); box-shadow: 0 4px 14px rgba(83, 74, 183, 0.2);">
+        Create Account
+      </button>
+    </form>
+
+    <div class="mt-6 pt-6 border-t border-[#E5E4F0] text-center text-xs text-gray-500">
+      Already have an account? 
+      <a href="{% url 'login' %}" class="font-semibold transition-colors hover:underline" style="color:var(--primary);">Log In</a>
+    </div>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function selectRole(role) {
+      document.getElementById('role-input').value = role;
+      document.querySelectorAll('.role-card').forEach(function(c) {
+        c.classList.remove('active');
+      });
+      document.getElementById('role-card-' + role).classList.add('active');
+    }
+  </script>
+</body>
+</html>

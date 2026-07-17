@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pipeline Status — ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes drawCheck {
+    from { stroke-dashoffset: 20; }
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(83,74,183,0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(83,74,183,0); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  @keyframes bannerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
+  .pipeline-container { max-width: 780px; margin: 0 auto; }
+
+  .step-card { animation: fadeInUp 0.5s ease both; }
+  .step-card:nth-child(1) { animation-delay: 0.1s; }
+  .step-card:nth-child(2) { animation-delay: 0.25s; }
+  .step-card:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Stepper line */
+  .stepper { position: relative; padding-left: 40px; }
+  .stepper::before {
+    content: ''; position: absolute; left: 18px; top: 24px; bottom: 24px;
+    width: 2px; background: var(--border);
+  }
+
+  .step-indicator {
+    position: absolute; left: -40px; top: 0;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--border); background: #fff;
+    transition: all 0.3s ease; z-index: 2;
+  }
+
+  .step-indicator.passed {
+    background: var(--accent); border-color: var(--accent);
+    animation: none;
+  }
+  .step-indicator.running {
+    border-color: var(--primary); border-top-color: transparent;
+    animation: spin 1s linear infinite, pulseGlow 2s ease infinite;
+  }
+  .step-indicator.failed {
+    background: var(--error); border-color: var(--error);
+    animation: shake 0.4s ease;
+  }
+  .step-indicator.pending {
+    background: #f3f4f6; border-color: #d1d5db;
+  }
+
+  .step-body {
+    padding: 20px; border-radius: var(--radius-card);
+    border: 1px solid var(--border); background: #fff;
+    margin-bottom: 20px; position: relative;
+    transition: box-shadow 0.2s ease;
+  }
+  .step-body:hover { box-shadow: var(--shadow); }
+
+  .log-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease;
+    background: #1A1A2E; border-radius: 8px; margin-top: 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    color: #e2e8f0; line-height: 1.8;
+  }
+  .log-panel.open {
+    max-height: 300px; padding: 14px 16px; margin-top: 12px;
+    overflow-y: auto;
+  }
+
+  .status-banner {
+    border-radius: var(--radius-card); padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 24px; animation: fadeInUp 0.5s ease 0.6s both;
+  }
+  .banner-running {
+    background: linear-gradient(135deg, rgba(83,74,183,0.1), rgba(83,74,183,0.05));
+    border: 1px solid rgba(83,74,183,0.2);
+    animation: bannerPulse 2s ease infinite;
+  }
+  .banner-success {
+    background: linear-gradient(135deg, rgba(29,158,117,0.12), rgba(29,158,117,0.04));
+    border: 1px solid rgba(29,158,117,0.25);
+  }
+  .banner-failure {
+    background: linear-gradient(135deg, rgba(224,82,82,0.12), rgba(224,82,82,0.04));
+    border: 1px solid rgba(224,82,82,0.25);
+  }
+</style>
+
+<div class="pipeline-container">
+
+  <!-- Header -->
+  <div style="animation: fadeInUp 0.4s ease both;" class="mb-8">
+    <a href="/developer/" class="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#534AB7] mb-4 transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Portal
+    </a>
+    <div class="flex items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold">MathMentor AI <span class="text-[#6B7280] font-normal text-lg">v2.1.0</span></h1>
+        <div class="flex items-center gap-3 mt-1.5">
+          <span class="text-xs font-mono text-[#9CA3AF]" id="pipeline-job-id" data-job-id="{{ job_id|default:'job-abc123' }}">Job: {{ job_id|default:'job-abc123' }}</span>
+          <span class="text-xs text-[#9CA3AF]">•</span>
+          <span class="text-xs text-[#9CA3AF]">Started: July 6, 2026 5:30 PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper">
+
+    <!-- Step 1: Schema Validation -->
+    <div class="step-card" style="position:relative;">
+      <div class="step-indicator passed" id="indicator-schema_check">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8.5L6.5 12L13 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="stroke-dasharray:20; stroke-dashoffset:0; animation: drawCheck 0.4s ease 0.3s both;"/>
+        </svg>
+      </div>
+      <div class="step-body" id="step-schema_check">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-[#1A1A2E]">Schema Validation</h3>
+            <p class="text-xs text-[#9CA3AF] mt-0.5">Validates manifest.json against platform schema</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge" style="background:rgba(29,158,117,0.1); color:var(--accent); font-size:0.7rem;">3.2s</span>
+            <span class="text-xs text-[#9CA3AF]">5:30:04 PM</span>
+          </div>
+        </div>
+        <button onclick="toggleLog('schema_check')" class="mt-2 text-xs text-[#534AB7] hover:underline flex items-center gap-1 cursor-pointer">
+          <i data-lucide="terminal" class="w-3 h-3"></i> View logs
+        </button>
+        <div class="log-panel" id="log-schema_check">
+<span style="color:#6B7280;">[17:30:01]</span> Validating manifest.json...
+<span style="color:#6B7280;">[17:30:02]</span> Checking required fields: name, version, description ✓
+<span style="color:#6B7280;">[17:30:02]</span> Checking subject_areas array... ✓
+<span style="color:#6B7280;">[17:30:03]</span> Checking capabilities array... ✓
+<span style="color:#6B7280;">[17:30:03]</span> Checking entry_point format... ✓
+<span style="color:#1D9E75;">[17:30:04]</span> <span style="color:#1D9E75;">✓ Schema validation passed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Security Scan -->
+    <div class="step-card" style="position:relative;">
+      <div class="step-indicator running" id="indicator-security_scan">
+        <!-- spinner shown via CSS animation on the border -->
+      </div>
+      <div class="step-body" id="step-security_scan">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-[#1A1A2E]">Security Scan</h3>
+            <p class="text-xs text-[#9CA3AF] mt-0.5">Scans container image for CVEs and vulnerabilities</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge" id="duration-security_scan" style="background:rgba(83,74,183,0.1); color:var(--primary); font-size:0.7rem;">Running...</span>
+          </div>
+        </div>
+        <button onclick="toggleLog('security_scan')" class="mt-2 text-xs text-[#534AB7] hover:underline flex items-center gap-1 cursor-pointer">
+          <i data-lucide="terminal" class="w-3 h-3"></i> View logs
+        </button>
+        <div class="log-panel" id="log-security_scan">
+<span style="color:#6B7280;">[17:30:05]</span> Pulling image for scanning...
+<span style="color:#6B7280;">[17:30:08]</span> Scanning for known CVEs...
+<span style="color:#BA7517;">[17:30:12]</span> Checking dependency tree...
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Smoke Test -->
+    <div class="step-card" style="position:relative;">
+      <div class="step-indicator pending" id="indicator-smoke_test"></div>
+      <div class="step-body" id="step-smoke_test" style="opacity:0.6;">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-[#1A1A2E]">Smoke Test</h3>
+            <p class="text-xs text-[#9CA3AF] mt-0.5">Deploys agent and runs basic interaction tests</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge" id="duration-smoke_test" style="background:var(--bg); color:var(--text-secondary); font-size:0.7rem;">Pending</span>
+          </div>
+        </div>
+        <button onclick="toggleLog('smoke_test')" class="mt-2 text-xs text-[#9CA3AF] flex items-center gap-1 cursor-pointer" disabled>
+          <i data-lucide="terminal" class="w-3 h-3"></i> View logs
+        </button>
+        <div class="log-panel" id="log-smoke_test"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status Banners -->
+  <div id="banner-running" class="status-banner banner-running">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full" style="background:var(--primary); animation: bannerPulse 1.5s ease infinite;"></div>
+      <span class="font-semibold" style="color:var(--primary);">Pipeline in progress...</span>
+    </div>
+    <span class="text-xs text-[#6B7280]">Estimated time: ~30s remaining</span>
+  </div>
+
+  <div id="banner-success" class="status-banner banner-success" style="display:none;">
+    <div class="flex items-center gap-3">
+      <i data-lucide="check-circle" class="w-5 h-5" style="color:var(--accent);"></i>
+      <span class="font-semibold" style="color:var(--accent);">Agent passed all checks! 🎉</span>
+    </div>
+    <a href="/marketplace/" class="btn-pill btn-accent" style="padding:8px 20px; font-size:0.8125rem;">
+      View in Marketplace
+    </a>
+  </div>
+
+  <div id="banner-failure" class="status-banner banner-failure" style="display:none;">
+    <div class="flex items-center gap-3">
+      <i data-lucide="x-circle" class="w-5 h-5" style="color:var(--error);"></i>
+      <div>
+        <span class="font-semibold" style="color:var(--error);">Pipeline failed</span>
+        <span class="text-sm text-[#6B7280] ml-2" id="failed-step-name"></span>
+      </div>
+    </div>
+    <button class="btn-pill" style="background:var(--error);color:#fff;padding:8px 20px;font-size:0.8125rem;">
+      Fix and Resubmit
+    </button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pipeline.js' %}"></script>
+<script>
+  lucide.createIcons();
+
+  function toggleLog(stepId) {
+    var panel = document.getElementById('log-' + stepId);
+    panel.classList.toggle('open');
+  }
+</script>
+{% endblock %}

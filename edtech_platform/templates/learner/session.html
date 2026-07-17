@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Session - {{ agent.name }} - ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  .session-container { max-width: 800px; margin: 0 auto; animation: fadeIn 0.4s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .agent-header {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(83,74,183,0.08);
+  }
+
+  .input-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(83,74,183,0.08);
+  }
+
+  .response-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 4px 16px rgba(83,74,183,0.06);
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  /* Form controls styled premium */
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(83,74,183,0.1);
+  }
+
+  /* Skeleton Loading State */
+  .loading-skeleton {
+    display: none;
+    margin-top: 24px;
+  }
+  .skeleton-block {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+  @keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Error Banner */
+  .error-banner {
+    display: none;
+    padding: 16px 20px;
+    background: rgba(224,82,82,0.06);
+    border: 1px solid rgba(224,82,82,0.15);
+    border-radius: var(--radius-card);
+    color: var(--error);
+    margin-top: 24px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+</style>
+
+<div class="session-container">
+  
+  <!-- Back navigation -->
+  <div class="mb-4">
+    <a href="{% url 'learner:dashboard' %}" class="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#534AB7] transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Agent Header Card -->
+  <div class="agent-header flex justify-between items-center">
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="text-xl font-bold text-[#1A1A2E]">{{ agent.name }}</h1>
+        <span class="bg-[#534AB7]/10 text-[#534AB7] text-xs font-semibold rounded-full px-2.5 py-0.5">v{{ agent.version }}</span>
+      </div>
+      <p class="text-sm text-[#6B7280] mt-0.5">by @{{ agent.developer.user.username }}</p>
+      
+      <!-- Subject chips -->
+      <div class="flex flex-wrap gap-1.5 mt-3">
+        {% for area in agent.subject_areas %}
+          <span class="bg-[#534AB7]/[0.08] text-[#534AB7] rounded-full px-3 py-1 text-xs font-medium">{{ area }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <div class="flex flex-col items-end gap-1.5">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#1D9E75]"></span>
+        <span class="text-sm text-[#1D9E75] font-medium">Ready</span>
+      </div>
+      <span class="text-xs text-[#9CA3AF]">Format: {{ agent.input_type }}</span>
+    </div>
+  </div>
+
+  <!-- Input Form Container -->
+  <div class="input-card">
+    <h2 class="text-sm font-semibold text-[#1A1A2E] uppercase tracking-wider mb-4">Your Question / Input</h2>
+    <!-- Dynamic include based on agent's input_type -->
+    {% if input_type == 'text_with_units' %}
+      {% include 'learner/inputs/text_with_units.html' %}
+    {% elif input_type == 'number' %}
+      {% include 'learner/inputs/number.html' %}
+    {% elif input_type == 'image_upload' %}
+      {% include 'learner/inputs/image_upload.html' %}
+    {% elif input_type == 'multiple_choice' %}
+      {% include 'learner/inputs/multiple_choice.html' %}
+    {% elif input_type == 'free_text' %}
+      {% include 'learner/inputs/free_text.html' %}
+    {% else %}
+      <p class="text-sm text-red-500">Error: Unknown input type config: {{ input_type }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Loading State Skeleton -->
+  <div class="loading-skeleton id-loading-container" id="invoke-loading">
+    <div class="card" style="padding:24px;">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="skeleton-block w-8 h-8 rounded-full"></div>
+        <div class="skeleton-block w-24 h-4"></div>
+      </div>
+      <div class="space-y-2">
+        <div class="skeleton-block w-full h-4"></div>
+        <div class="skeleton-block w-5/6 h-4"></div>
+        <div class="skeleton-block w-2/3 h-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoke Error Dismissible Banner -->
+  <div class="error-banner" id="invoke-error">
+    <div class="flex items-start gap-2.5">
+      <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+      <div>
+        <strong class="text-sm font-bold block" id="error-title">Error Calling Agent</strong>
+        <span class="text-xs mt-0.5 block" id="error-message">Connection timed out.</span>
+      </div>
+    </div>
+    <button onclick="dismissError()" class="hover:bg-red-200/50 p-1 rounded transition-colors">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- Dynamic Response Container -->
+  <div id="agent-response" data-invoke-url="{{ invoke_url }}"></div>
+
+</div>
+
+<!-- Inject learner parameters -->
+<script>
+  window.LEARNER_ID = "{{ request.user.id|default:1 }}";
+</script>
+
+<!-- Import renderer and action scripts -->
+<script src="{% static 'js/agent_response_renderer.js' %}"></script>
+<script src="{% static 'js/agent_input_handlers.js' %}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
+
+  function dismissError() {
+    document.getElementById('invoke-error').style.display = 'none';
+  }
+</script>
+{% endblock %}

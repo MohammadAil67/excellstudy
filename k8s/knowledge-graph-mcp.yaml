@@ -1,0 +1,91 @@
+# ── Knowledge Graph MCP Server ────────────────────────────────────────────────
+# Namespace: platform  |  Port: 8002
+# Exposes Neo4j curriculum graph queries to agent containers.
+# Only reachable by pods in the platform and agent namespaces (NetworkPolicy).
+# ─────────────────────────────────────────────────────────────────────────────
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knowledge-graph-mcp-server
+  namespace: platform
+  labels:
+    app: knowledge-graph-mcp-server
+    component: mcp-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: knowledge-graph-mcp-server
+  template:
+    metadata:
+      labels:
+        app: knowledge-graph-mcp-server
+        component: mcp-server
+    spec:
+      containers:
+        - name: knowledge-graph-mcp
+          image: platform/knowledge-graph-mcp:v1
+          ports:
+            - containerPort: 8002
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: MCP_SERVER_PORT
+              value: "8002"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knowledge-graph-mcp-server
+  namespace: platform
+spec:
+  selector:
+    app: knowledge-graph-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: knowledge-graph-mcp-ingress
+  namespace: platform
+spec:
+  podSelector:
+    matchLabels:
+      app: knowledge-graph-mcp-server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: platform
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              role: agent-namespace

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registration Confirmed — ExcellStudy{% endblock %}
+
+{% block content %}
+<style>
+  .confirm-container { max-width: 680px; margin: 0 auto; animation: fadeIn 0.4s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .code-block {
+    background: #1A1A2E;
+    border-radius: var(--radius-card);
+    padding: 20px 24px;
+    overflow-x: auto;
+    position: relative;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: #e2e8f0;
+    margin: 16px 0;
+  }
+  .code-block .comment { color: #6B7280; }
+  .code-block .cmd { color: #1D9E75; }
+  .code-block .flag { color: #BA7517; }
+  .code-block .url { color: #8B5CF6; }
+
+  .copy-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+    color: #9CA3AF; border-radius: 6px; padding: 6px 10px;
+    font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+</style>
+
+<div class="confirm-container">
+  <div class="card" style="padding:32px; border-top: 5px solid var(--primary);">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(29,158,117,0.1);">
+        <i data-lucide="check-circle" class="w-6 h-6" style="color:var(--accent);"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-[#1A1A2E]">Agent Registered!</h1>
+    </div>
+
+    <p class="text-sm text-[#6B7280] mb-6">
+      Your agent metadata registry has been created successfully. An internal deployment record has been set up with status <span class="badge" style="background:rgba(186,117,23,0.1); color:var(--highlight); font-size:0.75rem;">Pending</span>.
+    </p>
+
+    <!-- Slug Display -->
+    <div class="p-4 rounded-lg mb-6" style="background:var(--bg); border:1px solid var(--border);">
+      <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-1">Generated Slug Identifier</span>
+      <code class="text-base font-mono font-bold" style="color:var(--primary);">{{ slug }}</code>
+    </div>
+
+    <!-- Docker Commands -->
+    <h2 class="text-sm font-semibold text-[#1A1A2E] uppercase tracking-wider">Docker Deployment Commands</h2>
+    <p class="text-xs text-[#6B7280] mt-1">Tag and push your agent Docker image using the matching slug tag below:</p>
+
+    <div class="code-block">
+      <button class="copy-btn" id="copy-cmds-btn">
+        <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> <span id="copy-btn-text">Copy Commands</span>
+      </button>
+      <pre id="docker-commands-text"><span class="comment"># Build container image tagged with slug</span>
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/{{ org }}/{{ slug }}:v1</span> .
+
+<span class="comment"># Push the image to package registry</span>
+<span class="cmd">docker</span> push <span class="url">ghcr.io/{{ org }}/{{ slug }}:v1</span></pre>
+    </div>
+
+    <!-- Warning / Note -->
+    <div class="p-4 rounded-lg flex gap-3 mb-8" style="background:rgba(186,117,23,0.06); border: 1px solid rgba(186,117,23,0.15);">
+      <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0" style="color:var(--highlight);"></i>
+      <div>
+        <strong class="text-xs font-bold block" style="color:var(--highlight);">Pipeline Validation Notice</strong>
+        <span class="text-xs text-[#6B7280] mt-0.5 block">Your agent will not appear on the platform search or tutoring dashboard until you push a matching image and it passes automated cross-checks.</span>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="flex gap-4">
+      <a href="{% url 'developer:portal' %}" class="btn btn-outline" style="flex:1; text-align:center;">Back to Dashboard</a>
+      <a href="{% url 'developer:pipeline_status' slug %}" class="btn btn-primary" style="flex:2; text-align:center;">
+        <i data-lucide="activity" class="w-4 h-4 inline mr-1"></i> View Pipeline Status
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    const copyBtn = document.getElementById('copy-cmds-btn');
+    const btnText = document.getElementById('copy-btn-text');
+
+    copyBtn.addEventListener('click', () => {
+      // Clean comments and format commands to copy
+      const textToCopy = `docker build -t ghcr.io/{{ org }}/{{ slug }}:v1 .\ndocker push ghcr.io/{{ org }}/{{ slug }}:v1`;
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btnText.textContent = 'Copied!';
+        setTimeout(() => {
+          btnText.textContent = 'Copy Commands';
+        }, 2000);
+      });
+    });
+  });
+</script>
+{% endblock %}
