@@ -1,0 +1,89 @@
+name: Agent Pipeline Validation
+
+on:
+  registry_package:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      agent_slug:
+        description: 'Agent Slug to manually validate'
+        required: true
+        type: string
+
+jobs:
+  validate-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Extract Manifest from Docker Image
+        run: |
+          # Resolve the target image name (slug) from package publish event or input parameter
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SLUG="${{ inputs.agent_slug }}"
+          else
+            SLUG="${{ github.event.registry_package.name }}"
+          fi
+          
+          IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/$SLUG:latest"
+          echo "Validating image: $IMAGE_TAG"
+          
+          # Pull image and copy manifest.json
+          docker pull $IMAGE_TAG
+          CONTAINER_ID=$(docker create $IMAGE_TAG)
+          docker cp $CONTAINER_ID:/app/manifest.json ./manifest.json
+          docker rm $CONTAINER_ID
+
+      - name: Run Manifest Validation Script
+        env:
+          PLATFORM_API_URL: "https://excellstudy.herokuapp.com" # Replace with actual production domain
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SLUG="${{ inputs.agent_slug }}"
+          else
+            SLUG="${{ github.event.registry_package.name }}"
+          fi
+          
+          # Execute the cross-validation script
+          python scripts/validate_manifest.py ./manifest.json $SLUG
+
+      - name: Callback Webhook (Success)
+        if: success()
+        env:
+          PLATFORM_API_URL: "https://excellstudy.herokuapp.com"
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SLUG="${{ inputs.agent_slug }}"
+          else
+            SLUG="${{ github.event.registry_package.name }}"
+          fi
+          
+          curl -X POST "${{ env.PLATFORM_API_URL }}/api/v1/pipeline/webhook/" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\": \"success\", \"agent_slug\": \"$SLUG\", \"k8s_service_url\": \"http://$SLUG.default.svc.cluster.local\"}"
+
+      - name: Callback Webhook (Failure)
+        if: failure()
+        env:
+          PLATFORM_API_URL: "https://excellstudy.herokuapp.com"
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SLUG="${{ inputs.agent_slug }}"
+          else
+            SLUG="${{ github.event.registry_package.name }}"
+          fi
+          
+          curl -X POST "${{ env.PLATFORM_API_URL }}/api/v1/pipeline/webhook/" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\": \"failure\", \"agent_slug\": \"$SLUG\", \"rejection_reason\": \"Cross-validation check failed. The container input/output schema does not match registration.\"}"
