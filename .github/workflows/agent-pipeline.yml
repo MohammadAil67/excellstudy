@@ -30,6 +30,9 @@ jobs:
       - name: Resolve agent identity
         id: identity
         run: |
+          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner_lower=$OWNER_LOWER" >> $GITHUB_OUTPUT
+
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
@@ -41,15 +44,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Verify Python is available
+        run: |
+          python3 --version
+          pip3 --version
 
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests
+          python3 -m pip install --upgrade pip
+          pip3 install requests
 
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
@@ -62,7 +65,7 @@ jobs:
       - name: Pull image and extract manifest
         id: extract
         run: |
-          IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
+          IMAGE_TAG="ghcr.io/${{ steps.identity.outputs.owner_lower }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
           docker pull "$IMAGE_TAG"
@@ -77,7 +80,7 @@ jobs:
       # ─────────────────────────────────────────────
       - name: Schema check
         run: |
-          python scripts/validate_manifest.py ./manifest.json "${{ steps.identity.outputs.slug }}"
+          python3 scripts/validate_manifest.py ./manifest.json "${{ steps.identity.outputs.slug }}"
 
       # ─────────────────────────────────────────────
       # 3. Security scan — CVEs + non-root check
