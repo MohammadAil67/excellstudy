@@ -51,9 +51,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          pip3 install requests
-
+          python3 -m pip install --upgrade pip --break-system-packages
+          pip3 install requests --break-system-packages
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
       # ─────────────────────────────────────────────
