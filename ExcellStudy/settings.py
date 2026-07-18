@@ -190,3 +190,9 @@ DEFAULT_AGENT_URL = os.environ.get('DEFAULT_AGENT_URL', 'http://localhost:8080')
 # ── Media Uploads Storage ──
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ── Pipeline Webhook Secret ──
+PIPELINE_WEBHOOK_SECRET = os.environ.get(
+    'PIPELINE_WEBHOOK_SECRET',
+    '4b46d87104cc2781abba66504e6e7c5c2854da0f77bed0d2a6fe5bac6f42c2ba'
+)

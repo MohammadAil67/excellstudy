@@ -63,6 +63,8 @@ def pipeline_webhook(request):
     except AgentRegistry.DoesNotExist:
         return JsonResponse({'error': f'Agent registry row not found for slug: {slug}'}, status=404)
 
+    from django.core.exceptions import ValidationError
+
     if status == 'success':
         k8s_url = body.get('k8s_service_url')
         if not k8s_url:
@@ -72,7 +74,10 @@ def pipeline_webhook(request):
         agent.k8s_service_url = k8s_url
         agent.health_status = 'healthy'
         agent.rejection_reason = ''
-        agent.save()
+        try:
+            agent.save()
+        except ValidationError as e:
+            return JsonResponse({'error': f'Validation failed: {e.message_dict if hasattr(e, "message_dict") else str(e)}'}, status=400)
 
         # Cache in Redis for active routing lookup
         agent_data = {
@@ -97,7 +102,10 @@ def pipeline_webhook(request):
         reason = body.get('rejection_reason', 'Pipeline validation failed.')
         agent.status = 'rejected'
         agent.rejection_reason = reason
-        agent.save()
+        try:
+            agent.save()
+        except ValidationError as e:
+            return JsonResponse({'error': f'Validation failed: {e.message_dict if hasattr(e, "message_dict") else str(e)}'}, status=400)
 
         logger.info(f"Agent {slug} was rejected: {reason}")
 
