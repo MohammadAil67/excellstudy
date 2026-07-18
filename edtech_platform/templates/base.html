@@ -323,7 +323,7 @@
       <div class="hidden md:flex items-center gap-1">
         <a href="/learner/" class="nav-link active" data-nav="dashboard">Dashboard</a>
         <a href="/learner/" class="nav-link" data-nav="courses">Courses</a>
-        <a href="/learner/" class="nav-link" data-nav="sessions">Sessions</a>
+        <a href="/learner/#active-agents-section" class="nav-link" data-nav="sessions">Sessions</a>
         <!-- <a href="/playground/" class="nav-link" data-nav="playground">Playground</a> -->
         <a href="/marketplace/" class="nav-link" data-nav="marketplace">Marketplace</a>
       </div>
@@ -421,7 +421,7 @@
           <i data-lucide="book-open" class="w-5 h-5 flex-shrink-0"></i>
           <span class="sidebar-label">My Courses</span>
         </a>
-        <a href="/learner/" class="sidebar-nav-item" data-sidebar="sessions">
+        <a href="/learner/#active-agents-section" class="sidebar-nav-item" data-sidebar="sessions">
           <i data-lucide="message-circle" class="w-5 h-5 flex-shrink-0"></i>
           <span class="sidebar-label">Sessions</span>
         </a>
@@ -470,36 +470,51 @@
       lucide.createIcons();
 
       // Dynamic navigation active highlight
-      const path = window.location.pathname;
-      let activeNav = "dashboard";
-      if (path.includes("/marketplace/")) {
-        activeNav = "marketplace";
-      } else if (path.includes("/developer/pipeline/")) {
-        activeNav = "pipeline";
-      } else if (path.includes("/developer/")) {
-        activeNav = "agents";
-      } else if (path.includes("/learner/agents/")) {
-        activeNav = "sessions";
-      } else if (path.includes("/courses/")) {
-        activeNav = "courses";
-      } else if (path === "/learner/") {
-        activeNav = "dashboard";
+      function updateNavHighlights() {
+        const path = window.location.pathname;
+        const hash = window.location.hash;
+        let activeNav = "dashboard";
+        
+        if (path.includes("/marketplace/")) {
+          activeNav = "marketplace";
+        } else if (path.includes("/developer/pipeline/")) {
+          activeNav = "pipeline";
+        } else if (path.includes("/developer/")) {
+          activeNav = "agents";
+        } else if (path.includes("/learner/agents/") || hash === "#active-agents-section") {
+          activeNav = "sessions";
+        } else if (path.includes("/courses/")) {
+          activeNav = "courses";
+        } else if (path === "/learner/") {
+          activeNav = "dashboard";
+        }
+
+        document.querySelectorAll("[data-nav]").forEach(function(el) {
+          if (el.getAttribute("data-nav") === activeNav) {
+            el.classList.add("active");
+          } else {
+            el.classList.remove("active");
+          }
+        });
+
+        document.querySelectorAll("[data-sidebar]").forEach(function(el) {
+          if (el.getAttribute("data-sidebar") === activeNav) {
+            el.classList.add("active");
+          } else {
+            el.classList.remove("active");
+          }
+        });
       }
 
-      document.querySelectorAll("[data-nav]").forEach(function(el) {
-        if (el.getAttribute("data-nav") === activeNav) {
-          el.classList.add("active");
-        } else {
-          el.classList.remove("active");
-        }
-      });
+      updateNavHighlights();
+      window.addEventListener("hashchange", updateNavHighlights);
 
-      document.querySelectorAll("[data-sidebar]").forEach(function(el) {
-        if (el.getAttribute("data-sidebar") === activeNav) {
-          el.classList.add("active");
-        } else {
-          el.classList.remove("active");
-        }
+      // Intercept clicks on courses to show Coming Soon toast
+      document.querySelectorAll("[data-nav='courses'], [data-sidebar='courses']").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          e.preventDefault();
+          showToast("My Courses feature is coming soon!", "info");
+        });
       });
     });
 
