@@ -32,6 +32,18 @@ class Learner(models.Model):
         ('confused', 'Confused'),
     ]
 
+    HINT_LEVEL_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+
+    PACE_CHOICES = [
+        ('slow', 'Slow'),
+        ('normal', 'Normal'),
+        ('fast', 'Fast'),
+    ]
+
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='learner_profile',
     )
@@ -44,6 +56,12 @@ class Learner(models.Model):
     skill_levels = models.JSONField(default=dict, blank=True)
     learning_style = models.CharField(
         max_length=20, choices=LEARNING_STYLE_CHOICES, default='visual',
+    )
+    hint_level = models.CharField(
+        max_length=10, choices=HINT_LEVEL_CHOICES, default='medium',
+    )
+    pace = models.CharField(
+        max_length=10, choices=PACE_CHOICES, default='normal',
     )
 
     current_module = models.ForeignKey(
