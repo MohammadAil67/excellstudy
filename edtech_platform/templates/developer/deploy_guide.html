@@ -295,9 +295,35 @@
       <div class="deploy-step" id="b3">
         <div class="step-bubble">3</div>
         <div class="step-card">
-          <div class="step-card-title">B.3 — Build your agent</div>
+          <div class="step-card-title">B.3 — Build your agent &amp; prepare manifest.json</div>
           <div class="step-card-desc">
-            Follow <a href="{% url 'developer:creation-guide' %}" style="color:var(--primary);">Part A — the creation guide</a>. Before you build, make sure your <code class="inline">manifest.json</code>'s <code class="inline">input_type</code> and <code class="inline">output_types</code> match <strong>exactly</strong> what you entered in the portal form (B.1).
+            Follow <a href="{% url 'developer:creation-guide' %}" style="color:var(--primary);">Part A — the creation guide</a> to build your agent image.
+          </div>
+
+          <!-- Manifest generator callout -->
+          <div class="callout callout-tip" style="margin-top:14px;">
+            <i data-lucide="sparkles" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+              <strong>Use the manifest.json generator — don't hand-write it.</strong>
+              After registering your agent (B.1), go to your agent's <strong>Pipeline Status</strong> page in the dev portal.
+              Open the <em>manifest.json Generator</em> card — it outputs a pre-filled, copy-ready <code class="inline">manifest.json</code>
+              built directly from your registered data. This guarantees the schema check will pass.
+            </div>
+          </div>
+
+          <div class="callout callout-warn" style="margin-top:8px;">
+            <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+              The pipeline cross-checks <code class="inline">input_type</code> and <code class="inline">output_types</code>
+              in your <code class="inline">manifest.json</code> against what you registered in B.1 — they must match
+              <strong>exactly</strong>, or the schema check will reject your image with a specific mismatch message.
+              Do not edit these two fields after copying the generated manifest.
+            </div>
+          </div>
+
+          <div class="step-card-desc" style="margin-top:12px;">
+            Drop the generated file at <code class="inline">/app/manifest.json</code> inside your Docker image
+            (e.g. via a <code class="inline">COPY manifest.json /app/manifest.json</code> line in your Dockerfile).
           </div>
         </div>
       </div>
