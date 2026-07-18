@@ -19,578 +19,447 @@
     padding: 40px 24px 80px;
     align-items: start;
   }
-
   @media (max-width: 900px) {
     .guide-layout { grid-template-columns: 1fr; }
     .guide-toc    { display: none; }
   }
 
-  /* ── Table of Contents ── */
   .guide-toc {
-    position: sticky;
-    top: 88px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 20px;
-    animation: fadeInUp 0.4s ease both;
+    position: sticky; top: 88px; background: #fff;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    padding: 20px; animation: fadeInUp 0.4s ease both;
   }
   .toc-title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 12px;
   }
   .toc-link {
-    display: block;
-    padding: 6px 10px;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.15s;
-    border-left: 2px solid transparent;
-    margin-bottom: 2px;
+    display: block; padding: 6px 10px; font-size: 0.8125rem;
+    color: var(--text-secondary); border-radius: 6px; text-decoration: none;
+    transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 2px;
   }
   .toc-link:hover, .toc-link.active {
-    color: var(--primary);
-    background: rgba(83,74,183,0.06);
-    border-left-color: var(--primary);
+    color: #1D9E75; background: rgba(29,158,117,0.06); border-left-color: #1D9E75;
   }
-  .toc-link.sub {
-    padding-left: 22px;
-    font-size: 0.775rem;
-  }
+  .toc-link.sub { padding-left: 22px; font-size: 0.775rem; }
 
-  /* ── Main Content ── */
   .guide-content { min-width: 0; }
-
   .guide-section {
     animation: fadeInUp 0.5s ease both;
-    margin-bottom: 48px;
-    scroll-margin-top: 90px;
+    margin-bottom: 48px; scroll-margin-top: 90px;
   }
-  .guide-section:nth-child(1) { animation-delay: 0.05s; }
-  .guide-section:nth-child(2) { animation-delay: 0.1s; }
-  .guide-section:nth-child(3) { animation-delay: 0.15s; }
-  .guide-section:nth-child(4) { animation-delay: 0.2s; }
-  .guide-section:nth-child(5) { animation-delay: 0.25s; }
-  .guide-section:nth-child(6) { animation-delay: 0.3s; }
-  .guide-section:nth-child(7) { animation-delay: 0.35s; }
 
   .section-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #1D9E75;
-    margin-bottom: 6px;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: #1D9E75; margin-bottom: 6px;
   }
   .section-title {
-    font-size: 1.375rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 12px;
+    font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;
   }
   .section-body {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.75;
+    font-size: 0.9rem; color: var(--text-secondary); line-height: 1.78;
   }
   .section-body p { margin-bottom: 10px; }
   .section-body strong { color: var(--text-primary); }
-
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0 0 48px;
-  }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 48px; }
+  .sub-heading { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 20px 0 8px; }
 
   /* Code block */
   .code-block {
-    background: #1A1A2E;
-    border-radius: 10px;
-    padding: 20px 22px;
-    overflow-x: auto;
-    position: relative;
+    background: #1A1A2E; border-radius: 10px; padding: 20px 22px;
+    overflow-x: auto; position: relative;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 0.8rem;
-    line-height: 1.9;
-    color: #e2e8f0;
-    margin: 16px 0;
+    font-size: 0.785rem; line-height: 1.85; color: #e2e8f0; margin: 14px 0;
   }
   .code-block .comment { color: #6B7280; }
   .code-block .cmd     { color: #1D9E75; }
   .code-block .flag    { color: #FDE68A; }
   .code-block .url     { color: #93C5FD; }
   .code-block .str     { color: #86EFAC; }
-  .code-block .step-num {
-    color: #6B7280; margin-right: 8px; user-select: none;
-  }
+  .code-block .key     { color: #93C5FD; }
+  .code-block .val     { color: #86EFAC; }
+  .code-block .kw      { color: #C4B5FD; }
 
   .copy-btn {
     position: absolute; top: 12px; right: 12px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-    color: #9CA3AF; border-radius: 6px; padding: 5px 10px;
-    font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; gap: 4px;
+    color: #9CA3AF; border-radius: 6px; padding: 5px 10px; font-size: 0.7rem;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px;
   }
   .copy-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
   /* Callouts */
   .callout {
-    border-radius: 10px; padding: 16px 18px;
-    display: flex; gap: 12px;
-    margin: 16px 0;
-    font-size: 0.875rem;
-    line-height: 1.6;
+    border-radius: 10px; padding: 15px 18px; display: flex; gap: 12px;
+    margin: 14px 0; font-size: 0.875rem; line-height: 1.6;
   }
-  .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #92500a; }
+  .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #7a4208; }
   .callout-info  { background: rgba(83,74,183,0.07);   border: 1px solid rgba(83,74,183,0.2);  color: #3D3590; }
   .callout-tip   { background: rgba(29,158,117,0.07);  border: 1px solid rgba(29,158,117,0.2); color: #0f5c3d; }
   .callout strong { display: block; margin-bottom: 3px; }
 
-  /* Step timeline */
-  .deploy-steps { position: relative; padding-left: 48px; }
-  .deploy-steps::before {
-    content: ''; position: absolute; left: 19px; top: 28px; bottom: 28px;
-    width: 2px; background: linear-gradient(to bottom, #534AB7, #1D9E75);
-    opacity: 0.3;
-  }
-  .deploy-step { position: relative; margin-bottom: 32px; animation: fadeInUp 0.5s ease both; }
-  .deploy-step:nth-child(1) { animation-delay: 0.1s; }
-  .deploy-step:nth-child(2) { animation-delay: 0.2s; }
-  .deploy-step:nth-child(3) { animation-delay: 0.3s; }
-  .deploy-step:nth-child(4) { animation-delay: 0.4s; }
-  .deploy-step:nth-child(5) { animation-delay: 0.5s; }
-
-  .step-bubble {
-    position: absolute; left: -48px; top: 6px;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, #534AB7, #3D3590);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 0.875rem; color: #fff;
-    box-shadow: 0 4px 12px rgba(83,74,183,0.3);
-    z-index: 2;
-  }
-  .step-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 20px 22px;
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .step-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-  .step-card-title {
-    font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 6px;
-  }
-  .step-card-desc {
-    font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 12px;
-  }
-
-  /* Hero banner */
-  .guide-hero {
-    background: linear-gradient(135deg, #1D9E75 0%, #0f5c3d 100%);
-    border-radius: var(--radius-card);
-    padding: 32px 36px;
-    color: #fff;
-    margin-bottom: 40px;
-    position: relative;
-    overflow: hidden;
-    animation: fadeInUp 0.4s ease both;
-  }
-  .guide-hero::after {
-    content: '';
-    position: absolute; right: -40px; top: -40px;
-    width: 200px; height: 200px; border-radius: 50%;
-    background: rgba(255,255,255,0.05);
-  }
-  .guide-hero h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
-  .guide-hero p  { opacity: 0.85; font-size: 0.9rem; max-width: 560px; line-height: 1.6; }
-  .guide-hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-  .guide-pill {
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 30px; padding: 4px 14px;
-    font-size: 0.78rem; font-weight: 500; color: #fff;
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  /* Pipeline state diagram */
-  .pipeline-flow {
-    display: flex; align-items: center; gap: 0;
-    overflow-x: auto; padding: 20px 0;
-    margin: 16px 0;
-  }
-  .flow-node {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
-    text-align: center;
-    min-width: 130px;
-    flex-shrink: 0;
-    transition: box-shadow 0.2s;
-  }
-  .flow-node:hover { box-shadow: var(--shadow); }
-  .flow-node-icon {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 8px;
-  }
-  .flow-node-label { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
-  .flow-node-sub   { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
-  .flow-arrow {
-    color: var(--border); font-size: 1.2rem; padding: 0 8px; flex-shrink: 0;
-  }
-
-  /* Troubleshoot table */
-  .trouble-table { width: 100%; border-collapse: collapse; font-size: 0.845rem; }
-  .trouble-table th {
-    text-align: left; padding: 10px 14px;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-secondary);
-    background: var(--bg); border-bottom: 1px solid var(--border);
-  }
-  .trouble-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
-  .trouble-table tr:last-child td { border-bottom: none; }
-  .trouble-table code {
+  code.inline {
     background: rgba(83,74,183,0.08); color: var(--primary);
     padding: 2px 7px; border-radius: 4px; font-size: 0.8rem;
     font-family: 'JetBrains Mono', monospace;
   }
-  .err-badge {
-    background: rgba(224,82,82,0.1); color: var(--error);
-    font-size: 0.72rem; font-weight: 600; padding: 2px 8px;
-    border-radius: 30px; white-space: nowrap;
+
+  /* Step timeline */
+  .deploy-steps { position: relative; padding-left: 52px; }
+  .deploy-steps::before {
+    content: ''; position: absolute; left: 20px; top: 28px; bottom: 28px;
+    width: 2px; background: linear-gradient(to bottom, #1D9E75 0%, rgba(83,74,183,0.3) 100%);
+  }
+  .deploy-step { position: relative; margin-bottom: 28px; scroll-margin-top: 90px; }
+  .step-bubble {
+    position: absolute; left: -52px; top: 6px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #1D9E75, #0f5c3d);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.875rem; color: #fff;
+    box-shadow: 0 4px 12px rgba(29,158,117,0.3); z-index: 2;
+  }
+  .step-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-card); padding: 20px 22px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .step-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .step-card-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 8px; }
+  .step-card-desc  { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; }
+
+  /* Pipeline flow */
+  .pipeline-flow {
+    display: flex; align-items: stretch; gap: 0;
+    overflow-x: auto; padding: 20px 0; margin: 16px 0;
+  }
+  .flow-node {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; text-align: center; min-width: 130px; flex-shrink: 0;
+    transition: box-shadow 0.2s;
+  }
+  .flow-node:hover { box-shadow: var(--shadow); }
+  .flow-node-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+  .flow-node-label { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+  .flow-node-sub   { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
+  .flow-arrow { color: #d1d5db; font-size: 1.1rem; padding: 0 8px; flex-shrink: 0; display: flex; align-items: center; }
+
+  /* Step failure card */
+  .failure-example {
+    background: rgba(224,82,82,0.04); border: 1px solid rgba(224,82,82,0.2);
+    border-radius: 10px; padding: 16px 18px; margin: 14px 0;
+    font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;
+  }
+  .failure-example strong { color: var(--error); }
+
+  /* Steps list (B.1 numbered list) */
+  .register-steps { list-style: none; padding: 0; margin: 14px 0; counter-reset: rs; }
+  .register-steps li {
+    counter-increment: rs; position: relative; padding: 12px 14px 12px 46px;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 6px;
+  }
+  .register-steps li::before {
+    content: counter(rs); position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(29,158,117,0.12); color: #1D9E75;
+    font-weight: 700; font-size: 0.75rem;
+    display: flex; align-items: center; justify-content: center;
   }
 
-  /* CTA bar */
+  /* Hero */
+  .guide-hero {
+    background: linear-gradient(135deg, #1D9E75 0%, #0f5c3d 100%);
+    border-radius: var(--radius-card); padding: 32px 36px; color: #fff;
+    margin-bottom: 40px; position: relative; overflow: hidden;
+    animation: fadeInUp 0.4s ease both;
+  }
+  .guide-hero::after {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.05);
+  }
+  .guide-hero h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
+  .guide-hero p  { opacity: 0.85; font-size: 0.9rem; max-width: 580px; line-height: 1.65; }
+  .hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .hero-pill {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 30px; padding: 4px 14px; font-size: 0.78rem; font-weight: 500;
+    color: #fff; display: flex; align-items: center; gap: 6px;
+  }
+
+  /* CTA */
   .cta-bar {
-    background: linear-gradient(135deg, rgba(29,158,117,0.08), rgba(83,74,183,0.05));
-    border: 1px solid rgba(29,158,117,0.2);
-    border-radius: var(--radius-card);
-    padding: 24px 28px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 48px;
+    background: linear-gradient(135deg, rgba(29,158,117,0.07), rgba(83,74,183,0.04));
+    border: 1px solid rgba(29,158,117,0.18); border-radius: var(--radius-card);
+    padding: 24px 28px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 40px;
   }
 </style>
 
 <div class="guide-layout">
 
-  <!-- ── LEFT: Table of Contents ── -->
+  <!-- ── TOC ── -->
   <aside class="guide-toc">
     <div class="toc-title">On this page</div>
-    <a href="#prerequisites"  class="toc-link">Prerequisites</a>
-    <a href="#steps"          class="toc-link">Deployment Steps</a>
-    <a href="#step-1"         class="toc-link sub">1. Register on Portal</a>
-    <a href="#step-2"         class="toc-link sub">2. Build Image</a>
-    <a href="#step-3"         class="toc-link sub">3. Tag &amp; Push</a>
-    <a href="#step-4"         class="toc-link sub">4. Monitor Pipeline</a>
-    <a href="#step-5"         class="toc-link sub">5. Go Live</a>
-    <a href="#pipeline"       class="toc-link">Pipeline Stages</a>
-    <a href="#troubleshoot"   class="toc-link">Troubleshooting</a>
-    <a href="#next-steps"     class="toc-link">Next Steps</a>
+    <a href="#overview"     class="toc-link">Overview</a>
+    <a href="#b1"           class="toc-link">B.1 Register in the portal</a>
+    <a href="#b2"           class="toc-link">B.2 Generate push token</a>
+    <a href="#b3"           class="toc-link">B.3 Build your agent</a>
+    <a href="#b4"           class="toc-link">B.4 Tag &amp; push</a>
+    <a href="#b5"           class="toc-link">B.5 What happens next</a>
+    <a href="#pipeline-stages" class="toc-link sub">Pipeline stages</a>
+    <a href="#b6"           class="toc-link">B.6 If a step fails</a>
+    <a href="#b7"           class="toc-link">B.7 Updating a live agent</a>
+    <a href="#b8"           class="toc-link">B.8 End-to-end verification</a>
   </aside>
 
-  <!-- ── RIGHT: Content ── -->
+  <!-- ── Content ── -->
   <main class="guide-content">
 
     <!-- Hero -->
     <div class="guide-hero">
-      <div class="flex items-center gap-2 mb-3" style="opacity:0.7; font-size:0.8rem; font-weight:500;">
+      <div style="opacity:0.7; font-size:0.8rem; font-weight:500; margin-bottom:10px;">
         <a href="/developer/" style="color:#fff; text-decoration:none;">Developer Portal</a>
-        <span>›</span>
-        <span>Deploy Your Agent</span>
+        <span style="margin:0 6px;">›</span>
+        <span>Push &amp; Deploy Guide</span>
       </div>
-      <h1>Push &amp; Deploy Your Agent</h1>
-      <p>A step-by-step walkthrough from building your Docker image to your agent being live on the marketplace for learners to use.</p>
-      <div class="guide-hero-pills">
-        <span class="guide-pill"><i data-lucide="rocket" style="width:13px;height:13px;"></i> Deployment Guide</span>
-        <span class="guide-pill"><i data-lucide="clock" style="width:13px;height:13px;"></i> ~10 min</span>
-        <span class="guide-pill"><i data-lucide="container" style="width:13px;height:13px;"></i> Docker required</span>
+      <h1>Pushing and Deploying Your Agent</h1>
+      <p>Part B — complete walkthrough. Register first, build and push your image, watch the pipeline, and go live.</p>
+      <div class="hero-pills">
+        <span class="hero-pill"><i data-lucide="rocket" style="width:13px;height:13px;"></i> Deploy Guide</span>
+        <span class="hero-pill"><i data-lucide="git-branch" style="width:13px;height:13px;"></i> Register-first flow</span>
+        <span class="hero-pill"><i data-lucide="container" style="width:13px;height:13px;"></i> ghcr.io registry</span>
       </div>
     </div>
 
-    <!-- ── Prerequisites ── -->
-    <section class="guide-section" id="prerequisites">
-      <div class="section-label">Before You Start</div>
-      <h2 class="section-title">Prerequisites</h2>
-      <div class="section-body">
-        <p>Make sure you have the following before starting:</p>
+    <!-- Overview callout -->
+    <section class="guide-section" id="overview">
+      <div class="callout callout-info">
+        <i data-lucide="info" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <strong>Register-first flow</strong>
+          You declare your agent in the dev portal <em>before</em> you push any code. The pipeline then validates that your pushed container actually matches what you declared.
+        </div>
       </div>
-
-      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
-        {% for item in prerequisites %}
-        <li style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:9px; font-size:0.875rem;">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(83,74,183,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-            <i data-lucide="{{ item.icon }}" style="width:12px;height:12px;color:#534AB7;"></i>
-          </span>
-          <div>
-            <strong style="color:var(--text-primary);">{{ item.label }}</strong>
-            <div style="color:var(--text-secondary); margin-top:2px;">{{ item.desc }}</div>
-          </div>
-        </li>
-        {% empty %}
-        <li style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:9px; font-size:0.875rem;">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(83,74,183,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-            <i data-lucide="check" style="width:12px;height:12px;color:#534AB7;"></i>
-          </span>
-          <div><strong style="color:var(--text-primary);">Docker Desktop</strong> <div style="color:var(--text-secondary);">Installed and running locally</div></div>
-        </li>
-        <li style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:9px; font-size:0.875rem;">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(83,74,183,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-            <i data-lucide="check" style="width:12px;height:12px;color:#534AB7;"></i>
-          </span>
-          <div><strong style="color:var(--text-primary);">Agent Registered</strong> <div style="color:var(--text-secondary);">You have registered your agent on the Developer Portal</div></div>
-        </li>
-        <li style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:9px; font-size:0.875rem;">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(83,74,183,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-            <i data-lucide="check" style="width:12px;height:12px;color:#534AB7;"></i>
-          </span>
-          <div><strong style="color:var(--text-primary);">manifest.json in place</strong> <div style="color:var(--text-secondary);">Bundled at the root of your Docker image</div></div>
-        </li>
-        <li style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:9px; font-size:0.875rem;">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(83,74,183,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
-            <i data-lucide="check" style="width:12px;height:12px;color:#534AB7;"></i>
-          </span>
-          <div><strong style="color:var(--text-primary);">Developer API Key</strong> <div style="color:var(--text-secondary);">Available in your Developer Portal settings</div></div>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-    <hr class="section-divider">
-
-    <!-- ── Steps ── -->
-    <section class="guide-section" id="steps">
-      <div class="section-label">Deployment Steps</div>
-      <h2 class="section-title">How to Deploy Your Agent</h2>
     </section>
 
+    <!-- Steps -->
     <div class="deploy-steps">
 
-      <!-- Step 1 -->
-      <div class="deploy-step" id="step-1" style="scroll-margin-top:90px;">
+      <!-- B.1 -->
+      <div class="deploy-step" id="b1">
         <div class="step-bubble">1</div>
         <div class="step-card">
-          <div class="step-card-title">Register Your Agent on the Portal</div>
-          <div class="step-card-desc">
-            Before you can push an image, you must register your agent's metadata on the Developer Portal.
-            This creates the registry entry that your image push will be matched against.
+          <div class="step-card-title">B.1 — Register the agent in the dev portal</div>
+          <div class="step-card-desc" style="margin-bottom:14px;">Do this <strong>before</strong> building or pushing anything.</div>
+
+          <ol class="register-steps">
+            <li>Log into the dev portal</li>
+            <li>Go to <strong>"Register a new agent"</strong></li>
+            <li>Fill in: <strong>name</strong>, <strong>input_type</strong> (single choice, from A.4), <strong>output_types</strong> (one or more, from A.5), <strong>subject_areas</strong>, <strong>age_groups</strong>, <strong>capabilities</strong></li>
+            <li>Submit</li>
+          </ol>
+
+          <div class="callout callout-tip" style="margin-top:14px;">
+            <i data-lucide="tag" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+              This creates a <code class="inline">pending</code> registration and auto-generates your agent's <strong>slug</strong> — a unique identifier of the form <code class="inline">{your-namespace}-{agent-name}</code>, e.g. <code class="inline">alice-biology-drawing-checker</code>. The confirmation page shows you the exact commands to use next, built from that slug.
+            </div>
           </div>
-          <a href="{% url 'developer:register-agent' %}" class="btn-pill btn-primary" style="font-size:0.8125rem; padding:8px 18px; display:inline-flex; align-items:center; gap:6px;">
+
+          <a href="{% url 'developer:register-agent' %}" class="btn-pill btn-primary" style="font-size:0.8125rem; padding:8px 18px; display:inline-flex; align-items:center; gap:6px; margin-top:14px;">
             <i data-lucide="plus" style="width:14px;height:14px;"></i> Register an Agent
           </a>
         </div>
       </div>
 
-      <!-- Step 2 -->
-      <div class="deploy-step" id="step-2" style="scroll-margin-top:90px;">
+      <!-- B.2 -->
+      <div class="deploy-step" id="b2">
         <div class="step-bubble">2</div>
         <div class="step-card">
-          <div class="step-card-title">Build Your Docker Image</div>
-          <div class="step-card-desc">
-            Build your agent image locally. Make sure your <code style="font-family:monospace;font-size:0.8rem;background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;">manifest.json</code>
-            is included at the container root and your app listens on port <code style="font-family:monospace;font-size:0.8rem;background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;">8080</code>.
-          </div>
+          <div class="step-card-title">B.2 — Generate a registry push token</div>
+          <div class="step-card-desc">One-time, per developer. You'll use this to authenticate <code class="inline">docker push</code>.</div>
 
-          <div class="code-block">
-            <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
-<span class="comment"># Build your Docker image</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> my-math-agent:<span class="str">1.0.0</span> .
-          </div>
-
-          <div class="callout callout-tip" style="margin-top:8px;">
-            <i data-lucide="lightbulb" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
-            <div>Image must be under <strong>4 GB</strong> and must not run as root. Test locally before pushing.</div>
-          </div>
+          <ol class="register-steps" style="margin-top:12px;">
+            <li>Go to <code class="inline">github.com/settings/tokens?type=beta</code></li>
+            <li>Generate new token</li>
+            <li>Resource owner: the platform's GitHub org (or account)</li>
+            <li>Permissions → <strong>Packages: Read and write</strong></li>
+            <li>Copy the token — you'll use it in B.4</li>
+          </ol>
         </div>
       </div>
 
-      <!-- Step 3 -->
-      <div class="deploy-step" id="step-3" style="scroll-margin-top:90px;">
+      <!-- B.3 -->
+      <div class="deploy-step" id="b3">
         <div class="step-bubble">3</div>
         <div class="step-card">
-          <div class="step-card-title">Tag &amp; Push to the ExcellStudy Registry</div>
+          <div class="step-card-title">B.3 — Build your agent</div>
           <div class="step-card-desc">
-            Tag your image using your agent's slug (shown on the portal after registration), 
-            then push to the ExcellStudy container registry. Replace
-            <code style="font-family:monospace;font-size:0.8rem;background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;">YOUR_SLUG</code> and
-            <code style="font-family:monospace;font-size:0.8rem;background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;">VERSION</code>
-            with the values from your portal registration.
+            Follow <a href="{% url 'developer:creation-guide' %}" style="color:var(--primary);">Part A — the creation guide</a>. Before you build, make sure your <code class="inline">manifest.json</code>'s <code class="inline">input_type</code> and <code class="inline">output_types</code> match <strong>exactly</strong> what you entered in the portal form (B.1).
           </div>
+        </div>
+      </div>
+
+      <!-- B.4 -->
+      <div class="deploy-step" id="b4">
+        <div class="step-bubble">4</div>
+        <div class="step-card">
+          <div class="step-card-title">B.4 — Tag and push, using your exact slug from B.1</div>
+          <div class="step-card-desc" style="margin-bottom:4px;">Replace <code class="inline">{platform-org}</code>, <code class="inline">{your-slug}</code>, <code class="inline">YOUR_GITHUB_USERNAME</code>, and <code class="inline">YOUR_TOKEN_FROM_B2</code> with your values.</div>
 
           <div class="code-block">
             <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
-<span class="comment"># 1. Authenticate with the registry</span>
-<span class="cmd">docker</span> login <span class="url">excellstudy.registry.io</span>
+<span class="comment"># Build</span>
+<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v1 .
 
-<span class="comment"># 2. Tag your local image</span>
-<span class="cmd">docker</span> tag my-math-agent:<span class="str">1.0.0</span> \
-  <span class="url">excellstudy.registry.io</span>/<span class="flag">YOUR_SLUG</span>:<span class="flag">VERSION</span>
+<span class="comment"># Authenticate</span>
+<span class="cmd">docker</span> login ghcr.io <span class="flag">-u</span> YOUR_GITHUB_USERNAME <span class="flag">-p</span> YOUR_TOKEN_FROM_B2
 
-<span class="comment"># 3. Push</span>
-<span class="cmd">docker</span> push <span class="url">excellstudy.registry.io</span>/<span class="flag">YOUR_SLUG</span>:<span class="flag">VERSION</span>
+<span class="comment"># Push</span>
+<span class="cmd">docker</span> push ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v1
           </div>
 
-          <div class="callout callout-warn" style="margin-top:8px;">
+          <div class="callout callout-warn">
             <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
-            <div>The tag format must match exactly. Pushing to an unregistered tag will be silently discarded.</div>
+            <div>
+              <strong>The image tag must exactly match your registered slug.</strong>
+              Pushing under a different name will fail — the pipeline looks up your pending registration by this exact slug and will reject the push if no matching pending row exists.
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Step 4 -->
-      <div class="deploy-step" id="step-4" style="scroll-margin-top:90px;">
-        <div class="step-bubble">4</div>
+      <!-- B.5 -->
+      <div class="deploy-step" id="b5">
+        <div class="step-bubble">5</div>
         <div class="step-card">
-          <div class="step-card-title">Monitor the Pipeline</div>
-          <div class="step-card-desc">
-            Once your image is pushed, the platform automatically triggers the CI/CD pipeline. 
-            You can monitor each stage in real time from your agent's Pipeline Status page.
-            The pipeline runs three checks: <strong>Schema Validation</strong>, <strong>Security Scan</strong>, and a <strong>Smoke Test</strong>.
+          <div class="step-card-title">B.5 — What happens automatically after you push</div>
+          <div class="step-card-desc" style="margin-bottom:14px;">After the push is detected, the pipeline starts automatically. You can watch live progress on the dev portal's pipeline status page for this agent.</div>
+
+          <!-- Pipeline flow -->
+          <div class="pipeline-flow" id="pipeline-stages" style="scroll-margin-top:90px;">
+            <div class="flow-node">
+              <div class="flow-node-icon" style="background:rgba(83,74,183,0.1);">
+                <i data-lucide="file-check-2" style="width:16px;height:16px;color:#534AB7;"></i>
+              </div>
+              <div class="flow-node-label">1. Schema Check</div>
+              <div class="flow-node-sub">manifest.json vs. portal registration</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-icon" style="background:rgba(186,117,23,0.1);">
+                <i data-lucide="shield-check" style="width:16px;height:16px;color:#BA7517;"></i>
+              </div>
+              <div class="flow-node-label">2. Security Scan</div>
+              <div class="flow-node-sub">CVE scan + root check</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-icon" style="background:rgba(29,158,117,0.1);">
+                <i data-lucide="flask-conical" style="width:16px;height:16px;color:#1D9E75;"></i>
+              </div>
+              <div class="flow-node-label">3. Smoke Test</div>
+              <div class="flow-node-sub">/health + /invoke with synthetic request</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-icon" style="background:rgba(29,158,117,0.1);">
+                <i data-lucide="server" style="width:16px;height:16px;color:#1D9E75;"></i>
+              </div>
+              <div class="flow-node-label">4. Deploy</div>
+              <div class="flow-node-sub">Isolated, quota-limited namespace</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" style="border-color:rgba(29,158,117,0.35);">
+              <div class="flow-node-icon" style="background:rgba(29,158,117,0.15);">
+                <i data-lucide="rocket" style="width:16px;height:16px;color:#1D9E75;"></i>
+              </div>
+              <div class="flow-node-label" style="color:#1D9E75; font-weight:700;">Live</div>
+              <div class="flow-node-sub">at /agents/{your-slug}/</div>
+            </div>
           </div>
-          <a href="/developer/" class="btn-pill" style="background:var(--bg);color:var(--primary);border:1px solid var(--primary);font-size:0.8125rem;padding:8px 18px;display:inline-flex;align-items:center;gap:6px;">
-            <i data-lucide="activity" style="width:14px;height:14px;"></i> Go to My Agents
-          </a>
+
+          <div class="section-body" style="margin-top:8px;">
+            <p><strong>Schema check</strong> — pulls <code class="inline">manifest.json</code> from your image, cross-checks <code class="inline">input_type</code>/<code class="inline">output_types</code> against what you registered in B.1. Mismatch = rejected with a specific message.</p>
+            <p><strong>Security scan</strong> — CVE dependency scan + confirms your container doesn't run as root.</p>
+            <p><strong>Smoke test</strong> — spins up your container, calls <code class="inline">/health</code> and <code class="inline">/invoke</code> with a synthetic request, validates the response shape matches your declared output types.</p>
+            <p><strong>Deploy</strong> — on success, your container is deployed into your own isolated, quota-limited namespace and registered on the platform.</p>
+          </div>
         </div>
       </div>
 
-      <!-- Step 5 -->
-      <div class="deploy-step" id="step-5" style="scroll-margin-top:90px;">
-        <div class="step-bubble" style="background:linear-gradient(135deg,#1D9E75,#0f5c3d);">5</div>
-        <div class="step-card" style="border-color:rgba(29,158,117,0.3);">
-          <div class="step-card-title">🎉 Your Agent is Live!</div>
-          <div class="step-card-desc">
-            Once all pipeline stages pass, your agent's status changes from <strong>Pending</strong> to <strong>Live</strong> 
-            and it becomes visible in the learner marketplace. You'll receive a notification in your portal.
-            Learners can now select and use your agent in their sessions.
-          </div>
-        </div>
-      </div>
-
-    </div>
-
+    </div><!-- /deploy-steps -->
     <hr class="section-divider">
 
-    <!-- ── Pipeline Stages ── -->
-    <section class="guide-section" id="pipeline">
-      <div class="section-label">Pipeline</div>
-      <h2 class="section-title">What Happens During the Pipeline</h2>
+    <!-- B.6 -->
+    <section class="guide-section" id="b6">
+      <div class="section-label">B.6</div>
+      <h2 class="section-title">If a step fails</h2>
       <div class="section-body">
-        <p>After your image is pushed, three automated checks run in sequence. All three must pass for your agent to go live.</p>
+        <p>You'll see the specific failing step and a detailed reason on the pipeline status page. For example:</p>
       </div>
 
-      <div class="pipeline-flow">
-        <div class="flow-node">
-          <div class="flow-node-icon" style="background:rgba(83,74,183,0.1);">
-            <i data-lucide="file-check-2" style="width:16px;height:16px;color:#534AB7;"></i>
-          </div>
-          <div class="flow-node-label">Schema Validation</div>
-          <div class="flow-node-sub">manifest.json checked against platform spec</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node">
-          <div class="flow-node-icon" style="background:rgba(186,117,23,0.1);">
-            <i data-lucide="shield-check" style="width:16px;height:16px;color:#BA7517;"></i>
-          </div>
-          <div class="flow-node-label">Security Scan</div>
-          <div class="flow-node-sub">Container image scanned for CVEs</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node">
-          <div class="flow-node-icon" style="background:rgba(29,158,117,0.1);">
-            <i data-lucide="flask-conical" style="width:16px;height:16px;color:#1D9E75;"></i>
-          </div>
-          <div class="flow-node-label">Smoke Test</div>
-          <div class="flow-node-sub">Agent deployed and tested with a real request</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node" style="border-color:rgba(29,158,117,0.3);">
-          <div class="flow-node-icon" style="background:rgba(29,158,117,0.15);">
-            <i data-lucide="rocket" style="width:16px;height:16px;color:#1D9E75;"></i>
-          </div>
-          <div class="flow-node-label" style="color:#1D9E75;">Live</div>
-          <div class="flow-node-sub">Agent available in marketplace</div>
-        </div>
+      <div class="failure-example">
+        <strong>Schema check failed:</strong>
+        Container declares <code class="inline">input_type='number'</code> but you registered <code class="inline">'text_with_units'</code> in the dev portal. These must match.
       </div>
-    </section>
-    <hr class="section-divider">
 
-    <!-- ── Troubleshooting ── -->
-    <section class="guide-section" id="troubleshoot">
-      <div class="section-label">Troubleshooting</div>
-      <h2 class="section-title">Common Pipeline Failures</h2>
       <div class="section-body">
-        <p>If your pipeline fails, check the rejection reason on the Pipeline Status page. Here are the most common issues:</p>
+        <p>Fix the mismatch (either your code/manifest, or your portal registration — whichever is actually wrong), then push a new version tag (e.g. <code class="inline">:v2</code>) to resubmit.</p>
       </div>
 
-      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card);">
-        <table class="trouble-table">
-          <thead>
-            <tr>
-              <th>Error</th>
-              <th>Cause</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="err-badge">Schema Mismatch</span></td>
-              <td>Fields in <code>manifest.json</code> don't match portal registration</td>
-              <td>Re-check <code>input_type</code>, <code>output_types</code>, and <code>name</code> match exactly</td>
-            </tr>
-            <tr>
-              <td><span class="err-badge">CVE Detected</span></td>
-              <td>Security scanner found a known vulnerability in your base image or dependencies</td>
-              <td>Update your base image to a newer version and pin dependencies</td>
-            </tr>
-            <tr>
-              <td><span class="err-badge">Port Unreachable</span></td>
-              <td>Container is not listening on port <code>8080</code></td>
-              <td>Ensure your app binds to <code>0.0.0.0:8080</code></td>
-            </tr>
-            <tr>
-              <td><span class="err-badge">POST /infer 404</span></td>
-              <td>Smoke test could not reach the <code>/infer</code> endpoint</td>
-              <td>Verify your route is <code>POST /infer</code> and returns valid JSON</td>
-            </tr>
-            <tr>
-              <td><span class="err-badge">Image Too Large</span></td>
-              <td>Image exceeds the 4 GB limit</td>
-              <td>Use a lighter base image, remove model weights from the image and load at runtime</td>
-            </tr>
-            <tr>
-              <td><span class="err-badge">Running as Root</span></td>
-              <td>Container process runs as UID 0</td>
-              <td>Add <code>USER nonroot</code> to your Dockerfile</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-    <hr class="section-divider">
-
-    <!-- ── Next Steps ── -->
-    <section class="guide-section" id="next-steps">
-      <div class="section-label">Done!</div>
-      <h2 class="section-title">Your agent is on its way</h2>
-      <div class="section-body">
-        <p>Once the pipeline passes, your agent is automatically published to the ExcellStudy Marketplace. Learners can browse and add it to their teaching team.</p>
-      </div>
-
-      <div class="cta-bar">
+      <div class="callout callout-info">
+        <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
         <div>
-          <div style="font-weight:700; color:var(--text-primary);">New to building agents?</div>
-          <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:3px;">Read the Agent Creation Guide for constraints, manifest fields, and I/O types.</div>
+          You do <strong>not</strong> need to re-register in the portal for a version bump of the same agent — only if you're changing its declared <code class="inline">input_type</code>/<code class="inline">output_types</code> from scratch.
         </div>
-        <a href="{% url 'developer:creation-guide' %}" class="btn-pill btn-primary" style="white-space:nowrap; padding:10px 24px;">
-          ← Creation Guide
-        </a>
       </div>
     </section>
+    <hr class="section-divider">
+
+    <!-- B.7 -->
+    <section class="guide-section" id="b7">
+      <div class="section-label">B.7</div>
+      <h2 class="section-title">Updating an already-live agent</h2>
+      <div class="section-body">
+        <p>Push a new version tag. The full pipeline runs again before replacing the live version — it does <strong>not</strong> go live immediately on push.</p>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v2 .
+<span class="cmd">docker</span> push ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v2
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- B.8 -->
+    <section class="guide-section" id="b8">
+      <div class="section-label">B.8</div>
+      <h2 class="section-title">Quick end-to-end verification, once live</h2>
+      <div class="section-body">
+        <p>A successful response here confirms your agent is reachable and responding correctly through the platform's real invocation path, not just standalone.</p>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="cmd">curl</span> <span class="flag">-X</span> POST https://<span class="flag">{platform-domain}</span>/api/v1/agents/<span class="flag">{your-slug}</span>/invoke/ \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="flag">-d</span> <span class="str">'{"input": {"value": "test"}, "context": {"learner_id": "test-001"}}'</span>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-bar">
+      <div>
+        <div style="font-weight:700; color:var(--text-primary);">New to building agents?</div>
+        <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:3px;">Read Part A — the creation guide — for endpoints, manifest fields, I/O types, and hard constraints.</div>
+      </div>
+      <a href="{% url 'developer:creation-guide' %}" class="btn-pill btn-primary" style="white-space:nowrap; padding:10px 24px;">
+        ← Part A: Creation Guide
+      </a>
+    </div>
 
   </main>
 </div>
@@ -613,17 +482,15 @@
     });
   }
 
-  // TOC active state on scroll
-  var sections = document.querySelectorAll('[id]');
   var tocLinks = document.querySelectorAll('.toc-link');
-
+  var sections = document.querySelectorAll('[id]');
   window.addEventListener('scroll', function() {
-    var scrollY = window.scrollY + 110;
+    var y = window.scrollY + 110;
     sections.forEach(function(s) {
-      if (scrollY >= s.offsetTop) {
+      if (y >= s.offsetTop) {
         tocLinks.forEach(function(l) { l.classList.remove('active'); });
-        var active = document.querySelector('.toc-link[href="#' + s.id + '"]');
-        if (active) active.classList.add('active');
+        var a = document.querySelector('.toc-link[href="#' + s.id + '"]');
+        if (a) a.classList.add('active');
       }
     });
   });

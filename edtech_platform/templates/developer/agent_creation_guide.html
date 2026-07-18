@@ -19,13 +19,11 @@
     padding: 40px 24px 80px;
     align-items: start;
   }
-
   @media (max-width: 900px) {
     .guide-layout { grid-template-columns: 1fr; }
     .guide-toc    { display: none; }
   }
 
-  /* ── Table of Contents ── */
   .guide-toc {
     position: sticky;
     top: 88px;
@@ -36,555 +34,648 @@
     animation: fadeInUp 0.4s ease both;
   }
   .toc-title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 12px;
   }
   .toc-link {
-    display: block;
-    padding: 6px 10px;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.15s;
-    border-left: 2px solid transparent;
-    margin-bottom: 2px;
+    display: block; padding: 6px 10px; font-size: 0.8125rem;
+    color: var(--text-secondary); border-radius: 6px; text-decoration: none;
+    transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 2px;
   }
   .toc-link:hover, .toc-link.active {
-    color: var(--primary);
-    background: rgba(83,74,183,0.06);
-    border-left-color: var(--primary);
+    color: var(--primary); background: rgba(83,74,183,0.06); border-left-color: var(--primary);
   }
-  .toc-link.sub {
-    padding-left: 22px;
-    font-size: 0.775rem;
-  }
+  .toc-link.sub { padding-left: 22px; font-size: 0.775rem; }
 
-  /* ── Main Content ── */
-  .guide-content {
-    min-width: 0;
-  }
+  .guide-content { min-width: 0; }
 
   .guide-section {
     animation: fadeInUp 0.5s ease both;
     margin-bottom: 48px;
     scroll-margin-top: 90px;
   }
-  .guide-section:nth-child(1) { animation-delay: 0.05s; }
-  .guide-section:nth-child(2) { animation-delay: 0.1s; }
-  .guide-section:nth-child(3) { animation-delay: 0.15s; }
-  .guide-section:nth-child(4) { animation-delay: 0.2s; }
-  .guide-section:nth-child(5) { animation-delay: 0.25s; }
-  .guide-section:nth-child(6) { animation-delay: 0.3s; }
 
   .section-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--primary);
-    margin-bottom: 6px;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--primary); margin-bottom: 6px;
   }
   .section-title {
-    font-size: 1.375rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 12px;
+    font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;
   }
   .section-body {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.75;
+    font-size: 0.9rem; color: var(--text-secondary); line-height: 1.78;
   }
   .section-body p { margin-bottom: 10px; }
   .section-body strong { color: var(--text-primary); }
-
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0 0 48px;
-  }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 48px; }
 
   /* Code block */
   .code-block {
-    background: #1A1A2E;
-    border-radius: 10px;
-    padding: 20px 22px;
-    overflow-x: auto;
-    position: relative;
+    background: #1A1A2E; border-radius: 10px; padding: 20px 22px;
+    overflow-x: auto; position: relative;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 0.8rem;
-    line-height: 1.8;
-    color: #e2e8f0;
-    margin: 16px 0;
+    font-size: 0.785rem; line-height: 1.85; color: #e2e8f0; margin: 14px 0;
   }
   .code-block .comment { color: #6B7280; }
   .code-block .key     { color: #93C5FD; }
   .code-block .val     { color: #86EFAC; }
   .code-block .str     { color: #FDE68A; }
-  .code-block .type    { color: #C4B5FD; }
+  .code-block .kw      { color: #C4B5FD; }
+  .code-block .fn      { color: #67E8F9; }
+  .code-block .cmd     { color: #1D9E75; }
+  .code-block .url     { color: #93C5FD; }
+  .code-block .flag    { color: #FDE68A; }
 
   .copy-btn {
     position: absolute; top: 12px; right: 12px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-    color: #9CA3AF; border-radius: 6px; padding: 5px 10px;
-    font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; gap: 4px;
+    color: #9CA3AF; border-radius: 6px; padding: 5px 10px; font-size: 0.7rem;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px;
   }
   .copy-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
-  /* Constraint / info cards */
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-  }
-  .info-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 18px 20px;
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-  .info-card-icon {
-    width: 36px; height: 36px; border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 10px;
-  }
-  .info-card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
-  .info-card-desc  { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
-
-  /* Allowed / Blocked lists */
-  .check-list { list-style: none; padding: 0; margin: 12px 0; }
-  .check-list li {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-  }
-  .check-list li:last-child { border-bottom: none; }
-  .check-list li .icon-wrap {
-    width: 20px; height: 20px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 1px;
-  }
-  .icon-ok  { background: rgba(29,158,117,0.12); }
-  .icon-no  { background: rgba(224,82,82,0.12); }
-
-  /* Alert callouts */
+  /* Callouts */
   .callout {
-    border-radius: 10px; padding: 16px 18px;
-    display: flex; gap: 12px;
-    margin: 16px 0;
-    font-size: 0.875rem;
-    line-height: 1.6;
+    border-radius: 10px; padding: 15px 18px; display: flex; gap: 12px;
+    margin: 14px 0; font-size: 0.875rem; line-height: 1.6;
   }
-  .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #92500a; }
+  .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #7a4208; }
   .callout-info  { background: rgba(83,74,183,0.07);   border: 1px solid rgba(83,74,183,0.2);  color: #3D3590; }
   .callout-tip   { background: rgba(29,158,117,0.07);  border: 1px solid rgba(29,158,117,0.2); color: #0f5c3d; }
+  .callout-error { background: rgba(224,82,82,0.07);   border: 1px solid rgba(224,82,82,0.2);  color: #8b1a1a; }
   .callout strong { display: block; margin-bottom: 3px; }
 
-  /* Field table */
-  .field-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.845rem; }
-  .field-table th {
-    text-align: left; padding: 10px 14px;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-secondary);
-    background: var(--bg); border-bottom: 1px solid var(--border);
+  /* Data tables */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.845rem; margin: 14px 0; }
+  .data-table th {
+    text-align: left; padding: 10px 14px; font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary);
+    background: var(--bg); border-bottom: 2px solid var(--border);
   }
-  .field-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
-  .field-table tr:last-child td { border-bottom: none; }
-  .field-table code {
+  .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(83,74,183,0.02); }
+  code.inline {
     background: rgba(83,74,183,0.08); color: var(--primary);
     padding: 2px 7px; border-radius: 4px; font-size: 0.8rem;
     font-family: 'JetBrains Mono', monospace;
   }
-  .required-badge {
-    background: rgba(224,82,82,0.1); color: var(--error);
-    font-size: 0.68rem; font-weight: 700; padding: 1px 7px;
-    border-radius: 30px; text-transform: uppercase; letter-spacing: 0.04em;
+
+  /* Constraint / never-do list */
+  .constraint-list { list-style: none; padding: 0; margin: 14px 0; }
+  .constraint-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-size: 0.875rem; color: var(--text-secondary); background: #fff;
   }
-  .optional-badge {
-    background: rgba(107,114,128,0.1); color: #6B7280;
-    font-size: 0.68rem; font-weight: 700; padding: 1px 7px;
-    border-radius: 30px; text-transform: uppercase; letter-spacing: 0.04em;
+  .constraint-list li:first-child { border-radius: 10px 10px 0 0; }
+  .constraint-list li:last-child  { border-bottom: none; border-radius: 0 0 10px 10px; }
+  .constraint-list { border: 1px solid var(--border); border-radius: 10px; }
+  .icon-x { width: 20px; height: 20px; border-radius: 50%; background: rgba(224,82,82,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .icon-ok { width: 20px; height: 20px; border-radius: 50%; background: rgba(29,158,117,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; margin: 14px 0; display: flex; flex-direction: column; gap: 6px; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.875rem; color: var(--text-secondary);
+  }
+  .check-box {
+    width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px;
+    flex-shrink: 0; margin-top: 1px;
   }
 
-  /* Hero banner */
+  /* Endpoint cards */
+  .endpoint-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card);
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .endpoint-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+  }
+  .method-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 5px;
+  }
+  .method-post { background: rgba(83,74,183,0.12); color: var(--primary); }
+  .method-get  { background: rgba(29,158,117,0.12); color: #1D9E75; }
+  .endpoint-path { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+  .endpoint-desc { padding: 14px 18px; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; }
+
+  /* Hero */
   .guide-hero {
     background: linear-gradient(135deg, #534AB7 0%, #3D3590 100%);
-    border-radius: var(--radius-card);
-    padding: 32px 36px;
-    color: #fff;
-    margin-bottom: 40px;
-    position: relative;
-    overflow: hidden;
+    border-radius: var(--radius-card); padding: 32px 36px; color: #fff;
+    margin-bottom: 40px; position: relative; overflow: hidden;
     animation: fadeInUp 0.4s ease both;
   }
   .guide-hero::after {
-    content: '';
-    position: absolute; right: -40px; top: -40px;
-    width: 200px; height: 200px; border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.05);
   }
   .guide-hero h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
-  .guide-hero p  { opacity: 0.8; font-size: 0.9rem; max-width: 560px; line-height: 1.6; }
-  .guide-hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-  .guide-pill {
+  .guide-hero p  { opacity: 0.82; font-size: 0.9rem; max-width: 580px; line-height: 1.65; }
+  .hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .hero-pill {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 30px; padding: 4px 14px;
-    font-size: 0.78rem; font-weight: 500; color: #fff;
-    display: flex; align-items: center; gap: 6px;
+    border-radius: 30px; padding: 4px 14px; font-size: 0.78rem; font-weight: 500;
+    color: #fff; display: flex; align-items: center; gap: 6px;
   }
 
   /* CTA bar */
   .cta-bar {
     background: linear-gradient(135deg, rgba(83,74,183,0.07), rgba(29,158,117,0.05));
-    border: 1px solid rgba(83,74,183,0.15);
-    border-radius: var(--radius-card);
-    padding: 24px 28px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 48px;
+    border: 1px solid rgba(83,74,183,0.15); border-radius: var(--radius-card);
+    padding: 24px 28px; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-top: 40px;
   }
+
+  /* sub-heading inside section */
+  .sub-heading { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 24px 0 8px; }
 </style>
 
 <div class="guide-layout">
 
-  <!-- ── LEFT: Table of Contents ── -->
+  <!-- ── TOC ── -->
   <aside class="guide-toc">
     <div class="toc-title">On this page</div>
-    <a href="#overview"       class="toc-link">Overview</a>
-    <a href="#architecture"   class="toc-link">Architecture</a>
-    <a href="#manifest"       class="toc-link">manifest.json</a>
-    <a href="#manifest-fields"class="toc-link sub">Fields Reference</a>
-    <a href="#input-output"   class="toc-link">Input / Output Types</a>
-    <a href="#constraints"    class="toc-link">Constraints &amp; Rules</a>
-    <a href="#allowed"        class="toc-link sub">Allowed</a>
-    <a href="#blocked"        class="toc-link sub">Blocked</a>
-    <a href="#next-steps"     class="toc-link">Next Steps</a>
+    <a href="#what-youre-building"  class="toc-link">A.1 What you're building</a>
+    <a href="#endpoints"            class="toc-link">A.2 Required endpoints</a>
+    <a href="#invoke"               class="toc-link sub">POST /invoke</a>
+    <a href="#health"               class="toc-link sub">GET /health</a>
+    <a href="#capabilities"         class="toc-link sub">GET /capabilities</a>
+    <a href="#manifest"             class="toc-link">A.3 manifest.json</a>
+    <a href="#input-types"          class="toc-link">A.4 Input types</a>
+    <a href="#output-types"         class="toc-link">A.5 Output types</a>
+    <a href="#platform-data"        class="toc-link">A.6 Platform data (MCP)</a>
+    <a href="#constraints"          class="toc-link">A.7 Hard constraints</a>
+    <a href="#checklist"            class="toc-link">A.8 Pre-submission checklist</a>
   </aside>
 
-  <!-- ── RIGHT: Content ── -->
+  <!-- ── Content ── -->
   <main class="guide-content">
 
     <!-- Hero -->
     <div class="guide-hero">
-      <div class="flex items-center gap-2 mb-3" style="opacity:0.7; font-size:0.8rem; font-weight:500;">
+      <div style="opacity:0.7; font-size:0.8rem; font-weight:500; margin-bottom:10px;">
         <a href="/developer/" style="color:#fff; text-decoration:none;">Developer Portal</a>
-        <span>›</span>
+        <span style="margin:0 6px;">›</span>
         <span>Agent Creation Guide</span>
       </div>
-      <h1>Creating an Agent</h1>
-      <p>Everything you need to know about building a compliant AI teaching agent for the ExcellStudy platform — from architecture to field constraints.</p>
-      <div class="guide-hero-pills">
-        <span class="guide-pill"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Spec v2.0</span>
-        <span class="guide-pill"><i data-lucide="clock" style="width:13px;height:13px;"></i> ~15 min read</span>
-        <span class="guide-pill"><i data-lucide="shield-check" style="width:13px;height:13px;"></i> Platform compliant</span>
+      <h1>Building an AI Agent</h1>
+      <p>Complete developer reference — Part A. Covers endpoints, the manifest, I/O types, MCP data access, and hard constraints.</p>
+      <div class="hero-pills">
+        <span class="hero-pill"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Spec v2.0</span>
+        <span class="hero-pill"><i data-lucide="clock" style="width:13px;height:13px;"></i> ~20 min read</span>
+        <span class="hero-pill"><i data-lucide="container" style="width:13px;height:13px;"></i> Docker-based</span>
       </div>
     </div>
 
-    <!-- ── 1. Overview ── -->
-    <section class="guide-section" id="overview">
-      <div class="section-label">01 — Overview</div>
-      <h2 class="section-title">What is an ExcellStudy Agent?</h2>
+    <!-- A.1 -->
+    <section class="guide-section" id="what-youre-building">
+      <div class="section-label">A.1</div>
+      <h2 class="section-title">What you're building</h2>
       <div class="section-body">
-        <p>
-          An <strong>ExcellStudy Agent</strong> is a containerised AI service that receives a learner input, 
-          processes it using your model or logic, and returns a structured educational response. 
-          Every agent runs in isolation, communicates exclusively through our defined API contract, 
-          and must pass the automated pipeline before going live.
-        </p>
-        <p>
-          Agents are subject-matter specialists — a single agent should focus on one domain 
-          (e.g., <em>Algebra</em>, <em>Chemistry</em>, <em>Essay Writing</em>). 
-          Multi-subject generalist agents are not accepted.
-        </p>
+        <p>An agent is a <strong>Docker container</strong> exposing a small, fixed set of HTTP endpoints. The platform never inspects or runs your code directly — it only ever talks to your container over HTTP, at the routes described below. Your language, framework, internal logic, and LLM choice are entirely up to you.</p>
+      </div>
+      <div class="code-block">
+<span class="comment">Your container just needs to:</span>
+  1. Listen on a port
+  2. Respond correctly at /invoke, /health, /capabilities
+  3. Return JSON in the platform's expected shape
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- A.2 -->
+    <section class="guide-section" id="endpoints">
+      <div class="section-label">A.2</div>
+      <h2 class="section-title">Required endpoints</h2>
+      <div class="section-body">
+        <p>Every agent <strong>must</strong> expose all three. The validation pipeline checks all three before your agent ever goes live, and Kubernetes continuously checks <code class="inline">/health</code> afterward.</p>
       </div>
 
-      <div class="callout callout-info">
-        <i data-lucide="info" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
-        <div>
-          <strong>Platform Note</strong>
-          Your agent must be registered on the portal <em>before</em> you push its Docker image. 
-          The pipeline cross-validates the pushed image against the registration metadata.
+      <!-- POST /invoke -->
+      <div class="endpoint-card" id="invoke" style="scroll-margin-top:90px;">
+        <div class="endpoint-header">
+          <span class="method-badge method-post">POST</span>
+          <span class="endpoint-path">/invoke</span>
+        </div>
+        <div class="endpoint-desc">
+          Called every time a learner submits input to your agent.
+          <div class="sub-heading">Request body you will receive:</div>
+        </div>
+        <div class="code-block" style="border-radius:0; margin:0; border-top:1px solid rgba(255,255,255,0.06);">
+          <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{
+  <span class="key">"input"</span>:   { <span class="comment">/* shape depends on your declared input_type — see A.4 */</span> },
+  <span class="key">"context"</span>: { <span class="key">"learner_id"</span>: <span class="str">"8821"</span> }
+}
+        </div>
+        <div class="endpoint-desc">
+          <div class="sub-heading">Response you must return:</div>
+        </div>
+        <div class="code-block" style="border-radius:0; margin:0; border-top:1px solid rgba(255,255,255,0.06);">
+          <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{
+  <span class="key">"content"</span>: [
+    {
+      <span class="key">"type"</span>:       <span class="str">"verdict"</span>,
+      <span class="key">"correct"</span>:    <span class="val">true</span>,
+      <span class="key">"confidence"</span>: <span class="val">0.92</span>,
+      <span class="key">"summary"</span>:    <span class="str">"Correct!"</span>
+    }
+  ]
+}
+        </div>
+        <div class="endpoint-desc">
+          Each block's <code class="inline">type</code> must be an approved output type (see A.5). Blocks with unrecognised types are <strong>silently dropped</strong> by the platform's renderer — double-check spelling and casing.
+        </div>
+      </div>
+
+      <!-- GET /health -->
+      <div class="endpoint-card" id="health" style="scroll-margin-top:90px;">
+        <div class="endpoint-header">
+          <span class="method-badge method-get">GET</span>
+          <span class="endpoint-path">/health</span>
+        </div>
+        <div class="endpoint-desc">
+          Called frequently by both the pipeline and Kubernetes. Must respond quickly with <strong>no side effects</strong> — don't write to a database, don't call an LLM here. If this stops responding, Kubernetes restarts your container automatically.
+        </div>
+        <div class="code-block" style="border-radius:0; margin:0; border-top:1px solid rgba(255,255,255,0.06);">
+          <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{ <span class="key">"status"</span>: <span class="str">"ok"</span> }
+        </div>
+      </div>
+
+      <!-- GET /capabilities -->
+      <div class="endpoint-card" id="capabilities" style="scroll-margin-top:90px;">
+        <div class="endpoint-header">
+          <span class="method-badge method-get">GET</span>
+          <span class="endpoint-path">/capabilities</span>
+        </div>
+        <div class="endpoint-desc">
+          Returns a live description of what your agent supports, matching what you registered in the dev portal (see A.3).
+        </div>
+        <div class="code-block" style="border-radius:0; margin:0; border-top:1px solid rgba(255,255,255,0.06);">
+          <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{
+  <span class="key">"input_type"</span>:   <span class="str">"image_upload"</span>,
+  <span class="key">"output_types"</span>: [<span class="str">"verdict"</span>, <span class="str">"annotated_image"</span>]
+}
         </div>
       </div>
     </section>
     <hr class="section-divider">
 
-    <!-- ── 2. Architecture ── -->
-    <section class="guide-section" id="architecture">
-      <div class="section-label">02 — Architecture</div>
-      <h2 class="section-title">How Agents Work</h2>
-      <div class="section-body">
-        <p>Your agent is a stateless HTTP service inside a Docker container. The platform calls it on each learner interaction.</p>
-      </div>
-
-      <div class="info-grid">
-        <div class="info-card">
-          <div class="info-card-icon" style="background:rgba(83,74,183,0.1);">
-            <i data-lucide="box" style="width:18px;height:18px;color:#534AB7;"></i>
-          </div>
-          <div class="info-card-title">Docker Container</div>
-          <div class="info-card-desc">Your agent must be packaged as a Docker image and pushed to the ExcellStudy registry.</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-icon" style="background:rgba(29,158,117,0.1);">
-            <i data-lucide="zap" style="width:18px;height:18px;color:#1D9E75;"></i>
-          </div>
-          <div class="info-card-title">REST API Contract</div>
-          <div class="info-card-desc">Your container must expose a <code style="background:rgba(29,158,117,0.1);color:#1D9E75;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">POST /infer</code> endpoint that accepts our payload schema.</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-icon" style="background:rgba(186,117,23,0.1);">
-            <i data-lucide="shield" style="width:18px;height:18px;color:#BA7517;"></i>
-          </div>
-          <div class="info-card-title">Stateless Design</div>
-          <div class="info-card-desc">Each request is independent. Do not persist learner data inside your container.</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-icon" style="background:rgba(139,92,246,0.1);">
-            <i data-lucide="file-json-2" style="width:18px;height:18px;color:#8B5CF6;"></i>
-          </div>
-          <div class="info-card-title">manifest.json</div>
-          <div class="info-card-desc">A metadata file bundled with your image that describes your agent's capabilities and constraints.</div>
-        </div>
-      </div>
-    </section>
-    <hr class="section-divider">
-
-    <!-- ── 3. manifest.json ── -->
+    <!-- A.3 -->
     <section class="guide-section" id="manifest">
-      <div class="section-label">03 — Manifest</div>
+      <div class="section-label">A.3</div>
       <h2 class="section-title">manifest.json</h2>
       <div class="section-body">
-        <p>
-          Every agent image must include a <strong>manifest.json</strong> at its root. 
-          This file is read by the pipeline during the schema validation step. 
-          Any mismatch with your portal registration will cause the pipeline to fail.
-        </p>
+        <p>Every submitted image must include <code class="inline">manifest.json</code> (typically at <code class="inline">/app/manifest.json</code>). This describes your agent to the platform without requiring anyone to read your code.</p>
       </div>
 
       <div class="code-block">
         <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
-<span class="comment">// manifest.json — place at the root of your Docker image</span>
 {
-  <span class="key">"name"</span>:            <span class="str">"My Math Agent"</span>,
-  <span class="key">"version"</span>:         <span class="str">"1.0.0"</span>,
-  <span class="key">"description"</span>:     <span class="str">"Teaches algebra fundamentals for ages 10–16"</span>,
-  <span class="key">"entry_point"</span>:     <span class="str">"main:app"</span>,
-  <span class="key">"port"</span>:            <span class="val">8080</span>,
-
-  <span class="comment">// Must match the input_type chosen during registration</span>
-  <span class="key">"input_type"</span>:     <span class="str">"text"</span>,
-
-  <span class="comment">// Must match output_types chosen during registration</span>
-  <span class="key">"output_types"</span>:   [<span class="str">"text"</span>, <span class="str">"hint"</span>],
-
-  <span class="comment">// At least one subject area required</span>
-  <span class="key">"subject_areas"</span>:  [<span class="str">"algebra"</span>, <span class="str">"mathematics"</span>],
-
-  <span class="comment">// Age range your agent is designed for</span>
-  <span class="key">"age_groups"</span>:     [<span class="str">"10-13"</span>, <span class="str">"14-16"</span>],
-
-  <span class="comment">// Optional feature flags</span>
-  <span class="key">"capabilities"</span>:   [<span class="str">"step_by_step"</span>, <span class="str">"adaptive_hints"</span>]
+  <span class="key">"name"</span>:          <span class="str">"biology-drawing-checker"</span>,
+  <span class="key">"version"</span>:       <span class="str">"1.0.0"</span>,
+  <span class="key">"subject_areas"</span>: [<span class="str">"biology"</span>],
+  <span class="key">"age_groups"</span>:    [<span class="str">"12-18"</span>],
+  <span class="key">"input_type"</span>:    <span class="str">"image_upload"</span>,
+  <span class="key">"output_types"</span>:  [<span class="str">"verdict"</span>, <span class="str">"annotated_image"</span>],
+  <span class="key">"options"</span>:        [],
+  <span class="key">"endpoints"</span>: {
+    <span class="key">"invoke"</span>:       <span class="str">"/invoke"</span>,
+    <span class="key">"health"</span>:       <span class="str">"/health"</span>,
+    <span class="key">"capabilities"</span>: <span class="str">"/capabilities"</span>
+  }
 }
+      </div>
+
+      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card); margin:16px 0;">
+        <table class="data-table">
+          <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">name</code></td><td>Display name</td></tr>
+            <tr><td><code class="inline">version</code></td><td>Semver only: <code class="inline">1.0.0</code>, not <code class="inline">v1</code> or <code class="inline">1.0</code></td></tr>
+            <tr><td><code class="inline">input_type</code></td><td>Exactly one value — see A.4</td></tr>
+            <tr><td><code class="inline">output_types</code></td><td>One or more values — see A.5</td></tr>
+            <tr><td><code class="inline">subject_areas</code> / <code class="inline">age_groups</code></td><td>Marketplace search/filter only</td></tr>
+            <tr><td><code class="inline">options</code></td><td>Only used when <code class="inline">input_type</code> is <code class="inline">multiple_choice</code> — see A.4</td></tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="callout callout-warn">
         <i data-lucide="alert-triangle" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
         <div>
-          <strong>Fields must match your portal registration exactly.</strong>
-          If <code>input_type</code> or <code>output_types</code> in your manifest differ from what you registered, 
-          the pipeline's schema validation step will immediately fail.
+          <strong>This file must match your portal registration exactly (Part B).</strong>
+          The pipeline cross-checks your container's manifest against your portal registration — a mismatch is a rejection, not a silent overwrite in either direction. If you change your agent's real input/output behaviour, update both the portal registration and this file together, then resubmit.
         </div>
       </div>
     </section>
+    <hr class="section-divider">
 
-    <!-- Fields Reference -->
-    <section class="guide-section" id="manifest-fields">
-      <div class="section-label">03a — Fields Reference</div>
-      <h2 class="section-title">manifest.json Field Reference</h2>
+    <!-- A.4 -->
+    <section class="guide-section" id="input-types">
+      <div class="section-label">A.4</div>
+      <h2 class="section-title">Choosing your input type</h2>
+      <div class="section-body">
+        <p>Declare <strong>exactly one</strong>. This determines what input component learners see, and what shape <code class="inline">input</code> takes in your <code class="inline">/invoke</code> request.</p>
+      </div>
 
-      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card);">
-        <table class="field-table">
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
-            </tr>
-          </thead>
+      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card); margin:16px 0;">
+        <table class="data-table">
+          <thead><tr><th>input_type</th><th>Learner sees</th><th>You receive</th></tr></thead>
           <tbody>
             <tr>
-              <td><code>name</code></td>
-              <td>string</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Human-readable agent name. Must match portal registration.</td>
+              <td><code class="inline">text_with_units</code></td>
+              <td>Text field</td>
+              <td><code class="inline">{ "value": "30 m/s" }</code></td>
             </tr>
             <tr>
-              <td><code>version</code></td>
-              <td>string</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Semver format e.g. <code>1.0.0</code>. Must match portal registration.</td>
+              <td><code class="inline">number</code></td>
+              <td>Number field</td>
+              <td><code class="inline">{ "value": 42 }</code></td>
             </tr>
             <tr>
-              <td><code>description</code></td>
-              <td>string</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Short description of what the agent teaches. Max 300 chars.</td>
+              <td><code class="inline">image_upload</code></td>
+              <td>File / drawing upload</td>
+              <td><code class="inline">{ "image_url": "https://..." }</code></td>
             </tr>
             <tr>
-              <td><code>entry_point</code></td>
-              <td>string</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Python module path to your ASGI/WSGI app e.g. <code>main:app</code>.</td>
+              <td><code class="inline">multiple_choice</code></td>
+              <td>Radio buttons</td>
+              <td><code class="inline">{ "selected_index": 2 }</code></td>
             </tr>
             <tr>
-              <td><code>port</code></td>
-              <td>integer</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Port your container listens on. Must be <code>8080</code>.</td>
-            </tr>
-            <tr>
-              <td><code>input_type</code></td>
-              <td>string</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>One of the approved input types. Must match registration.</td>
-            </tr>
-            <tr>
-              <td><code>output_types</code></td>
-              <td>array</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>List of approved output types. Must match registration.</td>
-            </tr>
-            <tr>
-              <td><code>subject_areas</code></td>
-              <td>array</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>At least one subject area. Must match registration.</td>
-            </tr>
-            <tr>
-              <td><code>age_groups</code></td>
-              <td>array</td>
-              <td><span class="required-badge">Required</span></td>
-              <td>Target age ranges e.g. <code>["10-13", "14-16"]</code>.</td>
-            </tr>
-            <tr>
-              <td><code>capabilities</code></td>
-              <td>array</td>
-              <td><span class="optional-badge">Optional</span></td>
-              <td>Feature flags like <code>step_by_step</code>, <code>adaptive_hints</code>.</td>
+              <td><code class="inline">free_text</code></td>
+              <td>Larger text area</td>
+              <td><code class="inline">{ "value": "..." }</code></td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <div class="callout callout-info">
+        <i data-lucide="info" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <strong>If input_type is multiple_choice</strong>, you must also provide <code class="inline">options</code> in your manifest — a list of <code class="inline">{label, value}</code> objects the platform renders as radio buttons.
+        </div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="key">"options"</span>: [
+  { <span class="key">"label"</span>: <span class="str">"1/2"</span>, <span class="key">"value"</span>: <span class="val">0</span> },
+  { <span class="key">"label"</span>: <span class="str">"3/4"</span>, <span class="key">"value"</span>: <span class="val">1</span> }
+]
+      </div>
+
+      <div class="callout callout-info" style="margin-top:4px;">
+        <i data-lucide="image" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <strong>Note on images:</strong> <code class="inline">image_url</code> is always a URL, never raw image bytes. The learner's browser uploads the file to platform storage first and only sends you the resulting URL. Download the image yourself inside your <code class="inline">/invoke</code> handler if you need to inspect pixel data.
+        </div>
+      </div>
     </section>
     <hr class="section-divider">
 
-    <!-- ── 4. Input / Output Types ── -->
-    <section class="guide-section" id="input-output">
-      <div class="section-label">04 — I/O Types</div>
-      <h2 class="section-title">Approved Input &amp; Output Types</h2>
+    <!-- A.5 -->
+    <section class="guide-section" id="output-types">
+      <div class="section-label">A.5</div>
+      <h2 class="section-title">Choosing your output types</h2>
       <div class="section-body">
-        <p>Only the following types are accepted by the platform. You must select from this list when registering and in your manifest.</p>
+        <p>Declare one or more. Every block in your <code class="inline">/invoke</code> response's <code class="inline">content</code> array must use one of these <code class="inline">type</code> values with the listed required fields.</p>
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px;">
-        <div>
-          <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-secondary); margin-bottom:10px;">Input Types</div>
-          <ul class="check-list">
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">text</code> — Plain text question</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">image</code> — Photo or diagram upload</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">audio</code> — Voice recording</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">code</code> — Code snippet</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">math_expression</code> — LaTeX / MathML</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">multiple_choice</code> — MCQ with options</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">structured_data</code> — JSON payload</span></li>
-          </ul>
-        </div>
-        <div>
-          <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-secondary); margin-bottom:10px;">Output Types</div>
-          <ul class="check-list">
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">text</code> — Plain text response</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">hint</code> — Scaffolded hint</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">score</code> — Numeric evaluation</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">explanation</code> — Step-by-step breakdown</span></li>
-            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">feedback</code> — Qualitative feedback</span></li>
-          </ul>
-        </div>
+      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card); margin:16px 0;">
+        <table class="data-table">
+          <thead><tr><th>type</th><th>Required fields</th><th>Use for</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code class="inline">verdict</code></td>
+              <td><code class="inline">correct</code> (bool), <code class="inline">summary</code> (str), <code class="inline">confidence</code> (float, optional)</td>
+              <td>Right/wrong feedback</td>
+            </tr>
+            <tr>
+              <td><code class="inline">annotated_image</code></td>
+              <td><code class="inline">image_url</code> (str), <code class="inline">markup</code> (list of <code class="inline">{x, y, label, status}</code>)</td>
+              <td>Marked-up image feedback</td>
+            </tr>
+            <tr>
+              <td><code class="inline">score</code></td>
+              <td><code class="inline">value</code> (num), <code class="inline">max</code> (num), <code class="inline">breakdown</code> (dict, optional)</td>
+              <td>Numeric / graded feedback</td>
+            </tr>
+            <tr>
+              <td><code class="inline">diff</code></td>
+              <td><code class="inline">learner_answer</code>, <code class="inline">correct_answer</code>, <code class="inline">explanation</code></td>
+              <td>Comparing to a correct answer</td>
+            </tr>
+            <tr>
+              <td><code class="inline">text</code></td>
+              <td><code class="inline">value</code> (str)</td>
+              <td>Plain explanation — safe fallback</td>
+            </tr>
+            <tr>
+              <td><code class="inline">step_list</code></td>
+              <td><code class="inline">steps</code> (list of str)</td>
+              <td>Worked-solution walkthroughs</td>
+            </tr>
+            <tr>
+              <td><code class="inline">comparison</code></td>
+              <td><code class="inline">headers</code> (list), <code class="inline">rows</code> (list of lists)</td>
+              <td>Side-by-side tables</td>
+            </tr>
+            <tr>
+              <td><code class="inline">hint</code></td>
+              <td><code class="inline">value</code> (str), <code class="inline">reveal_order</code> (int)</td>
+              <td>Progressive hints</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub-heading">Example — physics realism checker:</div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{
+  <span class="key">"content"</span>: [
+    {
+      <span class="key">"type"</span>:       <span class="str">"verdict"</span>,
+      <span class="key">"correct"</span>:    <span class="val">false</span>,
+      <span class="key">"confidence"</span>: <span class="val">0.87</span>,
+      <span class="key">"summary"</span>:    <span class="str">"Not realistic"</span>
+    },
+    {
+      <span class="key">"type"</span>:  <span class="str">"text"</span>,
+      <span class="key">"value"</span>: <span class="str">"A car accelerating at 50 m/s² would exceed highway speed in under a second."</span>
+    }
+  ]
+}
+      </div>
+
+      <div class="sub-heading">Example — biology drawing checker:</div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+{
+  <span class="key">"content"</span>: [
+    {
+      <span class="key">"type"</span>:      <span class="str">"annotated_image"</span>,
+      <span class="key">"image_url"</span>: <span class="str">"https://.../learner-upload-123.png"</span>,
+      <span class="key">"markup"</span>: [
+        { <span class="key">"x"</span>: <span class="val">120</span>, <span class="key">"y"</span>: <span class="val">80</span>,  <span class="key">"label"</span>: <span class="str">"correct: nucleus"</span>,   <span class="key">"status"</span>: <span class="str">"correct"</span> },
+        { <span class="key">"x"</span>: <span class="val">300</span>, <span class="key">"y"</span>: <span class="val">200</span>, <span class="key">"label"</span>: <span class="str">"missing: cell wall"</span>, <span class="key">"status"</span>: <span class="str">"missing"</span> }
+      ]
+    },
+    { <span class="key">"type"</span>: <span class="str">"verdict"</span>, <span class="key">"correct"</span>: <span class="val">false</span>, <span class="key">"summary"</span>: <span class="str">"Mostly correct — one structure missing"</span> }
+  ]
+}
       </div>
     </section>
     <hr class="section-divider">
 
-    <!-- ── 5. Constraints ── -->
+    <!-- A.6 -->
+    <section class="guide-section" id="platform-data">
+      <div class="section-label">A.6</div>
+      <h2 class="section-title">Accessing platform data from your agent</h2>
+      <div class="section-body">
+        <p>Your container has <strong>no</strong> database credentials and <strong>no</strong> direct network path to Postgres, Redis, or Neo4j. If you need learner or curriculum data, you call the platform's <strong>MCP servers</strong> as an MCP client, using the credential (<code class="inline">AGENT_KEY</code>) injected into your container automatically at deploy time.</p>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="kw">from</span> <span class="fn">fastmcp</span> <span class="kw">import</span> Client
+<span class="kw">import</span> os
+
+AGENT_KEY              = os.<span class="fn">environ</span>[<span class="str">"AGENT_KEY"</span>]
+LEARNER_CONTEXT_MCP_URL = os.<span class="fn">environ</span>[<span class="str">"LEARNER_CONTEXT_MCP_URL"</span>]
+
+<span class="kw">async def</span> <span class="fn">get_learner_profile</span>(learner_id: str) -> dict:
+    <span class="kw">async with</span> <span class="fn">Client</span>(LEARNER_CONTEXT_MCP_URL) <span class="kw">as</span> client:
+        <span class="kw">return await</span> client.<span class="fn">call_tool</span>(
+            <span class="str">"get_learner"</span>,
+            {<span class="str">"learner_id"</span>: learner_id, <span class="str">"agent_key"</span>: AGENT_KEY},
+        )
+      </div>
+
+      <div class="sub-heading" style="margin-top:20px;">Available MCP servers and tools:</div>
+      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card); margin:12px 0;">
+        <table class="data-table">
+          <thead><tr><th>Server</th><th>Tools</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="white-space:nowrap; font-weight:600; color:var(--text-primary);">Learner Context</td>
+              <td><code class="inline">get_learner</code>, <code class="inline">write_progress</code></td>
+              <td>Third-party agents get a filtered profile (no mood/session data) and a capped write delta (±10 vs ±100 for built-in agents). <code class="inline">get_session</code> is built-in-agents-only and will reject you.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap; font-weight:600; color:var(--text-primary);">Knowledge Graph</td>
+              <td><code class="inline">get_prerequisites</code>, <code class="inline">get_next_concepts</code>, <code class="inline">get_concept</code></td>
+              <td>No RBAC distinction — curriculum structure isn't sensitive.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap; font-weight:600; color:var(--text-primary);">Content</td>
+              <td><code class="inline">search_content</code>, <code class="inline">get_course</code>, <code class="inline">get_module</code></td>
+              <td>Used for RAG — retrieving relevant material to ground your LLM.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub-heading"><code class="inline">write_progress</code> example:</div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="kw">await</span> client.<span class="fn">call_tool</span>(<span class="str">"write_progress"</span>, {
+    <span class="str">"learner_id"</span>: learner_id,
+    <span class="str">"agent_key"</span>:  AGENT_KEY,
+    <span class="str">"updates"</span>:    {<span class="str">"physics"</span>: <span class="val">5</span>},  <span class="comment"># delta, not absolute</span>
+                              <span class="comment"># exceeding your cap raises an error,</span>
+                              <span class="comment"># it does not silently clamp</span>
+})
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- A.7 -->
     <section class="guide-section" id="constraints">
-      <div class="section-label">05 — Constraints</div>
-      <h2 class="section-title">Platform Constraints &amp; Rules</h2>
+      <div class="section-label">A.7</div>
+      <h2 class="section-title">Hard constraints — never do these</h2>
       <div class="section-body">
-        <p>All agents are reviewed against the following requirements. Violating any of these will result in automatic rejection during the pipeline or during manual review.</p>
+        <p>Violations of any of the following cause automatic pipeline rejection or immediate suspension.</p>
       </div>
 
-      <div id="allowed" style="scroll-margin-top:90px;">
-        <div class="callout callout-tip" style="margin-bottom:0; border-radius:10px 10px 0 0;">
-          <i data-lucide="check-circle-2" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
-          <div><strong>Allowed</strong> — Your agent must do all of these</div>
-        </div>
-        <ul class="check-list" style="background:#fff; border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:0 16px;">
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Respond within <strong>5 seconds</strong> per request</li>
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Return well-formed JSON matching the output schema</li>
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Return HTTP <code style="font-family:monospace;">200</code> on success, <code style="font-family:monospace;">4xx</code>/<code style="font-family:monospace;">5xx</code> on errors</li>
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Focus on <strong>one subject area</strong> per agent</li>
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Produce age-appropriate, curriculum-aligned responses</li>
-          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Run on port <code style="font-family:monospace;">8080</code> inside the container</li>
-        </ul>
-      </div>
-
-      <div id="blocked" style="scroll-margin-top:90px; margin-top:20px;">
-        <div class="callout callout-warn" style="margin-bottom:0; border-radius:10px 10px 0 0;">
-          <i data-lucide="shield-x" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
-          <div><strong>Blocked</strong> — These will cause automatic rejection</div>
-        </div>
-        <ul class="check-list" style="background:#fff; border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:0 16px;">
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Storing or logging learner PII (name, email, chat history)</li>
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Making outbound network calls to third-party APIs during inference</li>
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Writing to the filesystem during a request</li>
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Responses that generate off-topic, harmful, or age-inappropriate content</li>
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Container images larger than <strong>4 GB</strong></li>
-          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Running as root inside the container</li>
-        </ul>
-      </div>
+      <ul class="constraint-list">
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never return raw HTML, CSS, or JavaScript in any content block. All rendering is done by the platform's own components.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never invent a <code class="inline">type</code> value outside the A.5 table — unknown types are silently dropped from what learners see.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never attempt a direct database connection. Use the MCP servers (A.6) for any platform data you need.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never run your container process as root — the pipeline's security scan checks and rejects this.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never do slow or stateful work inside <code class="inline">/health</code>.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never hardcode secrets or API keys into the image.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never assume a write to <code class="inline">write_progress</code> silently succeeds if it exceeds your delta cap — handle the error.</span>
+        </li>
+        <li>
+          <span class="icon-x"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>
+          <span>Never call <code class="inline">get_session</code> as a third-party agent — always rejected.</span>
+        </li>
+      </ul>
     </section>
     <hr class="section-divider">
 
-    <!-- ── 6. Next Steps ── -->
-    <section class="guide-section" id="next-steps">
-      <div class="section-label">06 — Next Steps</div>
-      <h2 class="section-title">Ready to deploy?</h2>
+    <!-- A.8 -->
+    <section class="guide-section" id="checklist">
+      <div class="section-label">A.8</div>
+      <h2 class="section-title">Pre-submission checklist</h2>
       <div class="section-body">
-        <p>Once your agent is built and your manifest is in order, head to the deployment guide to learn how to push your image and trigger the pipeline.</p>
+        <p>Go through this list before pushing your image. Every item here maps to something the pipeline will check.</p>
       </div>
 
-      <div class="cta-bar">
-        <div>
-          <div style="font-weight:700; color:var(--text-primary);">Push &amp; Deploy Your Agent</div>
-          <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:3px;">Step-by-step instructions to tag, push, and monitor your deployment.</div>
-        </div>
-        <a href="{% url 'developer:deploy-guide' %}" class="btn-pill btn-primary" style="white-space:nowrap; padding:10px 24px;">
-          <i data-lucide="arrow-right" style="width:15px;height:15px;"></i> Deploy Guide →
-        </a>
-      </div>
+      <ul class="checklist">
+        <li><span class="check-box"></span><span><code class="inline">/invoke</code>, <code class="inline">/health</code>, <code class="inline">/capabilities</code> all respond correctly when tested locally</span></li>
+        <li><span class="check-box"></span><span><code class="inline">manifest.json</code> is present, valid JSON, and matches your <code class="inline">/invoke</code> behaviour exactly</span></li>
+        <li><span class="check-box"></span><span><code class="inline">input_type</code> and <code class="inline">output_types</code> in the manifest match what you'll enter in the dev portal</span></li>
+        <li><span class="check-box"></span><span>If <code class="inline">input_type</code> is <code class="inline">multiple_choice</code>, <code class="inline">options</code> is populated</span></li>
+        <li><span class="check-box"></span><span>Every output block your agent returns matches the required fields in A.5</span></li>
+        <li><span class="check-box"></span><span>Container does not run as root</span></li>
+        <li><span class="check-box"></span><span>No hardcoded secrets baked into the image</span></li>
+        <li><span class="check-box"></span><span>Tested with <code class="inline">docker run</code> + <code class="inline">curl</code> against all three endpoints yourself</span></li>
+      </ul>
     </section>
+
+    <!-- CTA -->
+    <div class="cta-bar">
+      <div>
+        <div style="font-weight:700; color:var(--text-primary);">Ready to deploy?</div>
+        <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:3px;">Head to Part B — step-by-step instructions to tag, push, and monitor your deployment.</div>
+      </div>
+      <a href="{% url 'developer:deploy-guide' %}" class="btn-pill btn-primary" style="white-space:nowrap; padding:10px 24px;">
+        Part B: Deploy Guide →
+      </a>
+    </div>
 
   </main>
 </div>
@@ -607,17 +698,15 @@
     });
   }
 
-  // Highlight active TOC link on scroll
-  var sections = document.querySelectorAll('section[id]');
   var tocLinks = document.querySelectorAll('.toc-link');
-
+  var sections = document.querySelectorAll('[id]');
   window.addEventListener('scroll', function() {
-    var scrollY = window.scrollY + 110;
+    var y = window.scrollY + 110;
     sections.forEach(function(s) {
-      if (scrollY >= s.offsetTop) {
+      if (y >= s.offsetTop) {
         tocLinks.forEach(function(l) { l.classList.remove('active'); });
-        var active = document.querySelector('.toc-link[href="#' + s.id + '"]');
-        if (active) active.classList.add('active');
+        var a = document.querySelector('.toc-link[href="#' + s.id + '"]');
+        if (a) a.classList.add('active');
       }
     });
   });
