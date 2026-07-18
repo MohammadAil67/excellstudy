@@ -1,11 +1,27 @@
+import hmac
 import json
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.core.models import AgentRegistry
 from apps.agents.registry import register_agent
+import hmac
+import hashlib
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+def _verify_signature(request) -> bool:
+    signature = request.headers.get("X-Pipeline-Signature", "")
+    expected = hmac.new(
+        settings.PIPELINE_WEBHOOK_SECRET.encode(),
+        request.body,
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(signature, expected)
+
+
+
 
 
 @csrf_exempt
@@ -20,6 +36,13 @@ def pipeline_webhook(request):
         "rejection_reason": "mismatch..."  # required if failure
     }
     """
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    if not _verify_signature(request):
+        return JsonResponse({'error': 'Invalid signature'}, status=401)
+
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -33,6 +56,7 @@ def pipeline_webhook(request):
 
     if not slug or not status:
         return JsonResponse({'error': 'Missing agent_slug or status in payload'}, status=400)
+
 
     try:
         agent = AgentRegistry.objects.get(slug=slug)

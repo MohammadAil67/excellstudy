@@ -9,11 +9,35 @@ on:
         description: 'Agent Slug to manually validate'
         required: true
         type: string
+      version:
+        description: 'Version tag to validate'
+        required: true
+        type: string
+        default: 'v1'
+
+env:
+  PLATFORM_API_URL: "http://localhost:8000"   # update when moving off local testing
 
 jobs:
   validate-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # must be self-hosted — GitHub's cloud
+                            # runners cannot reach your minikube cluster
+
     steps:
+      # ─────────────────────────────────────────────
+      # 0. Resolve which agent/version this run is for
+      # ─────────────────────────────────────────────
+      - name: Resolve agent identity
+        id: identity
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
+            echo "version=${{ github.event.registry_package.package_version.version }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -27,63 +51,216 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Extract Manifest from Docker Image
+      # ─────────────────────────────────────────────
+      # 1. Pull the image and extract its manifest
+      # ─────────────────────────────────────────────
+      - name: Docker login to ghcr.io
         run: |
-          # Resolve the target image name (slug) from package publish event or input parameter
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            SLUG="${{ inputs.agent_slug }}"
-          else
-            SLUG="${{ github.event.registry_package.name }}"
-          fi
-          
-          IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/$SLUG:latest"
-          echo "Validating image: $IMAGE_TAG"
-          
-          # Pull image and copy manifest.json
-          docker pull $IMAGE_TAG
-          CONTAINER_ID=$(docker create $IMAGE_TAG)
-          docker cp $CONTAINER_ID:/app/manifest.json ./manifest.json
-          docker rm $CONTAINER_ID
+          echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io \
+            -u ${{ github.actor }} --password-stdin
 
-      - name: Run Manifest Validation Script
-        env:
-          PLATFORM_API_URL: "https://excellstudy.herokuapp.com" # Replace with actual production domain
+      - name: Pull image and extract manifest
+        id: extract
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            SLUG="${{ inputs.agent_slug }}"
-          else
-            SLUG="${{ github.event.registry_package.name }}"
-          fi
-          
-          # Execute the cross-validation script
-          python scripts/validate_manifest.py ./manifest.json $SLUG
+          IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Callback Webhook (Success)
+          docker pull "$IMAGE_TAG"
+          CONTAINER_ID=$(docker create "$IMAGE_TAG")
+          docker cp "$CONTAINER_ID:/app/manifest.json" ./manifest.json
+          docker rm "$CONTAINER_ID"
+
+      # ─────────────────────────────────────────────
+      # 2. Schema check — cross-validate against the
+      #    pending AgentRegistry row (registered in the
+      #    dev portal BEFORE this push happened)
+      # ─────────────────────────────────────────────
+      - name: Schema check
+        run: |
+          python scripts/validate_manifest.py ./manifest.json "${{ steps.identity.outputs.slug }}"
+
+      # ─────────────────────────────────────────────
+      # 3. Security scan — CVEs + non-root check
+      # ─────────────────────────────────────────────
+      - name: Security scan — CVE check
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.extract.outputs.image_tag }}
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      - name: Security scan — non-root check
+        run: |
+          USER=$(docker inspect "${{ steps.extract.outputs.image_tag }}" --format='{{.Config.User}}')
+          if [ -z "$USER" ] || [ "$USER" = "root" ] || [ "$USER" = "0" ]; then
+            echo "Container runs as root — rejected."
+            exit 1
+          fi
+          echo "Running as non-root user: $USER"
+
+      # ─────────────────────────────────────────────
+      # 4. Smoke test — spin up the container and hit
+      #    its real endpoints with synthetic input
+      # ─────────────────────────────────────────────
+      - name: Smoke test
+        run: |
+          SLUG="${{ steps.identity.outputs.slug }}"
+          IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
+
+          docker run -d --name "smoke-test-$SLUG" -p 8099:8080 "$IMAGE_TAG"
+          sleep 8
+
+          curl -sf http://localhost:8099/health
+
+          curl -sf -X POST http://localhost:8099/invoke \
+            -H "Content-Type: application/json" \
+            -d '{"input": {"value": "test"}, "context": {"learner_id": "smoke-test"}}'
+
+      - name: Cleanup smoke test container
+        if: always()
+        run: |
+          SLUG="${{ steps.identity.outputs.slug }}"
+          docker stop "smoke-test-$SLUG" || true
+          docker rm "smoke-test-$SLUG" || true
+
+      # ─────────────────────────────────────────────
+      # 5. Load the image into minikube's own daemon
+      #    (avoids re-pulling from ghcr.io inside the
+      #    cluster during local dev)
+      # ─────────────────────────────────────────────
+      - name: Load image into minikube
+        run: |
+          eval $(minikube docker-env)
+          docker pull "${{ steps.extract.outputs.image_tag }}"
+
+      # ─────────────────────────────────────────────
+      # 6. Deploy — namespace, quota, deployment, service
+      # ─────────────────────────────────────────────
+      - name: Deploy to cluster
+        id: deploy
+        run: |
+          NAMESPACE="dev-${{ github.actor }}"
+          SLUG="${{ steps.identity.outputs.slug }}"
+          IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
+
+          kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: ResourceQuota
+          metadata:
+            name: ${{ github.actor }}-quota
+            namespace: $NAMESPACE
+          spec:
+            hard:
+              pods: "5"
+              requests.memory: "1Gi"
+              requests.cpu: "1"
+              limits.memory: "2Gi"
+              limits.cpu: "2"
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: $SLUG
+            namespace: $NAMESPACE
+            labels:
+              app: $SLUG
+              developer: "${{ github.actor }}"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: $SLUG
+            template:
+              metadata:
+                labels:
+                  app: $SLUG
+              spec:
+                containers:
+                - name: $SLUG
+                  image: $IMAGE_TAG
+                  imagePullPolicy: Never
+                  ports:
+                  - containerPort: 8080
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "250m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+                  livenessProbe:
+                    httpGet:
+                      path: /health
+                      port: 8080
+                    initialDelaySeconds: 10
+                    periodSeconds: 30
+                  readinessProbe:
+                    httpGet:
+                      path: /health
+                      port: 8080
+                    initialDelaySeconds: 5
+                    periodSeconds: 10
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: ${SLUG}-svc
+            namespace: $NAMESPACE
+          spec:
+            selector:
+              app: $SLUG
+            ports:
+            - port: 80
+              targetPort: 8080
+          EOF
+
+          kubectl wait --for=condition=ready pod \
+            -l app="$SLUG" -n "$NAMESPACE" --timeout=60s
+
+          # NOTE — for local dev with Django running outside the
+          # cluster, this cluster-internal DNS name is only reachable
+          # via kubectl port-forward (set the registry's
+          # k8s_service_url manually afterward) or minikube tunnel +
+          # LoadBalancer. In production, Django itself runs as a pod
+          # inside the cluster, so this DNS name resolves correctly
+          # as-is with no extra step needed.
+          echo "service_url=http://${SLUG}-svc.${NAMESPACE}.svc.cluster.local" >> $GITHUB_OUTPUT
+
+      # ─────────────────────────────────────────────
+      # 7. Notify Django — payload matches the ACTUAL
+      #    pipeline_webhook view contract exactly:
+      #    agent_slug, status, k8s_service_url,
+      #    rejection_reason, version
+      # ─────────────────────────────────────────────
+      - name: Notify Django — success
         if: success()
-        env:
-          PLATFORM_API_URL: "https://excellstudy.herokuapp.com"
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            SLUG="${{ inputs.agent_slug }}"
-          else
-            SLUG="${{ github.event.registry_package.name }}"
-          fi
-          
-          curl -X POST "${{ env.PLATFORM_API_URL }}/api/v1/pipeline/webhook/" \
-            -H "Content-Type: application/json" \
-            -d "{\"status\": \"success\", \"agent_slug\": \"$SLUG\", \"k8s_service_url\": \"http://$SLUG.default.svc.cluster.local\"}"
+          PAYLOAD=$(jq -n \
+            --arg agent_slug "${{ steps.identity.outputs.slug }}" \
+            --arg version "${{ steps.identity.outputs.version }}" \
+            --arg k8s_service_url "${{ steps.deploy.outputs.service_url }}" \
+            '{agent_slug:$agent_slug, status:"success", version:$version, k8s_service_url:$k8s_service_url}')
 
-      - name: Callback Webhook (Failure)
+          SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
+
+          curl -sf -X POST "${{ env.PLATFORM_API_URL }}/api/v1/pipeline/webhook/" \
+            -H "Content-Type: application/json" \
+            -H "X-Pipeline-Signature: $SIGNATURE" \
+            -d "$PAYLOAD"
+
+      - name: Notify Django — failure
         if: failure()
-        env:
-          PLATFORM_API_URL: "https://excellstudy.herokuapp.com"
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            SLUG="${{ inputs.agent_slug }}"
-          else
-            SLUG="${{ github.event.registry_package.name }}"
-          fi
-          
+          PAYLOAD=$(jq -n \
+            --arg agent_slug "${{ steps.identity.outputs.slug }}" \
+            --arg rejection_reason "Pipeline validation failed — check the Actions run logs for the specific step and reason." \
+            '{agent_slug:$agent_slug, status:"failure", rejection_reason:$rejection_reason}')
+
+          SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
+
           curl -X POST "${{ env.PLATFORM_API_URL }}/api/v1/pipeline/webhook/" \
             -H "Content-Type: application/json" \
-            -d "{\"status\": \"failure\", \"agent_slug\": \"$SLUG\", \"rejection_reason\": \"Cross-validation check failed. The container input/output schema does not match registration.\"}"
+            -H "X-Pipeline-Signature: $SIGNATURE" \
+            -d "$PAYLOAD"
