@@ -216,8 +216,8 @@
         <p class="text-xs text-[#6B7280] mb-2">Capabilities: {{ agent.capabilities|join:", " }}</p>
         <p class="text-sm font-semibold mb-4" style="color:var(--accent);">Free</p>
         <div class="flex gap-2">
-          <a href="/playground/?agent={{ agent.slug }}" class="btn-pill btn-outline flex-1 justify-center text-center" style="padding:7px 12px; font-size:0.8125rem;">Try in Playground</a>
-          <a href="{% url 'learner:agent-session' agent.slug %}" class="btn-pill btn-accent flex-1 justify-center text-center" style="padding:7px 12px; font-size:0.8125rem; text-decoration:none;">Start Session</a>
+          <!-- <a href="/playground/?agent={{ agent.slug }}" class="btn-pill btn-outline flex-1 justify-center text-center" style="padding:7px 12px; font-size:0.8125rem;">Try in Playground</a> -->
+          <a href="{% url 'learner:agent-session' agent.slug %}" class="btn-pill btn-accent w-full justify-center text-center" style="padding:7px 12px; font-size:0.8125rem; text-decoration:none;">Start Session</a>
         </div>
       </div>
       {% empty %}
