@@ -75,6 +75,7 @@
     overflow-x: auto; position: relative;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 0.785rem; line-height: 1.85; color: #e2e8f0; margin: 14px 0;
+    white-space: pre;
   }
   .code-block .comment { color: #6B7280; }
   .code-block .key     { color: #93C5FD; }
@@ -552,7 +553,7 @@
 <span class="kw">from</span> <span class="fn">fastmcp</span> <span class="kw">import</span> Client
 <span class="kw">import</span> os
 
-AGENT_KEY              = os.<span class="fn">environ</span>[<span class="str">"AGENT_KEY"</span>]
+AGENT_KEY               = os.<span class="fn">environ</span>[<span class="str">"AGENT_KEY"</span>]
 LEARNER_CONTEXT_MCP_URL = os.<span class="fn">environ</span>[<span class="str">"LEARNER_CONTEXT_MCP_URL"</span>]
 
 <span class="kw">async def</span> <span class="fn">get_learner_profile</span>(learner_id: str) -> dict:
