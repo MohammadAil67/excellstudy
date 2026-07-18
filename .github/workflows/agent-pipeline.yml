@@ -38,7 +38,7 @@ jobs:
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
           else
             echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
-            echo "version=${{ github.event.registry_package.package_version.version }}" >> $GITHUB_OUTPUT
+            echo "version=${{ github.event.registry_package.package_version.container_metadata.tag.name }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Repository
