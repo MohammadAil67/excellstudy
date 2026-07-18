@@ -75,3 +75,27 @@ class LearnerPortalTests(TestCase):
         response = self.client.post(url, {'file': text_file})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()['status'], 'error')
+
+    def test_dashboard_recent_activity_dynamic(self):
+        from apps.core.models import LearnerProgress, Module, Course
+        from django.utils import timezone
+        
+        learner, _ = Learner.objects.get_or_create(user=self.user)
+        course = Course.objects.create(title="Algebra", subject="math")
+        module = Module.objects.create(title="Quadratic Equations", course=course)
+        
+        # Create progress record with a live agent
+        LearnerProgress.objects.create(
+            learner=learner,
+            module=module,
+            completed_at=timezone.now(),
+            score=95,
+            agent_used=self.agent
+        )
+        
+        url = reverse('learner:dashboard')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Quadratic Equations")
+        self.assertContains(response, "with Live Math Tutor")
+        self.assertContains(response, "95")

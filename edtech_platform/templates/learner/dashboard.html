@@ -63,112 +63,10 @@
         <span id="greeting-date">Friday, July 4, 2026</span>
       </p>
     </div>
-    <div class="mt-3 sm:mt-0">
-      <div class="rounded-full bg-[#BA7517]/10 border border-[#BA7517]/30 text-[#BA7517] px-4 py-2 flex items-center gap-2 font-semibold text-sm">
-        🔥 <span>12 day streak</span>
-      </div>
-    </div>
   </section>
 
-  <!-- ========== 2. SKILL CARDS ROW ========== -->
-  <section class="mt-8 anim-fade delay-1">
-    <div class="flex justify-between items-center mb-1">
-      <h2 class="text-lg font-semibold text-[#1A1A2E]">Your Skills</h2>
-      <a href="#" class="text-[#534AB7] text-sm font-medium hover:underline flex items-center gap-1">
-        See all <i data-lucide="arrow-right" class="w-4 h-4"></i>
-      </a>
-    </div>
-
-    <div class="relative">
-      <!-- Left scroll button -->
-      <button id="scroll-left" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg hover:scale-110 transition-all duration-200 text-[#1A1A2E]" aria-label="Scroll left">
-        <i data-lucide="chevron-left" class="w-5 h-5"></i>
-      </button>
-      <!-- Right scroll button -->
-      <button id="scroll-right" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg hover:scale-110 transition-all duration-200 text-[#1A1A2E]" aria-label="Scroll right">
-        <i data-lucide="chevron-right" class="w-5 h-5"></i>
-      </button>
-
-      <!-- Scroll container -->
-      <div id="skill-scroll-container" class="skill-scroll flex gap-4 overflow-x-auto py-4 px-1 snap-x snap-mandatory">
-
-        <!-- Card 1: Mathematics 72 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-1">
-          <div class="w-9 h-9 rounded-full bg-[#1D9E75]/10 flex items-center justify-center">
-            <i data-lucide="calculator" class="w-5 h-5 text-[#1D9E75]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">Mathematics</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#1D9E75] bar-fill" style="width:72%; animation-delay:0.3s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">72</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-        <!-- Card 2: Science 45 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-2">
-          <div class="w-9 h-9 rounded-full bg-[#BA7517]/10 flex items-center justify-center">
-            <i data-lucide="flask-conical" class="w-5 h-5 text-[#BA7517]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">Science</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#BA7517] bar-fill" style="width:45%; animation-delay:0.45s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">45</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-        <!-- Card 3: English 88 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-3">
-          <div class="w-9 h-9 rounded-full bg-[#1D9E75]/10 flex items-center justify-center">
-            <i data-lucide="book-text" class="w-5 h-5 text-[#1D9E75]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">English</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#1D9E75] bar-fill" style="width:88%; animation-delay:0.6s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">88</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-        <!-- Card 4: History 33 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-4">
-          <div class="w-9 h-9 rounded-full bg-[#E05252]/10 flex items-center justify-center">
-            <i data-lucide="landmark" class="w-5 h-5 text-[#E05252]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">History</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#E05252] bar-fill" style="width:33%; animation-delay:0.75s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">33</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-        <!-- Card 5: Geography 61 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-5">
-          <div class="w-9 h-9 rounded-full bg-[#BA7517]/10 flex items-center justify-center">
-            <i data-lucide="globe-2" class="w-5 h-5 text-[#BA7517]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">Geography</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#BA7517] bar-fill" style="width:61%; animation-delay:0.9s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">61</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-        <!-- Card 6: Coding 79 -->
-        <div class="min-w-[200px] flex-shrink-0 snap-start bg-white rounded-[12px] p-5 shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(83,74,183,0.15)] anim-fade delay-6">
-          <div class="w-9 h-9 rounded-full bg-[#1D9E75]/10 flex items-center justify-center">
-            <i data-lucide="code-2" class="w-5 h-5 text-[#1D9E75]"></i>
-          </div>
-          <p class="font-semibold text-[15px] text-[#1A1A2E] mt-3">Coding</p>
-          <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
-            <div class="h-full rounded-full bg-[#1D9E75] bar-fill" style="width:79%; animation-delay:1.05s;"></div>
-          </div>
-          <p class="mt-2"><span class="text-2xl font-bold text-[#1A1A2E]">79</span><span class="text-sm text-[#6B7280]">/100</span></p>
-        </div>
-
-      </div><!-- /scroll container -->
-    </div>
-  </section>
-
-  <!-- ========== 3. CONTINUE LEARNING HERO CARD ========== -->
+  {% if current_module %}
+  <!-- ========== 2. CONTINUE LEARNING HERO CARD ========== -->
   <section class="mt-8 anim-slide" style="animation-delay:0.2s;">
     <div class="p-[3px] rounded-[14px]" style="background: linear-gradient(135deg, #534AB7, #1D9E75);">
       <div class="bg-white rounded-[12px] p-8">
@@ -176,14 +74,14 @@
           <!-- Left -->
           <div class="flex-1">
             <p class="uppercase text-xs tracking-widest text-[#6B7280] font-medium">Continue where you left off</p>
-            <h3 class="text-xl font-bold text-[#1A1A2E] mt-1">Module 3: Quadratic Equations</h3>
-            <p class="text-[#6B7280] mt-1">Algebra Fundamentals</p>
+            <h3 class="text-xl font-bold text-[#1A1A2E] mt-1">Module: {{ current_module.title }}</h3>
+            <p class="text-[#6B7280] mt-1">{{ current_module.course }}</p>
             <div class="flex flex-wrap gap-4 mt-4">
               <span class="flex items-center gap-2 bg-[#1D9E75]/10 text-[#1D9E75] rounded-full px-3 py-1 text-sm font-medium">
-                <i data-lucide="bot" class="w-4 h-4"></i> MathTutor v2.1
+                <i data-lucide="bot" class="w-4 h-4"></i> {{ current_module.agent_name }}
               </span>
               <span class="flex items-center gap-2 text-[#6B7280] text-sm">
-                <i data-lucide="clock" class="w-4 h-4"></i> ~25 min remaining
+                <i data-lucide="clock" class="w-4 h-4"></i> ~{{ current_module.estimated_time }} remaining
               </span>
             </div>
           </div>
@@ -198,6 +96,7 @@
       </div>
     </div>
   </section>
+  {% endif %}
 
   <!-- ========== 4. ACTIVE AGENTS GRID ========== -->
   <section id="active-agents-section" class="mt-8">
@@ -250,82 +149,28 @@
     </div>
 
     <div class="bg-white rounded-[12px] shadow overflow-hidden mt-4">
-
-      <!-- Activity 1 -->
-      <div class="flex items-center gap-4 p-4 border-b border-[#E5E4F0] transition-colors hover:bg-[#F8F7FF] bg-[#F8F7FF]/50 border-l-[3px] border-l-[#534AB7]">
+      {% for activity in recent_activity %}
+      <div class="flex items-center gap-4 p-4 border-b border-[#E5E4F0] transition-colors hover:bg-[#F8F7FF] border-l-[3px] border-l-[#534AB7] {% if forloop.counter|divisibleby:2 %}bg-[#F8F7FF]/50{% endif %}">
         <div class="w-10 h-10 rounded-full bg-[#534AB7]/10 flex items-center justify-center flex-shrink-0">
-          <i data-lucide="book-open" class="w-5 h-5 text-[#534AB7]"></i>
+          <i data-lucide="check-circle" class="w-5 h-5 text-[#534AB7]"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-[#1A1A2E] truncate">Quadratic Equations - Algebra Fundamentals</p>
-          <p class="text-xs text-[#6B7280] mt-0.5">with MathTutor</p>
+          <p class="font-medium text-sm text-[#1A1A2E] truncate">{{ activity.module }}</p>
+          <p class="text-xs text-[#6B7280] mt-0.5">with {{ activity.agent }}</p>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#1D9E75]/10 text-[#1D9E75]">85</span>
-          <p class="text-xs text-[#6B7280] mt-1">2 hours ago</p>
+          {% if activity.score is not None %}
+          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#1D9E75]/10 text-[#1D9E75]">{{ activity.score }}</span>
+          {% endif %}
+          <p class="text-xs text-[#6B7280] mt-1">{{ activity.timestamp|timesince }} ago</p>
         </div>
       </div>
-
-      <!-- Activity 2 -->
-      <div class="flex items-center gap-4 p-4 border-b border-[#E5E4F0] transition-colors hover:bg-[#F8F7FF] border-l-[3px] border-l-[#534AB7]">
-        <div class="w-10 h-10 rounded-full bg-[#534AB7]/10 flex items-center justify-center flex-shrink-0">
-          <i data-lucide="flask-conical" class="w-5 h-5 text-[#534AB7]"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-[#1A1A2E] truncate">Chemical Bonding - Chemistry Basics</p>
-          <p class="text-xs text-[#6B7280] mt-0.5">with ScienceBot</p>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#1D9E75]/10 text-[#1D9E75]">72</span>
-          <p class="text-xs text-[#6B7280] mt-1">5 hours ago</p>
-        </div>
+      {% empty %}
+      <div class="text-center p-8 text-[#6B7280]">
+        <i data-lucide="activity" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
+        No Activities Yet
       </div>
-
-      <!-- Activity 3 -->
-      <div class="flex items-center gap-4 p-4 border-b border-[#E5E4F0] transition-colors hover:bg-[#F8F7FF] bg-[#F8F7FF]/50 border-l-[3px] border-l-[#534AB7]">
-        <div class="w-10 h-10 rounded-full bg-[#534AB7]/10 flex items-center justify-center flex-shrink-0">
-          <i data-lucide="code-2" class="w-5 h-5 text-[#534AB7]"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-[#1A1A2E] truncate">Functions &amp; Loops - Python 101</p>
-          <p class="text-xs text-[#6B7280] mt-0.5">with CodeMentor</p>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#1D9E75]/10 text-[#1D9E75]">91</span>
-          <p class="text-xs text-[#6B7280] mt-1">Yesterday</p>
-        </div>
-      </div>
-
-      <!-- Activity 4 -->
-      <div class="flex items-center gap-4 p-4 border-b border-[#E5E4F0] transition-colors hover:bg-[#F8F7FF] border-l-[3px] border-l-[#534AB7]">
-        <div class="w-10 h-10 rounded-full bg-[#534AB7]/10 flex items-center justify-center flex-shrink-0">
-          <i data-lucide="landmark" class="w-5 h-5 text-[#534AB7]"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-[#1A1A2E] truncate">World War II - Modern History</p>
-          <p class="text-xs text-[#6B7280] mt-0.5">with HistoryGuide</p>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#E05252]/10 text-[#E05252]">38</span>
-          <p class="text-xs text-[#6B7280] mt-1">Yesterday</p>
-        </div>
-      </div>
-
-      <!-- Activity 5 -->
-      <div class="flex items-center gap-4 p-4 transition-colors hover:bg-[#F8F7FF] bg-[#F8F7FF]/50 border-l-[3px] border-l-[#534AB7]">
-        <div class="w-10 h-10 rounded-full bg-[#534AB7]/10 flex items-center justify-center flex-shrink-0">
-          <i data-lucide="globe-2" class="w-5 h-5 text-[#534AB7]"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-[#1A1A2E] truncate">Climate Zones - Physical Geography</p>
-          <p class="text-xs text-[#6B7280] mt-0.5">with ScienceBot</p>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[#BA7517]/10 text-[#BA7517]">67</span>
-          <p class="text-xs text-[#6B7280] mt-1">2 days ago</p>
-        </div>
-      </div>
-
+      {% endfor %}
     </div>
   </section>
 
