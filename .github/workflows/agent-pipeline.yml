@@ -44,15 +44,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # FIXED — removed actions/setup-python@v5 entirely.
+      # It failed with "version 3.12 not found for this OS/arch"
+      # because GitHub's hosted Python binary manifest doesn't
+      # cover this runner's exact Debian/WSL2 environment.
+      # The runner already has Python 3.13.5 installed natively —
+      # use that instead of trying to download a separate one.
       - name: Verify Python is available
         run: |
           python3 --version
           pip3 --version
 
+      # FIXED — added --break-system-packages to both pip calls.
+      # Debian 12+/newer Python enforces PEP 668, which blocks
+      # `pip install` from touching the system-managed Python
+      # environment by default. This is a throwaway CI runner
+      # environment (not your dev machine's Python), so bypassing
+      # this protection here is low-risk.
       - name: Install Dependencies
         run: |
           python3 -m pip install --upgrade pip --break-system-packages
           pip3 install requests --break-system-packages
+
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
       # ─────────────────────────────────────────────
