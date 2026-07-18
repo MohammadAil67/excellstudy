@@ -225,8 +225,68 @@
       <div><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">excellstudy.registry.io/{{ agent.slug }}:{{ agent.version }}</span></div>
     </div>
 
+    <!-- ── manifest.json Generator ── -->
+    <div style="margin-top:28px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#fff; max-width:600px; margin-left:auto; margin-right:auto;">
+
+      <!-- Accordion header -->
+      <button onclick="toggleManifest()" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:none; border:none; cursor:pointer; text-align:left;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(83,74,183,0.1); display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="file-json" style="width:16px; height:16px; color:var(--primary);"></i>
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">manifest.json Generator</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">Pre-filled from your registration — copy and drop into <code style="background:rgba(83,74,183,0.08); padding:1px 5px; border-radius:3px; font-size:0.72rem;">/app/manifest.json</code></div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" id="manifest-chevron" style="width:18px; height:18px; color:var(--text-secondary); transition:transform 0.25s; flex-shrink:0;"></i>
+      </button>
+
+      <!-- Accordion content -->
+      <div id="manifest-content" style="display:none; border-top:1px solid var(--border);">
+        <!-- Callout -->
+        <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:rgba(29,158,117,0.05); border-bottom:1px solid rgba(29,158,117,0.15);">
+          <i data-lucide="check-circle-2" style="width:15px; height:15px; color:#1D9E75; flex-shrink:0; margin-top:2px;"></i>
+          <p style="font-size:0.78rem; color:#0f5c3d; margin:0;">
+            This manifest is generated from your registered data. The pipeline cross-checks it exactly — if they don't match, the schema check will fail. Keep this file in sync with what you registered.
+          </p>
+        </div>
+
+        <!-- Code block -->
+        <div style="position:relative;">
+          <button class="copy-btn" style="top:12px; right:12px;" onclick="copyManifest(this)">
+            <i data-lucide="copy" style="width:11px; height:11px; display:inline-block; vertical-align:middle;"></i> Copy
+          </button>
+          <pre id="manifest-json" style="margin:0; padding:20px 22px; padding-right:70px; background:#1A1A2E; font-family:'JetBrains Mono',monospace; font-size:0.775rem; color:#e2e8f0; line-height:1.85; overflow-x:auto; white-space:pre;">{
+  <span style="color:#93C5FD;">"name"</span>: <span style="color:#FDE68A;">"{{ agent.slug }}"</span>,
+  <span style="color:#93C5FD;">"version"</span>: <span style="color:#FDE68A;">"{{ agent.version }}"</span>,
+  <span style="color:#93C5FD;">"subject_areas"</span>: {{ agent.subject_areas|default:"[]"|safe }},
+  <span style="color:#93C5FD;">"age_groups"</span>: {{ agent.age_groups|default:"[]"|safe }},
+  <span style="color:#93C5FD;">"input_type"</span>: <span style="color:#FDE68A;">"{{ agent.input_type }}"</span>,
+  <span style="color:#93C5FD;">"output_types"</span>: {{ agent.output_types|default:"[]"|safe }},
+  <span style="color:#93C5FD;">"options"</span>: [],
+  <span style="color:#93C5FD;">"endpoints"</span>: {
+    <span style="color:#93C5FD;">"invoke"</span>: <span style="color:#FDE68A;">"/invoke"</span>,
+    <span style="color:#93C5FD;">"health"</span>: <span style="color:#FDE68A;">"/health"</span>,
+    <span style="color:#93C5FD;">"capabilities"</span>: <span style="color:#FDE68A;">"/capabilities"</span>
+  }
+}</pre>
+        </div>
+
+        <!-- Footer hint -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--border); flex-wrap:wrap; gap:8px;">
+          <span style="font-size:0.75rem; color:var(--text-secondary);">
+            Drop this file at <code style="background:rgba(83,74,183,0.08); padding:1px 6px; border-radius:3px;">/app/manifest.json</code> inside your Docker image.
+          </span>
+          <a href="{% url 'developer:creation-guide' %}#manifest" style="font-size:0.75rem; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+            <i data-lucide="book-open" style="width:13px; height:13px;"></i> Manifest spec →
+          </a>
+        </div>
+      </div>
+    </div>
+
     <p class="text-xs text-[#9CA3AF] mt-4">
-      Need help? <a href="#" class="text-[#534AB7] hover:underline">Read the deployment guide →</a>
+      Need help? <a href="{% url 'developer:deploy-guide' %}" class="text-[#534AB7] hover:underline">Read the deployment guide →</a>
     </p>
   </div>
 
@@ -385,6 +445,28 @@
     navigator.clipboard.writeText(text).then(function() {
       btn.textContent = 'Copied!';
       setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  }
+
+  function toggleManifest() {
+    var content = document.getElementById('manifest-content');
+    var chevron = document.getElementById('manifest-chevron');
+    var isOpen = content.style.display !== 'none';
+    content.style.display = isOpen ? 'none' : 'block';
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  function copyManifest(btn) {
+    // Get the raw text content of the pre block (strips all HTML spans)
+    var pre = document.getElementById('manifest-json');
+    var text = pre.innerText || pre.textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      btn.innerHTML = '<i data-lucide="check" style="width:11px;height:11px;display:inline-block;vertical-align:middle;"></i> Copied!';
+      lucide.createIcons();
+      setTimeout(function() {
+        btn.innerHTML = '<i data-lucide="copy" style="width:11px;height:11px;display:inline-block;vertical-align:middle;"></i> Copy';
+        lucide.createIcons();
+      }, 2000);
     });
   }
 </script>
