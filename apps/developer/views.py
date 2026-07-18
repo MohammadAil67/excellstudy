@@ -90,13 +90,25 @@ class CheckRegistrationView(View):
         })
 
 
-def pipeline_status(request, job_id='job-abc123'):
-    """Pipeline status view for rendering status page."""
-    # Find matching agent by slug (using job_id parameter as slug/identifier)
-    agent = AgentRegistry.objects.filter(slug=job_id).first()
+
+def pipeline_status(request, job_id):
+    """Pipeline status page — shows the real deployment state of an agent."""
+    agent = get_object_or_404(AgentRegistry, slug=job_id, developer__user=request.user)
+
+    # Derive pipeline state from agent's registry status
+    if agent.status == 'live':
+        pipeline_state = 'success'
+    elif agent.status == 'rejected':
+        pipeline_state = 'failed'
+    elif agent.status == 'pending':
+        # Agent registered but image not pushed yet → nothing to run
+        pipeline_state = 'awaiting_push'
+    else:
+        pipeline_state = 'pending'
+
     context = {
         'user_type': 'developer',
-        'job_id': job_id,
         'agent': agent,
+        'pipeline_state': pipeline_state,
     }
     return render(request, 'developer/pipeline_status.html', context)
