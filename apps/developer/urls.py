@@ -9,4 +9,6 @@ urlpatterns = [
     path('my-agents/', views.MyAgentsListView.as_view(), name='my-agents'),
     path('api/agents/check-registration/', views.CheckRegistrationView.as_view(), name='check-registration'),
     path('pipeline/<str:job_id>/', views.pipeline_status, name='pipeline_status'),
+    path('guides/creating-an-agent/', views.creation_guide, name='creation-guide'),
+    path('guides/deploy/', views.deploy_guide, name='deploy-guide'),
 ]

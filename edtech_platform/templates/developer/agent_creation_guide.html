@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agent Creation Guide — ExcellStudy Developer Portal{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .guide-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .guide-layout { grid-template-columns: 1fr; }
+    .guide-toc    { display: none; }
+  }
+
+  /* ── Table of Contents ── */
+  .guide-toc {
+    position: sticky;
+    top: 88px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    animation: fadeInUp 0.4s ease both;
+  }
+  .toc-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .toc-link {
+    display: block;
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    margin-bottom: 2px;
+  }
+  .toc-link:hover, .toc-link.active {
+    color: var(--primary);
+    background: rgba(83,74,183,0.06);
+    border-left-color: var(--primary);
+  }
+  .toc-link.sub {
+    padding-left: 22px;
+    font-size: 0.775rem;
+  }
+
+  /* ── Main Content ── */
+  .guide-content {
+    min-width: 0;
+  }
+
+  .guide-section {
+    animation: fadeInUp 0.5s ease both;
+    margin-bottom: 48px;
+    scroll-margin-top: 90px;
+  }
+  .guide-section:nth-child(1) { animation-delay: 0.05s; }
+  .guide-section:nth-child(2) { animation-delay: 0.1s; }
+  .guide-section:nth-child(3) { animation-delay: 0.15s; }
+  .guide-section:nth-child(4) { animation-delay: 0.2s; }
+  .guide-section:nth-child(5) { animation-delay: 0.25s; }
+  .guide-section:nth-child(6) { animation-delay: 0.3s; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .section-body {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+  .section-body p { margin-bottom: 10px; }
+  .section-body strong { color: var(--text-primary); }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0 0 48px;
+  }
+
+  /* Code block */
+  .code-block {
+    background: #1A1A2E;
+    border-radius: 10px;
+    padding: 20px 22px;
+    overflow-x: auto;
+    position: relative;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: #e2e8f0;
+    margin: 16px 0;
+  }
+  .code-block .comment { color: #6B7280; }
+  .code-block .key     { color: #93C5FD; }
+  .code-block .val     { color: #86EFAC; }
+  .code-block .str     { color: #FDE68A; }
+  .code-block .type    { color: #C4B5FD; }
+
+  .copy-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+    color: #9CA3AF; border-radius: 6px; padding: 5px 10px;
+    font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+  /* Constraint / info cards */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 18px 20px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .info-card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+  .info-card-desc  { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+  /* Allowed / Blocked lists */
+  .check-list { list-style: none; padding: 0; margin: 12px 0; }
+  .check-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-list li .icon-wrap {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .icon-ok  { background: rgba(29,158,117,0.12); }
+  .icon-no  { background: rgba(224,82,82,0.12); }
+
+  /* Alert callouts */
+  .callout {
+    border-radius: 10px; padding: 16px 18px;
+    display: flex; gap: 12px;
+    margin: 16px 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #92500a; }
+  .callout-info  { background: rgba(83,74,183,0.07);   border: 1px solid rgba(83,74,183,0.2);  color: #3D3590; }
+  .callout-tip   { background: rgba(29,158,117,0.07);  border: 1px solid rgba(29,158,117,0.2); color: #0f5c3d; }
+  .callout strong { display: block; margin-bottom: 3px; }
+
+  /* Field table */
+  .field-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.845rem; }
+  .field-table th {
+    text-align: left; padding: 10px 14px;
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-secondary);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .field-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-table code {
+    background: rgba(83,74,183,0.08); color: var(--primary);
+    padding: 2px 7px; border-radius: 4px; font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .required-badge {
+    background: rgba(224,82,82,0.1); color: var(--error);
+    font-size: 0.68rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 30px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .optional-badge {
+    background: rgba(107,114,128,0.1); color: #6B7280;
+    font-size: 0.68rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 30px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+
+  /* Hero banner */
+  .guide-hero {
+    background: linear-gradient(135deg, #534AB7 0%, #3D3590 100%);
+    border-radius: var(--radius-card);
+    padding: 32px 36px;
+    color: #fff;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease both;
+  }
+  .guide-hero::after {
+    content: '';
+    position: absolute; right: -40px; top: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .guide-hero h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
+  .guide-hero p  { opacity: 0.8; font-size: 0.9rem; max-width: 560px; line-height: 1.6; }
+  .guide-hero-pills { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .guide-pill {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 30px; padding: 4px 14px;
+    font-size: 0.78rem; font-weight: 500; color: #fff;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* CTA bar */
+  .cta-bar {
+    background: linear-gradient(135deg, rgba(83,74,183,0.07), rgba(29,158,117,0.05));
+    border: 1px solid rgba(83,74,183,0.15);
+    border-radius: var(--radius-card);
+    padding: 24px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 48px;
+  }
+</style>
+
+<div class="guide-layout">
+
+  <!-- ── LEFT: Table of Contents ── -->
+  <aside class="guide-toc">
+    <div class="toc-title">On this page</div>
+    <a href="#overview"       class="toc-link">Overview</a>
+    <a href="#architecture"   class="toc-link">Architecture</a>
+    <a href="#manifest"       class="toc-link">manifest.json</a>
+    <a href="#manifest-fields"class="toc-link sub">Fields Reference</a>
+    <a href="#input-output"   class="toc-link">Input / Output Types</a>
+    <a href="#constraints"    class="toc-link">Constraints &amp; Rules</a>
+    <a href="#allowed"        class="toc-link sub">Allowed</a>
+    <a href="#blocked"        class="toc-link sub">Blocked</a>
+    <a href="#next-steps"     class="toc-link">Next Steps</a>
+  </aside>
+
+  <!-- ── RIGHT: Content ── -->
+  <main class="guide-content">
+
+    <!-- Hero -->
+    <div class="guide-hero">
+      <div class="flex items-center gap-2 mb-3" style="opacity:0.7; font-size:0.8rem; font-weight:500;">
+        <a href="/developer/" style="color:#fff; text-decoration:none;">Developer Portal</a>
+        <span>›</span>
+        <span>Agent Creation Guide</span>
+      </div>
+      <h1>Creating an Agent</h1>
+      <p>Everything you need to know about building a compliant AI teaching agent for the ExcellStudy platform — from architecture to field constraints.</p>
+      <div class="guide-hero-pills">
+        <span class="guide-pill"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Spec v2.0</span>
+        <span class="guide-pill"><i data-lucide="clock" style="width:13px;height:13px;"></i> ~15 min read</span>
+        <span class="guide-pill"><i data-lucide="shield-check" style="width:13px;height:13px;"></i> Platform compliant</span>
+      </div>
+    </div>
+
+    <!-- ── 1. Overview ── -->
+    <section class="guide-section" id="overview">
+      <div class="section-label">01 — Overview</div>
+      <h2 class="section-title">What is an ExcellStudy Agent?</h2>
+      <div class="section-body">
+        <p>
+          An <strong>ExcellStudy Agent</strong> is a containerised AI service that receives a learner input, 
+          processes it using your model or logic, and returns a structured educational response. 
+          Every agent runs in isolation, communicates exclusively through our defined API contract, 
+          and must pass the automated pipeline before going live.
+        </p>
+        <p>
+          Agents are subject-matter specialists — a single agent should focus on one domain 
+          (e.g., <em>Algebra</em>, <em>Chemistry</em>, <em>Essay Writing</em>). 
+          Multi-subject generalist agents are not accepted.
+        </p>
+      </div>
+
+      <div class="callout callout-info">
+        <i data-lucide="info" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <strong>Platform Note</strong>
+          Your agent must be registered on the portal <em>before</em> you push its Docker image. 
+          The pipeline cross-validates the pushed image against the registration metadata.
+        </div>
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- ── 2. Architecture ── -->
+    <section class="guide-section" id="architecture">
+      <div class="section-label">02 — Architecture</div>
+      <h2 class="section-title">How Agents Work</h2>
+      <div class="section-body">
+        <p>Your agent is a stateless HTTP service inside a Docker container. The platform calls it on each learner interaction.</p>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(83,74,183,0.1);">
+            <i data-lucide="box" style="width:18px;height:18px;color:#534AB7;"></i>
+          </div>
+          <div class="info-card-title">Docker Container</div>
+          <div class="info-card-desc">Your agent must be packaged as a Docker image and pushed to the ExcellStudy registry.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(29,158,117,0.1);">
+            <i data-lucide="zap" style="width:18px;height:18px;color:#1D9E75;"></i>
+          </div>
+          <div class="info-card-title">REST API Contract</div>
+          <div class="info-card-desc">Your container must expose a <code style="background:rgba(29,158,117,0.1);color:#1D9E75;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">POST /infer</code> endpoint that accepts our payload schema.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(186,117,23,0.1);">
+            <i data-lucide="shield" style="width:18px;height:18px;color:#BA7517;"></i>
+          </div>
+          <div class="info-card-title">Stateless Design</div>
+          <div class="info-card-desc">Each request is independent. Do not persist learner data inside your container.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:rgba(139,92,246,0.1);">
+            <i data-lucide="file-json-2" style="width:18px;height:18px;color:#8B5CF6;"></i>
+          </div>
+          <div class="info-card-title">manifest.json</div>
+          <div class="info-card-desc">A metadata file bundled with your image that describes your agent's capabilities and constraints.</div>
+        </div>
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- ── 3. manifest.json ── -->
+    <section class="guide-section" id="manifest">
+      <div class="section-label">03 — Manifest</div>
+      <h2 class="section-title">manifest.json</h2>
+      <div class="section-body">
+        <p>
+          Every agent image must include a <strong>manifest.json</strong> at its root. 
+          This file is read by the pipeline during the schema validation step. 
+          Any mismatch with your portal registration will cause the pipeline to fail.
+        </p>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+<span class="comment">// manifest.json — place at the root of your Docker image</span>
+{
+  <span class="key">"name"</span>:            <span class="str">"My Math Agent"</span>,
+  <span class="key">"version"</span>:         <span class="str">"1.0.0"</span>,
+  <span class="key">"description"</span>:     <span class="str">"Teaches algebra fundamentals for ages 10–16"</span>,
+  <span class="key">"entry_point"</span>:     <span class="str">"main:app"</span>,
+  <span class="key">"port"</span>:            <span class="val">8080</span>,
+
+  <span class="comment">// Must match the input_type chosen during registration</span>
+  <span class="key">"input_type"</span>:     <span class="str">"text"</span>,
+
+  <span class="comment">// Must match output_types chosen during registration</span>
+  <span class="key">"output_types"</span>:   [<span class="str">"text"</span>, <span class="str">"hint"</span>],
+
+  <span class="comment">// At least one subject area required</span>
+  <span class="key">"subject_areas"</span>:  [<span class="str">"algebra"</span>, <span class="str">"mathematics"</span>],
+
+  <span class="comment">// Age range your agent is designed for</span>
+  <span class="key">"age_groups"</span>:     [<span class="str">"10-13"</span>, <span class="str">"14-16"</span>],
+
+  <span class="comment">// Optional feature flags</span>
+  <span class="key">"capabilities"</span>:   [<span class="str">"step_by_step"</span>, <span class="str">"adaptive_hints"</span>]
+}
+      </div>
+
+      <div class="callout callout-warn">
+        <i data-lucide="alert-triangle" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <strong>Fields must match your portal registration exactly.</strong>
+          If <code>input_type</code> or <code>output_types</code> in your manifest differ from what you registered, 
+          the pipeline's schema validation step will immediately fail.
+        </div>
+      </div>
+    </section>
+
+    <!-- Fields Reference -->
+    <section class="guide-section" id="manifest-fields">
+      <div class="section-label">03a — Fields Reference</div>
+      <h2 class="section-title">manifest.json Field Reference</h2>
+
+      <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-card);">
+        <table class="field-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Human-readable agent name. Must match portal registration.</td>
+            </tr>
+            <tr>
+              <td><code>version</code></td>
+              <td>string</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Semver format e.g. <code>1.0.0</code>. Must match portal registration.</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>string</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Short description of what the agent teaches. Max 300 chars.</td>
+            </tr>
+            <tr>
+              <td><code>entry_point</code></td>
+              <td>string</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Python module path to your ASGI/WSGI app e.g. <code>main:app</code>.</td>
+            </tr>
+            <tr>
+              <td><code>port</code></td>
+              <td>integer</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Port your container listens on. Must be <code>8080</code>.</td>
+            </tr>
+            <tr>
+              <td><code>input_type</code></td>
+              <td>string</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>One of the approved input types. Must match registration.</td>
+            </tr>
+            <tr>
+              <td><code>output_types</code></td>
+              <td>array</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>List of approved output types. Must match registration.</td>
+            </tr>
+            <tr>
+              <td><code>subject_areas</code></td>
+              <td>array</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>At least one subject area. Must match registration.</td>
+            </tr>
+            <tr>
+              <td><code>age_groups</code></td>
+              <td>array</td>
+              <td><span class="required-badge">Required</span></td>
+              <td>Target age ranges e.g. <code>["10-13", "14-16"]</code>.</td>
+            </tr>
+            <tr>
+              <td><code>capabilities</code></td>
+              <td>array</td>
+              <td><span class="optional-badge">Optional</span></td>
+              <td>Feature flags like <code>step_by_step</code>, <code>adaptive_hints</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- ── 4. Input / Output Types ── -->
+    <section class="guide-section" id="input-output">
+      <div class="section-label">04 — I/O Types</div>
+      <h2 class="section-title">Approved Input &amp; Output Types</h2>
+      <div class="section-body">
+        <p>Only the following types are accepted by the platform. You must select from this list when registering and in your manifest.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px;">
+        <div>
+          <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-secondary); margin-bottom:10px;">Input Types</div>
+          <ul class="check-list">
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">text</code> — Plain text question</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">image</code> — Photo or diagram upload</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">audio</code> — Voice recording</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">code</code> — Code snippet</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">math_expression</code> — LaTeX / MathML</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">multiple_choice</code> — MCQ with options</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">structured_data</code> — JSON payload</span></li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-secondary); margin-bottom:10px;">Output Types</div>
+          <ul class="check-list">
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">text</code> — Plain text response</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">hint</code> — Scaffolded hint</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">score</code> — Numeric evaluation</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">explanation</code> — Step-by-step breakdown</span></li>
+            <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span><span><code style="background:rgba(83,74,183,0.08);color:#534AB7;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">feedback</code> — Qualitative feedback</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- ── 5. Constraints ── -->
+    <section class="guide-section" id="constraints">
+      <div class="section-label">05 — Constraints</div>
+      <h2 class="section-title">Platform Constraints &amp; Rules</h2>
+      <div class="section-body">
+        <p>All agents are reviewed against the following requirements. Violating any of these will result in automatic rejection during the pipeline or during manual review.</p>
+      </div>
+
+      <div id="allowed" style="scroll-margin-top:90px;">
+        <div class="callout callout-tip" style="margin-bottom:0; border-radius:10px 10px 0 0;">
+          <i data-lucide="check-circle-2" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+          <div><strong>Allowed</strong> — Your agent must do all of these</div>
+        </div>
+        <ul class="check-list" style="background:#fff; border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:0 16px;">
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Respond within <strong>5 seconds</strong> per request</li>
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Return well-formed JSON matching the output schema</li>
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Return HTTP <code style="font-family:monospace;">200</code> on success, <code style="font-family:monospace;">4xx</code>/<code style="font-family:monospace;">5xx</code> on errors</li>
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Focus on <strong>one subject area</strong> per agent</li>
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Produce age-appropriate, curriculum-aligned responses</li>
+          <li><span class="icon-wrap icon-ok"><i data-lucide="check" style="width:11px;height:11px;color:#1D9E75;"></i></span>Run on port <code style="font-family:monospace;">8080</code> inside the container</li>
+        </ul>
+      </div>
+
+      <div id="blocked" style="scroll-margin-top:90px; margin-top:20px;">
+        <div class="callout callout-warn" style="margin-bottom:0; border-radius:10px 10px 0 0;">
+          <i data-lucide="shield-x" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+          <div><strong>Blocked</strong> — These will cause automatic rejection</div>
+        </div>
+        <ul class="check-list" style="background:#fff; border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:0 16px;">
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Storing or logging learner PII (name, email, chat history)</li>
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Making outbound network calls to third-party APIs during inference</li>
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Writing to the filesystem during a request</li>
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Responses that generate off-topic, harmful, or age-inappropriate content</li>
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Container images larger than <strong>4 GB</strong></li>
+          <li><span class="icon-wrap icon-no"><i data-lucide="x" style="width:11px;height:11px;color:#E05252;"></i></span>Running as root inside the container</li>
+        </ul>
+      </div>
+    </section>
+    <hr class="section-divider">
+
+    <!-- ── 6. Next Steps ── -->
+    <section class="guide-section" id="next-steps">
+      <div class="section-label">06 — Next Steps</div>
+      <h2 class="section-title">Ready to deploy?</h2>
+      <div class="section-body">
+        <p>Once your agent is built and your manifest is in order, head to the deployment guide to learn how to push your image and trigger the pipeline.</p>
+      </div>
+
+      <div class="cta-bar">
+        <div>
+          <div style="font-weight:700; color:var(--text-primary);">Push &amp; Deploy Your Agent</div>
+          <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:3px;">Step-by-step instructions to tag, push, and monitor your deployment.</div>
+        </div>
+        <a href="{% url 'developer:deploy-guide' %}" class="btn-pill btn-primary" style="white-space:nowrap; padding:10px 24px;">
+          <i data-lucide="arrow-right" style="width:15px;height:15px;"></i> Deploy Guide →
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  lucide.createIcons();
+
+  function copyBlock(btn) {
+    var block = btn.closest('.code-block');
+    var text = block.innerText.replace(/^Copy$/m, '').trim();
+    navigator.clipboard.writeText(text).then(function() {
+      btn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px;"></i> Copied!';
+      lucide.createIcons();
+      setTimeout(function() {
+        btn.innerHTML = '<i data-lucide="copy" style="width:12px;height:12px;"></i> Copy';
+        lucide.createIcons();
+      }, 2000);
+    });
+  }
+
+  // Highlight active TOC link on scroll
+  var sections = document.querySelectorAll('section[id]');
+  var tocLinks = document.querySelectorAll('.toc-link');
+
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY + 110;
+    sections.forEach(function(s) {
+      if (scrollY >= s.offsetTop) {
+        tocLinks.forEach(function(l) { l.classList.remove('active'); });
+        var active = document.querySelector('.toc-link[href="#' + s.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  });
+</script>
+{% endblock %}
