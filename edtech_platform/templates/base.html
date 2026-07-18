@@ -465,9 +465,42 @@
        SCRIPTS
        ════════════════════════════════════════════════════════════════════ -->
   <script>
-    // ── Initialize Lucide icons ──
+    // ── Initialize Lucide icons & Navigation Highlights ──
     document.addEventListener('DOMContentLoaded', function () {
       lucide.createIcons();
+
+      // Dynamic navigation active highlight
+      const path = window.location.pathname;
+      let activeNav = "dashboard";
+      if (path.includes("/marketplace/")) {
+        activeNav = "marketplace";
+      } else if (path.includes("/developer/pipeline/")) {
+        activeNav = "pipeline";
+      } else if (path.includes("/developer/")) {
+        activeNav = "agents";
+      } else if (path.includes("/learner/agents/")) {
+        activeNav = "sessions";
+      } else if (path.includes("/courses/")) {
+        activeNav = "courses";
+      } else if (path === "/learner/") {
+        activeNav = "dashboard";
+      }
+
+      document.querySelectorAll("[data-nav]").forEach(function(el) {
+        if (el.getAttribute("data-nav") === activeNav) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+
+      document.querySelectorAll("[data-sidebar]").forEach(function(el) {
+        if (el.getAttribute("data-sidebar") === activeNav) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
     });
 
     // ── Sidebar toggle ──
