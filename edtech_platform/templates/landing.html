@@ -295,8 +295,17 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <a href="{% url 'login' %}" class="btn btn-outline" style="padding:10px 24px; font-size:0.8125rem;">Log In</a>
-        <a href="{% url 'signup' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Get Started</a>
+        {% if user.is_authenticated %}
+          {% if user.developer_profile %}
+            <a href="{% url 'developer:portal' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Developer Portal</a>
+          {% else %}
+            <a href="{% url 'learner:dashboard' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Dashboard</a>
+          {% endif %}
+          <a href="{% url 'logout' %}" class="btn btn-outline" style="padding:10px 24px; font-size:0.8125rem;">Log Out</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline" style="padding:10px 24px; font-size:0.8125rem;">Log In</a>
+          <a href="{% url 'signup' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Get Started</a>
+        {% endif %}
       </div>
     </div>
   </nav>
