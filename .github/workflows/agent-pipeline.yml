@@ -258,14 +258,19 @@ jobs:
       - name: Notify Django — success
         if: success()
         run: |
-          PAYLOAD=$(python3 -c "
-import json, sys
+          cat > /tmp/build_payload.py << 'PYEOF'
+import json, os, sys
 print(json.dumps({
-    'agent_slug': '${{ steps.identity.outputs.slug }}',
-    'status': 'success',
-    'version': '${{ steps.identity.outputs.version }}',
-    'k8s_service_url': '${{ steps.deploy.outputs.service_url }}',
-}))")
+    "agent_slug":     os.environ["AGENT_SLUG"],
+    "status":         "success",
+    "version":        os.environ["VERSION"],
+    "k8s_service_url": os.environ["K8S_URL"],
+}))
+PYEOF
+          PAYLOAD=$(AGENT_SLUG="${{ steps.identity.outputs.slug }}" \
+                    VERSION="${{ steps.identity.outputs.version }}" \
+                    K8S_URL="${{ steps.deploy.outputs.service_url }}" \
+                    python3 /tmp/build_payload.py)
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
 
@@ -277,13 +282,16 @@ print(json.dumps({
       - name: Notify Django — failure
         if: failure()
         run: |
-          PAYLOAD=$(python3 -c "
-import json
+          cat > /tmp/build_payload_fail.py << 'PYEOF'
+import json, os
 print(json.dumps({
-    'agent_slug': '${{ steps.identity.outputs.slug }}',
-    'status': 'failure',
-    'rejection_reason': 'Pipeline validation failed \u2014 check the Actions run logs for the specific step and reason.',
-}))")
+    "agent_slug":       os.environ["AGENT_SLUG"],
+    "status":           "failure",
+    "rejection_reason": "Pipeline validation failed — check the Actions run logs for the specific step and reason.",
+}))
+PYEOF
+          PAYLOAD=$(AGENT_SLUG="${{ steps.identity.outputs.slug }}" \
+                    python3 /tmp/build_payload_fail.py)
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
 
