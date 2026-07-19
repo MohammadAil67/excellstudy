@@ -76,3 +76,10 @@ async def test_forward_to_agent_success():
 
     assert result["status_code"] == 200
     assert result["body"] == {"response": "Hello Biology"}
+
+
+def test_agent_invoke_url_resolves():
+    from django.urls import reverse
+    url = reverse('agent-invoke', kwargs={'agent_slug': 'dev-testdev-biohelper'})
+    assert url == '/api/v1/agents/dev-testdev-biohelper/invoke/'
+
