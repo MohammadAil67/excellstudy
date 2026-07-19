@@ -159,7 +159,8 @@ jobs:
       - name: Deploy to cluster
         id: deploy
         run: |
-          NAMESPACE="dev-${{ github.actor }}"
+          ACTOR_LOWER=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
+          NAMESPACE="dev-${ACTOR_LOWER}"
           SLUG="${{ steps.identity.outputs.slug }}"
           IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
 
@@ -169,7 +170,7 @@ jobs:
           apiVersion: v1
           kind: ResourceQuota
           metadata:
-            name: ${{ github.actor }}-quota
+            name: ${ACTOR_LOWER}-quota
             namespace: $NAMESPACE
           spec:
             hard:
