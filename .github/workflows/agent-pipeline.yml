@@ -2,7 +2,7 @@ name: Agent Pipeline Validation
 
 on:
   registry_package:
-    types: [published]
+    types: [published, updated]   # 'updated' catches re-pushes of an existing tag
   workflow_dispatch:
     inputs:
       agent_slug:
