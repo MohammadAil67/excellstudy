@@ -77,6 +77,42 @@ async def invoke_agent(request, agent_slug):
     try:
         result = await forward_to_agent(agent, input_payload, learner_context, request_id)
         request.mcp_status = "success"
+
+        # Record learner progress dynamically
+        try:
+            from django.utils import timezone
+            from apps.core.models import Learner, LearnerProgress, AgentRegistry
+
+            def _record_progress():
+                try:
+                    l_id = int(learner_id) if str(learner_id).isdigit() else None
+                    if not l_id:
+                        return
+                    learner_obj = Learner.objects.filter(user_id=l_id).first()
+                    agent_obj = AgentRegistry.objects.filter(slug=agent_slug).first()
+                    if not learner_obj or not agent_obj:
+                        return
+
+                    score = None
+                    if isinstance(result.get("body"), dict):
+                        score_val = result["body"].get("score")
+                        if isinstance(score_val, (int, float)):
+                            score = int(score_val)
+
+                    LearnerProgress.objects.create(
+                        learner=learner_obj,
+                        agent_used=agent_obj,
+                        completed_at=timezone.now(),
+                        score=score
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to record learner progress: {e}")
+
+            if learner_id and str(learner_id) != "smoke-test":
+                await sync_to_async(_record_progress)()
+        except Exception as e:
+            logger.error(f"Error in progress tracking block: {e}")
+
         return JsonResponse(
             {"status": "success", "request_id": request_id, "data": result["body"]},
             status=result["status_code"],
