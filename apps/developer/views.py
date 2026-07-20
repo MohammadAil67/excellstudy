@@ -122,3 +122,25 @@ def pipeline_status(request, job_id):
         'pipeline_state': pipeline_state,
     }
     return render(request, 'developer/pipeline_status.html', context)
+
+
+class ToggleAgentStatusView(LoginRequiredMixin, View):
+    """
+    POST -> toggle agent status between 'live' and 'suspended'.
+    """
+
+    def post(self, request, agent_slug):
+        agent = get_object_or_404(AgentRegistry, slug=agent_slug, developer__user=request.user)
+        from apps.agents.registry import invalidate_agent
+
+        if agent.status == 'live':
+            agent.status = 'suspended'
+            agent.save()
+            invalidate_agent(agent.slug)
+        elif agent.status == 'suspended':
+            agent.status = 'live'
+            agent.save()
+            invalidate_agent(agent.slug)
+
+        return redirect('developer:portal')
+

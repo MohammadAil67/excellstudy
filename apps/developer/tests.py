@@ -77,6 +77,33 @@ class DeveloperPortalTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_toggle_agent_status_live_to_suspended(self):
+        agent = AgentRegistry.objects.create(
+            name="Toggle Helper",
+            developer=self.developer,
+            input_type="number",
+            status="live",
+        )
+        url = reverse('developer:toggle-agent-status', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        agent.refresh_from_db()
+        self.assertEqual(agent.status, 'suspended')
+
+    def test_toggle_agent_status_suspended_to_live(self):
+        agent = AgentRegistry.objects.create(
+            name="Toggle Helper 2",
+            developer=self.developer,
+            input_type="number",
+            status="suspended",
+        )
+        url = reverse('developer:toggle-agent-status', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        agent.refresh_from_db()
+        self.assertEqual(agent.status, 'live')
+
+
 
 import sys
 import subprocess

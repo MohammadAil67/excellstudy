@@ -49,6 +49,8 @@
   .status-live { background: var(--accent); color: #fff; }
   .status-pending { background: var(--highlight); color: #fff; }
   .status-rejected { background: var(--error); color: #fff; }
+  .status-suspended { background: #6B7280; color: #fff; }
+
 
   .health-dot {
     width: 8px; height: 8px; border-radius: 50%; display: inline-block;
@@ -238,8 +240,20 @@
                   <div class="actions-menu">
                     <a href="{% url 'developer:pipeline_status' agent.slug %}"><i data-lucide="activity" class="w-3.5 h-3.5 inline mr-2"></i>Pipeline Status</a>
                     {% if agent.status == 'live' %}
-                      <a href="#"><i data-lucide="eye" class="w-3.5 h-3.5 inline mr-2"></i>View</a>
-                      <a href="#"><i data-lucide="pause" class="w-3.5 h-3.5 inline mr-2"></i>Disable</a>
+                      <a href="{% url 'learner:agent-session' agent.slug %}" target="_blank"><i data-lucide="eye" class="w-3.5 h-3.5 inline mr-2"></i>View in Portal</a>
+                      <a href="#" onclick="event.preventDefault(); document.getElementById('toggle-form-{{ agent.slug }}').submit();">
+                        <i data-lucide="pause" class="w-3.5 h-3.5 inline mr-2"></i>Disable
+                      </a>
+                      <form id="toggle-form-{{ agent.slug }}" action="{% url 'developer:toggle-agent-status' agent.slug %}" method="post" style="display:none;">
+                        {% csrf_token %}
+                      </form>
+                    {% elif agent.status == 'suspended' %}
+                      <a href="#" onclick="event.preventDefault(); document.getElementById('toggle-form-{{ agent.slug }}').submit();">
+                        <i data-lucide="play" class="w-3.5 h-3.5 inline mr-2"></i>Enable
+                      </a>
+                      <form id="toggle-form-{{ agent.slug }}" action="{% url 'developer:toggle-agent-status' agent.slug %}" method="post" style="display:none;">
+                        {% csrf_token %}
+                      </form>
                     {% endif %}
                     <a href="#" class="danger"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-2"></i>Delete</a>
                   </div>

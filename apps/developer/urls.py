@@ -11,4 +11,5 @@ urlpatterns = [
     path('pipeline/<str:job_id>/', views.pipeline_status, name='pipeline_status'),
     path('guides/creating-an-agent/', views.creation_guide, name='creation-guide'),
     path('guides/deploy/', views.deploy_guide, name='deploy-guide'),
+    path('agents/<slug:agent_slug>/toggle-status/', views.ToggleAgentStatusView.as_view(), name='toggle-agent-status'),
 ]
