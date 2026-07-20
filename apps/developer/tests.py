@@ -1,5 +1,7 @@
 import json
 import os
+from unittest.mock import patch
+import apps.developer.github_dispatch
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -102,6 +104,64 @@ class DeveloperPortalTests(TestCase):
         self.assertEqual(response.status_code, 302)
         agent.refresh_from_db()
         self.assertEqual(agent.status, 'live')
+
+    def test_trigger_pipeline_view_post_not_pending(self):
+        agent = AgentRegistry.objects.create(
+            name="Trigger Fail Agent",
+            developer=self.developer,
+            input_type="number",
+            status="live",
+        )
+        url = reverse('developer:trigger-pipeline', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url, {'version': 'v1'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('developer:pipeline_status', kwargs={'job_id': agent.slug}))
+
+    @patch('apps.developer.github_dispatch.image_exists_in_registry')
+    def test_trigger_pipeline_view_post_image_not_exists(self, mock_exists):
+        mock_exists.return_value = False
+        agent = AgentRegistry.objects.create(
+            name="Trigger Missing Image Agent",
+            developer=self.developer,
+            input_type="number",
+            status="pending",
+        )
+        url = reverse('developer:trigger-pipeline', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url, {'version': 'v3'})
+        self.assertEqual(response.status_code, 302)
+        mock_exists.assert_called_once_with(agent.slug, 'v3')
+
+    @patch('apps.developer.github_dispatch.image_exists_in_registry')
+    @patch('apps.developer.github_dispatch.trigger_pipeline')
+    def test_trigger_pipeline_view_post_success(self, mock_trigger, mock_exists):
+        mock_exists.return_value = True
+        mock_trigger.return_value = (True, "Pipeline successfully dispatched.")
+        agent = AgentRegistry.objects.create(
+            name="Trigger Success Agent",
+            developer=self.developer,
+            input_type="number",
+            status="pending",
+        )
+        url = reverse('developer:trigger-pipeline', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url, {'version': 'v2'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('developer:pipeline_status', kwargs={'job_id': agent.slug}))
+        mock_exists.assert_called_once_with(agent.slug, 'v2')
+        mock_trigger.assert_called_once_with(agent.slug, 'v2', self.developer.namespace)
+
+    def test_trigger_pipeline_view_post_different_developer(self):
+        other_user = User.objects.create_user(username="otherdev", password="password")
+        other_developer = Developer.objects.create(user=other_user)
+        agent = AgentRegistry.objects.create(
+            name="Other Agent",
+            developer=other_developer,
+            input_type="number",
+            status="pending",
+        )
+        url = reverse('developer:trigger-pipeline', kwargs={'agent_slug': agent.slug})
+        response = self.client.post(url, {'version': 'v1'})
+        self.assertEqual(response.status_code, 404)
+
 
 
 

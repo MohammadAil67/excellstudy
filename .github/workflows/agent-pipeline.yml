@@ -14,6 +14,11 @@ on:
         required: true
         type: string
         default: 'v1'
+      developer_namespace:
+        description: 'The developer namespace (e.g. dev-alex304)'
+        required: true
+        type: string
+        default: ''
 
 env:
   PLATFORM_API_URL: "http://localhost:8000"   # update when moving off local testing
@@ -36,9 +41,11 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "developer_namespace=${{ inputs.developer_namespace }}" >> $GITHUB_OUTPUT
           else
             echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
             echo "version=${{ github.event.registry_package.package_version.container_metadata.tag.name }}" >> $GITHUB_OUTPUT
+            echo "developer_namespace=dev-${{ github.actor }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Repository
@@ -159,8 +166,7 @@ jobs:
       - name: Deploy to cluster
         id: deploy
         run: |
-          ACTOR_LOWER=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
-          NAMESPACE="dev-${ACTOR_LOWER}"
+          NAMESPACE="${{ steps.identity.outputs.developer_namespace }}"
           SLUG="${{ steps.identity.outputs.slug }}"
           IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
 
@@ -170,7 +176,7 @@ jobs:
           apiVersion: v1
           kind: ResourceQuota
           metadata:
-            name: ${ACTOR_LOWER}-quota
+            name: ${{ steps.identity.outputs.developer_namespace }}-quota
             namespace: $NAMESPACE
           spec:
             hard:

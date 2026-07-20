@@ -203,3 +203,9 @@ PIPELINE_WEBHOOK_SECRET = os.environ.get(
     'PIPELINE_WEBHOOK_SECRET',
     '4b46d87104cc2781abba66504e6e7c5c2854da0f77bed0d2a6fe5bac6f42c2ba'
 )
+
+# ── GitHub Actions Workflow Dispatch API ──
+GITHUB_DISPATCH_TOKEN = os.environ.get("GITHUB_DISPATCH_TOKEN")
+GITHUB_REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER")
+GITHUB_REPO_NAME = os.environ.get("GITHUB_REPO_NAME")
+

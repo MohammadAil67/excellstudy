@@ -164,6 +164,16 @@
 </style>
 
 <div class="pipeline-container">
+  {% if messages %}
+    <div class="messages mb-6">
+      {% for message in messages %}
+        <div class="p-4 rounded-lg flex items-start gap-2.5 text-sm {% if message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+          <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>{{ message }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <!-- Header -->
   <div style="animation: fadeInUp 0.4s ease both;" class="mb-8">
@@ -199,7 +209,7 @@
     <h2 class="text-xl font-bold text-[#1A1A2E] mb-2">Waiting for Your Agent Image</h2>
     <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-8">
       Your agent <strong class="text-[#1A1A2E]">{{ agent.name }}</strong> has been registered.
-      The pipeline will start automatically once you push your Docker image to the ExcellStudy registry.
+      Tag and push your image to the package registry, then trigger the validation pipeline below.
     </p>
 
     <!-- Steps -->
@@ -210,11 +220,11 @@
       </div>
       <div class="step-label">
         <span class="step-num">2</span>
-        Tag and push to the registry using the command below
+        Tag and push to the registry using the commands below
       </div>
       <div class="step-label">
         <span class="step-num">3</span>
-        The pipeline will auto-trigger and this page will update
+        Click the button below to validate your agent
       </div>
     </div>
 
@@ -223,6 +233,26 @@
       <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       <div><span style="color:#1D9E75;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
       <div style="margin-top:4px;"><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
+    </div>
+
+    <!-- Trigger Validation Pipeline Form -->
+    <div style="margin-top:28px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#FDFDFF; max-width:600px; margin-left:auto; margin-right:auto; padding:20px; text-align:left;">
+      <h3 style="font-weight:700; font-size:0.9rem; color:var(--text-primary); margin-top:0; margin-bottom:6px;">Trigger Validation Pipeline</h3>
+      <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0; margin-bottom:16px;">
+        Once you have successfully built and pushed your Docker image to the registry, trigger the validation pipeline.
+      </p>
+      
+      <form method="post" action="{% url 'developer:trigger-pipeline' agent.slug %}">
+        {% csrf_token %}
+        <div style="margin-bottom:16px;">
+          <label for="version" style="font-size:0.75rem; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:4px;">Version tag you just pushed</label>
+          <input type="text" id="version" name="version" value="v1" required
+                 style="width: 100%; max-width: 200px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-input); font-size: 0.875rem;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px; font-size:0.8125rem; padding:8px 18px;">
+          <i data-lucide="play" style="width:14px; height:14px;"></i> I've pushed — validate my agent
+        </button>
+      </form>
     </div>
 
     <!-- ── manifest.json Generator ── -->

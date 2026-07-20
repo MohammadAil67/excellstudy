@@ -144,3 +144,55 @@ class ToggleAgentStatusView(LoginRequiredMixin, View):
 
         return redirect('developer:portal')
 
+
+class TriggerPipelineView(LoginRequiredMixin, View):
+    """
+    POST-only. Called when a developer clicks "I've pushed --
+    validate my agent" on the registration confirmation page
+    or the pipeline status page.
+    """
+
+    def post(self, request, agent_slug):
+        agent = get_object_or_404(AgentRegistry, slug=agent_slug, developer__user=request.user)
+
+        if agent.status != "pending":
+            from django.contrib import messages
+            if agent.status == "live":
+                messages.warning(request, "This agent is already live.")
+            elif agent.status == "rejected":
+                messages.warning(request, "This agent is already rejected — fix and re-register a new version/agent if needed.")
+            elif agent.status == "suspended":
+                messages.warning(request, "This agent is suspended — reactivate it via the portal.")
+            else:
+                messages.warning(request, f"This agent cannot be triggered (current status: {agent.status}).")
+            return redirect('developer:pipeline_status', job_id=agent.slug)
+
+        version = request.POST.get("version", "v1").strip()
+        if not version:
+            version = "v1"
+
+        from apps.developer.github_dispatch import image_exists_in_registry, trigger_pipeline
+        from django.contrib import messages
+
+        if not image_exists_in_registry(agent.slug, version):
+            messages.error(
+                request,
+                f"No image found tagged '{version}' for slug '{agent.slug}'. Push it first, then click this button."
+            )
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                return redirect(referer)
+            return redirect('developer:pipeline_status', job_id=agent.slug)
+
+        success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace)
+        if success:
+            messages.success(request, f"Validation pipeline successfully started for {agent.name} (version {version})!")
+            return redirect('developer:pipeline_status', job_id=agent.slug)
+        else:
+            messages.error(request, f"Failed to dispatch pipeline: {msg}")
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                return redirect(referer)
+            return redirect('developer:pipeline_status', job_id=agent.slug)
+
+
