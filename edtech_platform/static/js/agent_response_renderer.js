@@ -113,7 +113,7 @@ function renderAnnotatedImage(block) {
   wrapper.className = 'relative inline-block w-full overflow-hidden rounded-lg border border-[#E5E4F0]';
 
   const img = document.createElement('img');
-  img.src = block.image_url || '';
+  img.src = block.image_url || block.value || '';
   img.className = 'w-full h-auto block';
   wrapper.appendChild(img);
 

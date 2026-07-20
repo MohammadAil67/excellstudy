@@ -121,9 +121,10 @@ function initImageUploadHandler(form) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
-
     try {
+      const csrfElement = form.querySelector('[name=csrfmiddlewaretoken]');
+      const csrfToken = csrfElement ? csrfElement.value : "";
+
       const res = await fetch("/learner/upload-image/", {
         method: "POST",
         headers: {
