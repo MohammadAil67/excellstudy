@@ -221,8 +221,8 @@
     <!-- Push command -->
     <div class="command-block">
       <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-      <div style="color:#9CA3AF; margin-bottom:4px; font-size:0.7rem;"># Push your agent image</div>
-      <div><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">excellstudy.registry.io/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div><span style="color:#1D9E75;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div style="margin-top:4px;"><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
     </div>
 
     <!-- ── manifest.json Generator ── -->

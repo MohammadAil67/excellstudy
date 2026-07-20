@@ -333,18 +333,18 @@
         <div class="step-bubble">4</div>
         <div class="step-card">
           <div class="step-card-title">B.4 — Tag and push, using your exact slug from B.1</div>
-          <div class="step-card-desc" style="margin-bottom:4px;">Replace <code class="inline">{platform-org}</code>, <code class="inline">{your-slug}</code>, <code class="inline">YOUR_GITHUB_USERNAME</code>, and <code class="inline">YOUR_TOKEN_FROM_B2</code> with your values.</div>
+          <div class="step-card-desc" style="margin-bottom:4px;">Replace <code class="inline">{your-slug}</code>, <code class="inline">YOUR_GITHUB_USERNAME</code>, and <code class="inline">YOUR_TOKEN_FROM_B2</code> with your values.</div>
 
           <div class="code-block">
             <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
 <span class="comment"># Build</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v1 .
+<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/mohammadail67/<span class="flag">{your-slug}</span>:v1 .
 
 <span class="comment"># Authenticate</span>
 <span class="cmd">docker</span> login ghcr.io <span class="flag">-u</span> YOUR_GITHUB_USERNAME <span class="flag">-p</span> YOUR_TOKEN_FROM_B2
 
 <span class="comment"># Push</span>
-<span class="cmd">docker</span> push ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v1
+<span class="cmd">docker</span> push ghcr.io/mohammadail67/<span class="flag">{your-slug}</span>:v1
           </div>
 
           <div class="callout callout-warn">

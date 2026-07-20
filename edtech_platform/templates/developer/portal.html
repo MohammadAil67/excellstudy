@@ -166,11 +166,11 @@
           <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> Copy
         </button>
         <pre id="quick-start-code"><span class="comment"># Build and push your agent image</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">excellstudy.io/dev-username/my-agent:1.0.0</span> .
-<span class="cmd">docker</span> push <span class="url">excellstudy.io/dev-username/my-agent:1.0.0</span>
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/mohammadail67/my-agent:1.0.0</span> .
+<span class="cmd">docker</span> push <span class="url">ghcr.io/mohammadail67/my-agent:1.0.0</span>
 
 <span class="comment"># Register with the platform</span>
-<span class="cmd">curl</span> <span class="flag">-X POST</span> <span class="url">https://api.excellstudy.io/v1/agents/register</span> \
+<span class="cmd">curl</span> <span class="flag">-X POST</span> <span class="url">http://localhost:8000/api/v1/agents/register</span> \
   <span class="flag">-H</span> "Authorization: Bearer YOUR_API_KEY" \
   <span class="flag">-d</span> @manifest.json</pre>
       </div>

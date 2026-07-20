@@ -49,7 +49,7 @@ class RegisterAgentView(LoginRequiredMixin, View):
             agent.save()
             form.save_m2m()
 
-            org = "excellstudy"
+            org = "mohammadail67"
             return render(request, 'developer/register_confirm.html', {
                 'agent': agent,
                 'slug': agent.slug,
