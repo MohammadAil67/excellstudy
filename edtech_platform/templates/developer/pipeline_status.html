@@ -29,6 +29,8 @@
     50% { transform: translateY(-6px); }
   }
 
+  .hidden { display: none !important; }
+
   .pipeline-container { max-width: 780px; margin: 0 auto; padding: 32px 16px 64px; }
 
   .step-card { animation: fadeInUp 0.5s ease both; }
@@ -161,6 +163,16 @@
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
+  /* Large loading spinner */
+  .large-spinner {
+    width: 64px;
+    height: 64px;
+    border: 5px solid var(--border);
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+  }
 </style>
 
 <div class="pipeline-container">
@@ -227,26 +239,141 @@
         Click the button below to validate your agent
       </div>
     </div>
+  </div>
 
-    <!-- Push command -->
+  <!-- Awaiting banner -->
+  <div class="status-banner banner-awaiting">
+    <div class="flex items-center gap-3">
+      <i data-lucide="clock" class="w-5 h-5 text-[#BA7517]"></i>
+      <span class="font-semibold text-[#BA7517]">Awaiting image push</span>
+    </div>
+    <span class="text-xs text-[#6B7280]">Pipeline will start automatically once the image is pushed</span>
+  </div>
+  {% endif %}
+
+  {% if pipeline_state != 'awaiting_push' %}
+  <!-- ── SIMPLIFIED PIPELINE DISPLAY ── -->
+  <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 40px; text-align: center; margin-bottom: 24px;">
+    {% if pipeline_state == 'running' %}
+      <!-- Running layout with large spinner -->
+      <div id="pipeline-running-view">
+        <div class="large-spinner"></div>
+        <h2 class="text-xl font-bold text-[#1A1A2E] mb-2">Validation Pipeline is Running</h2>
+        <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-2">
+          Your container image is being checked for schema structure, security compliance, and endpoint availability.
+        </p>
+        <span class="text-xs text-[#9CA3AF] block mt-4" style="animation: bannerPulse 1.5s ease infinite;">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-1 animate-spin"></i> Updates are streamed live in real-time
+        </span>
+      </div>
+
+      <!-- Hidden success/failure layouts that SSE script can show dynamically -->
+      <div id="pipeline-success-view" class="hidden">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i>
+        </div>
+        <h2 class="text-xl font-bold text-green-700 mb-2">Agent Validation Passed!</h2>
+        <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
+          Your agent passed all checks successfully and is now active and live on the platform.
+        </p>
+        <a href="/marketplace/" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+          View in Marketplace <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <div id="pipeline-failure-view" class="hidden">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="alert-triangle" class="w-8 h-8 text-red-600"></i>
+        </div>
+        <h2 class="text-xl font-bold text-red-700 mb-2">Validation Pipeline Failed</h2>
+        <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
+          The validation checks encountered errors. Review the failure details below.
+        </p>
+        <div style="background: #1A1A2E; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
+          <div style="font-size: 0.75rem; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Rejection Reason</div>
+          <pre id="sse-failure-reason" style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: #fff; white-space: pre-wrap; word-break: break-word; line-height: 1.5;"></pre>
+        </div>
+        <a href="#trigger-section" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+          Fix and Resubmit
+        </a>
+      </div>
+
+    {% elif pipeline_state == 'success' %}
+      <!-- Static success layout -->
+      <div>
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i>
+        </div>
+        <h2 class="text-xl font-bold text-green-700 mb-2">Agent Validation Passed!</h2>
+        <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
+          Your agent passed all checks successfully and is now active and live on the platform.
+        </p>
+        <a href="/marketplace/" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+          View in Marketplace <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+    {% elif pipeline_state == 'failed' %}
+      <!-- Static failure layout -->
+      <div>
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="alert-triangle" class="w-8 h-8 text-red-600"></i>
+        </div>
+        <h2 class="text-xl font-bold text-red-700 mb-2">Validation Pipeline Failed</h2>
+        <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
+          The validation checks encountered errors. Review the failure details below.
+        </p>
+        <div style="background: #1A1A2E; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
+          <div style="font-size: 0.75rem; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Rejection Reason</div>
+          <pre style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: #fff; white-space: pre-wrap; word-break: break-word; line-height: 1.5;">{{ agent.rejection_reason }}</pre>
+        </div>
+        <a href="#trigger-section" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+          Fix and Resubmit
+        </a>
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ── Controls & Trigger section (Available in all non-live states) ── -->
+  {% if pipeline_state != 'success' %}
+  <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;" id="trigger-section">
+    {% if pipeline_state == 'running' %}
+      <h3 style="font-weight:700; font-size:1.1rem; color:var(--text-primary); margin-bottom:8px; text-align:center;">Validation Commands &amp; Controls</h3>
+      <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:20px; text-align:center; max-width:540px; margin-left:auto; margin-right:auto;">
+        Need to re-push your image or restart a stuck validation run? Use the instructions and form below.
+      </p>
+    {% elif pipeline_state == 'failed' %}
+      <h3 style="font-weight:700; font-size:1.1rem; color:var(--text-primary); margin-bottom:8px; text-align:center;">Re-validate Your Agent</h3>
+      <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:20px; text-align:center; max-width:540px; margin-left:auto; margin-right:auto;">
+        Push your code/image changes to the registry, then trigger the validation pipeline again below.
+      </p>
+    {% else %}
+      <h3 style="font-weight:700; font-size:1.1rem; color:var(--text-primary); margin-bottom:8px; text-align:center;">Push Instructions</h3>
+      <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:20px; text-align:center; max-width:540px; margin-left:auto; margin-right:auto;">
+        Follow the instructions below to tag, push, and submit your agent.
+      </p>
+    {% endif %}
+
+    <!-- Push commands -->
     <div class="command-block">
       <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       <div><span style="color:#1D9E75;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
       <div style="margin-top:4px;"><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
     </div>
 
-    <!-- Trigger Validation Pipeline Form -->
-    <div style="margin-top:28px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#FDFDFF; max-width:600px; margin-left:auto; margin-right:auto; padding:20px; text-align:left;">
-      <h3 style="font-weight:700; font-size:0.9rem; color:var(--text-primary); margin-top:0; margin-bottom:6px;">Trigger Validation Pipeline</h3>
+    <!-- Trigger Form -->
+    <div style="margin-top:24px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#FDFDFF; max-width:600px; margin-left:auto; margin-right:auto; padding:20px; text-align:left;">
+      <h4 style="font-weight:700; font-size:0.9rem; color:var(--text-primary); margin-top:0; margin-bottom:4px;">Trigger Validation Pipeline</h4>
       <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0; margin-bottom:16px;">
-        Once you have successfully built and pushed your Docker image to the registry, trigger the validation pipeline.
+        Verify the version tag you just pushed, then click the button to validate.
       </p>
       
       <form method="post" action="{% url 'developer:trigger-pipeline' agent.slug %}">
         {% csrf_token %}
         <div style="margin-bottom:16px;">
           <label for="version" style="font-size:0.75rem; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:4px;">Version tag you just pushed</label>
-          <input type="text" id="version" name="version" value="v1" required
+          <input type="text" id="version" name="version" value="{{ agent.version }}" required
                  style="width: 100%; max-width: 200px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-input); font-size: 0.875rem;">
         </div>
         <button type="submit" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px; font-size:0.8125rem; padding:8px 18px;">
@@ -254,40 +381,40 @@
         </button>
       </form>
     </div>
+  </div>
+  {% endif %}
 
-    <!-- ── manifest.json Generator ── -->
-    <div style="margin-top:28px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#fff; max-width:600px; margin-left:auto; margin-right:auto;">
-
-      <!-- Accordion header -->
-      <button onclick="toggleManifest()" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:none; border:none; cursor:pointer; text-align:left;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:32px; height:32px; border-radius:8px; background:rgba(83,74,183,0.1); display:flex; align-items:center; justify-content:center;">
-            <i data-lucide="file-json" style="width:16px; height:16px; color:var(--primary);"></i>
-          </div>
-          <div>
-            <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">manifest.json Generator</div>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">Pre-filled from your registration — copy and drop into <code style="background:rgba(83,74,183,0.08); padding:1px 5px; border-radius:3px; font-size:0.72rem;">/app/manifest.json</code></div>
-          </div>
+  <!-- ── manifest.json Generator (Globally Accessible) ── -->
+  <div style="margin-top:28px; border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:#fff; max-width:600px; margin-left:auto; margin-right:auto;">
+    <!-- Accordion header -->
+    <button onclick="toggleManifest()" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:none; border:none; cursor:pointer; text-align:left;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:32px; height:32px; border-radius:8px; background:rgba(83,74,183,0.1); display:flex; align-items:center; justify-content:center;">
+          <i data-lucide="file-json" style="width:16px; height:16px; color:var(--primary);"></i>
         </div>
-        <i data-lucide="chevron-down" id="manifest-chevron" style="width:18px; height:18px; color:var(--text-secondary); transition:transform 0.25s; flex-shrink:0;"></i>
-      </button>
-
-      <!-- Accordion content -->
-      <div id="manifest-content" style="display:none; border-top:1px solid var(--border);">
-        <!-- Callout -->
-        <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:rgba(29,158,117,0.05); border-bottom:1px solid rgba(29,158,117,0.15);">
-          <i data-lucide="check-circle-2" style="width:15px; height:15px; color:#1D9E75; flex-shrink:0; margin-top:2px;"></i>
-          <p style="font-size:0.78rem; color:#0f5c3d; margin:0;">
-            This manifest is generated from your registered data. The pipeline cross-checks it exactly — if they don't match, the schema check will fail. Keep this file in sync with what you registered.
-          </p>
+        <div>
+          <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">manifest.json Generator</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary);">Pre-filled from your registration — copy and drop into <code style="background:rgba(83,74,183,0.08); padding:1px 5px; border-radius:3px; font-size:0.72rem;">/app/manifest.json</code></div>
         </div>
+      </div>
+      <i data-lucide="chevron-down" id="manifest-chevron" style="width:18px; height:18px; color:var(--text-secondary); transition:transform 0.25s; flex-shrink:0;"></i>
+    </button>
 
-        <!-- Code block -->
-        <div style="position:relative;">
-          <button class="copy-btn" style="top:12px; right:12px;" onclick="copyManifest(this)">
-            <i data-lucide="copy" style="width:11px; height:11px; display:inline-block; vertical-align:middle;"></i> Copy
-          </button>
-          <pre id="manifest-json" style="margin:0; padding:20px 22px; padding-right:70px; background:#1A1A2E; font-family:'JetBrains Mono',monospace; font-size:0.775rem; color:#e2e8f0; line-height:1.85; overflow-x:auto; white-space:pre;">{
+    <!-- Accordion content -->
+    <div id="manifest-content" style="display:none; border-top:1px solid var(--border);">
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:rgba(29,158,117,0.05); border-bottom:1px solid rgba(29,158,117,0.15);">
+        <i data-lucide="check-circle-2" style="width:15px; height:15px; color:#1D9E75; flex-shrink:0; margin-top:2px;"></i>
+        <p style="font-size:0.78rem; color:#0f5c3d; margin:0;">
+          This manifest is generated from your registered data. The pipeline cross-checks it exactly — if they don't match, the schema check will fail. Keep this file in sync with what you registered.
+        </p>
+      </div>
+
+      <!-- Code block -->
+      <div style="position:relative;">
+        <button class="copy-btn" style="top:12px; right:12px;" onclick="copyManifest(this)">
+          <i data-lucide="copy" style="width:11px; height:11px; display:inline-block; vertical-align:middle;"></i> Copy
+        </button>
+        <pre id="manifest-json" style="margin:0; padding:20px 22px; padding-right:70px; background:#1A1A2E; font-family:'JetBrains Mono',monospace; font-size:0.775rem; color:#e2e8f0; line-height:1.85; overflow-x:auto; white-space:pre;">{
   <span style="color:#93C5FD;">"name"</span>: <span style="color:#FDE68A;">"{{ agent.slug }}"</span>,
   <span style="color:#93C5FD;">"version"</span>: <span style="color:#FDE68A;">"{{ agent.version }}"</span>,
   <span style="color:#93C5FD;">"subject_areas"</span>: {{ agent.subject_areas|default:"[]"|safe }},
@@ -301,166 +428,19 @@
     <span style="color:#93C5FD;">"capabilities"</span>: <span style="color:#FDE68A;">"/capabilities"</span>
   }
 }</pre>
-        </div>
+      </div>
 
-        <!-- Footer hint -->
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--border); flex-wrap:wrap; gap:8px;">
-          <span style="font-size:0.75rem; color:var(--text-secondary);">
-            Drop this file at <code style="background:rgba(83,74,183,0.08); padding:1px 6px; border-radius:3px;">/app/manifest.json</code> inside your Docker image.
-          </span>
-          <a href="{% url 'developer:creation-guide' %}#manifest" style="font-size:0.75rem; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
-            <i data-lucide="book-open" style="width:13px; height:13px;"></i> Manifest spec →
-          </a>
-        </div>
+      <!-- Footer hint -->
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--border); flex-wrap:wrap; gap:8px;">
+        <span style="font-size:0.75rem; color:var(--text-secondary);">
+          Drop this file at <code style="background:rgba(83,74,183,0.08); padding:1px 6px; border-radius:3px;">/app/manifest.json</code> inside your Docker image.
+        </span>
+        <a href="{% url 'developer:creation-guide' %}#manifest" style="font-size:0.75rem; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+          <i data-lucide="book-open" style="width:13px; height:13px;"></i> Manifest spec →
+        </a>
       </div>
     </div>
-
-    <p class="text-xs text-[#9CA3AF] mt-4">
-      Need help? <a href="{% url 'developer:deploy-guide' %}" class="text-[#534AB7] hover:underline">Read the deployment guide →</a>
-    </p>
   </div>
-
-  <!-- Awaiting banner -->
-  <div class="status-banner banner-awaiting">
-    <div class="flex items-center gap-3">
-      <i data-lucide="clock" class="w-5 h-5 text-[#BA7517]"></i>
-      <span class="font-semibold text-[#BA7517]">Awaiting image push</span>
-    </div>
-    <span class="text-xs text-[#6B7280]">Pipeline will start automatically once the image is pushed</span>
-  </div>
-
-  {% elif pipeline_state == 'success' %}
-  <!-- ── SUCCESS STATE ── -->
-  <div class="stepper">
-
-    {% for step_name, step_label, step_desc in steps %}
-    <div class="step-card" style="position:relative;">
-      <div class="step-indicator passed">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M3 8.5L6.5 12L13 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                style="stroke-dasharray:20; stroke-dashoffset:0; animation: drawCheck 0.4s ease 0.3s both;"/>
-        </svg>
-      </div>
-      <div class="step-body">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-[#1A1A2E]">{{ step_label }}</h3>
-            <p class="text-xs text-[#9CA3AF] mt-0.5">{{ step_desc }}</p>
-          </div>
-          <span class="badge" style="background:rgba(29,158,117,0.1); color:var(--accent); font-size:0.7rem;">Passed</span>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-
-  </div>
-  <div class="status-banner banner-success">
-    <div class="flex items-center gap-3">
-      <i data-lucide="check-circle" class="w-5 h-5" style="color:var(--accent);"></i>
-      <span class="font-semibold" style="color:var(--accent);">Agent passed all checks! 🎉 Your agent is now live.</span>
-    </div>
-    <a href="/marketplace/" class="btn-pill btn-accent" style="padding:8px 20px; font-size:0.8125rem;">
-      View in Marketplace
-    </a>
-  </div>
-
-  {% elif pipeline_state == 'failed' %}
-  <!-- ── FAILED STATE ── -->
-  <div class="stepper">
-
-    {% for step_name, step_label, step_desc in steps %}
-    <div class="step-card" style="position:relative;">
-      <div class="step-indicator failed">
-        <i data-lucide="x" class="w-4 h-4" style="color:#fff;"></i>
-      </div>
-      <div class="step-body">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-[#1A1A2E]">{{ step_label }}</h3>
-            <p class="text-xs text-[#9CA3AF] mt-0.5">{{ step_desc }}</p>
-          </div>
-          <span class="badge" style="background:rgba(224,82,82,0.1); color:var(--error); font-size:0.7rem;">Failed</span>
-        </div>
-        {% if agent.rejection_reason and forloop.last %}
-        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
-          <p class="text-xs text-red-700"><strong>Reason:</strong> {{ agent.rejection_reason }}</p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
-
-  </div>
-  <div class="status-banner banner-failure">
-    <div class="flex items-center gap-3">
-      <i data-lucide="x-circle" class="w-5 h-5" style="color:var(--error);"></i>
-      <div>
-        <span class="font-semibold" style="color:var(--error);">Pipeline failed</span>
-        {% if agent.rejection_reason %}
-        <span class="text-sm text-[#6B7280] ml-2">{{ agent.rejection_reason }}</span>
-        {% endif %}
-      </div>
-    </div>
-    <a href="{% url 'developer:register_agent' %}" class="btn-pill" style="background:var(--error);color:#fff;padding:8px 20px;font-size:0.8125rem;">
-      Fix and Resubmit
-    </a>
-  </div>
-
-  {% else %}
-  <!-- ── IN PROGRESS / RUNNING STATE ── -->
-  <div class="stepper">
-
-    <!-- Step 1: Schema Validation — running -->
-    <div class="step-card" style="position:relative;">
-      <div class="step-indicator running"></div>
-      <div class="step-body">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-[#1A1A2E]">Schema Validation</h3>
-            <p class="text-xs text-[#9CA3AF] mt-0.5">Validates manifest.json against the platform schema</p>
-          </div>
-          <span class="badge" style="background:rgba(83,74,183,0.1); color:var(--primary); font-size:0.7rem;">Running...</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 2: Security Scan — pending -->
-    <div class="step-card" style="position:relative;">
-      <div class="step-indicator pending"></div>
-      <div class="step-body" style="opacity:0.6;">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-[#1A1A2E]">Security Scan</h3>
-            <p class="text-xs text-[#9CA3AF] mt-0.5">Scans container image for CVEs and vulnerabilities</p>
-          </div>
-          <span class="badge" style="background:var(--bg); color:var(--text-secondary); font-size:0.7rem;">Pending</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Smoke Test — pending -->
-    <div class="step-card" style="position:relative;">
-      <div class="step-indicator pending"></div>
-      <div class="step-body" style="opacity:0.6;">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-[#1A1A2E]">Smoke Test</h3>
-            <p class="text-xs text-[#9CA3AF] mt-0.5">Deploys agent and runs basic interaction tests</p>
-          </div>
-          <span class="badge" style="background:var(--bg); color:var(--text-secondary); font-size:0.7rem;">Pending</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-  <div class="status-banner banner-running">
-    <div class="flex items-center gap-3">
-      <div class="w-3 h-3 rounded-full" style="background:var(--primary); animation: bannerPulse 1.5s ease infinite;"></div>
-      <span class="font-semibold" style="color:var(--primary);">Pipeline in progress...</span>
-    </div>
-    <span class="text-xs text-[#6B7280]">This page will refresh when complete</span>
-  </div>
-  {% endif %}
 
 </div>
 {% endblock %}
@@ -487,7 +467,6 @@
   }
 
   function copyManifest(btn) {
-    // Get the raw text content of the pre block (strips all HTML spans)
     var pre = document.getElementById('manifest-json');
     var text = pre.innerText || pre.textContent;
     navigator.clipboard.writeText(text).then(function() {
@@ -499,5 +478,56 @@
       }, 2000);
     });
   }
+
+  // SSE Dynamic updates
+  (function() {
+    const slug = "{{ agent.slug }}";
+    const state = "{{ pipeline_state }}";
+
+    if (state === 'running') {
+      console.log("Connecting to SSE stream for pipeline events...");
+      const eventSource = new EventSource(`/api/v1/pipeline/${slug}/events/`);
+
+      eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("Received SSE update:", data);
+
+        if (data.type === 'connected') {
+          return;
+        }
+
+        if (data.type === 'step_update') {
+          if (data.status === 'failure') {
+            eventSource.close();
+            document.getElementById("pipeline-running-view").classList.add("hidden");
+            const failView = document.getElementById("pipeline-failure-view");
+            failView.classList.remove("hidden");
+            document.getElementById("sse-failure-reason").textContent = data.message || 'Validation failed.';
+            lucide.createIcons();
+          }
+        }
+
+        if (data.type === 'completion') {
+          eventSource.close();
+          console.log("Pipeline execution completed. Closing SSE stream.");
+          
+          document.getElementById("pipeline-running-view").classList.add("hidden");
+
+          if (data.status === 'success') {
+            document.getElementById("pipeline-success-view").classList.remove("hidden");
+          } else {
+            const failView = document.getElementById("pipeline-failure-view");
+            failView.classList.remove("hidden");
+            document.getElementById("sse-failure-reason").textContent = data.rejection_reason || 'Validation failed.';
+          }
+          lucide.createIcons();
+        }
+      };
+
+      eventSource.onerror = function(err) {
+        console.error("SSE stream error:", err);
+      };
+    }
+  })();
 </script>
 {% endblock %}

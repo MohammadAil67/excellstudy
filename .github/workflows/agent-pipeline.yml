@@ -22,6 +22,7 @@ on:
 
 env:
   PLATFORM_API_URL: "http://localhost:8000"   # update when moving off local testing
+  PIPELINE_WEBHOOK_SECRET: ${{ secrets.PIPELINE_WEBHOOK_SECRET }}
 
 jobs:
   validate-and-deploy:
@@ -97,26 +98,42 @@ jobs:
       #    pending AgentRegistry row (registered in the
       #    dev portal BEFORE this push happened)
       # ─────────────────────────────────────────────
-      - name: Schema check
+      - name: Schema check — notify running
         run: |
-          python3 scripts/validate_manifest.py ./manifest.json "${{ steps.identity.outputs.slug }}"
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" schema_validation running
+
+      - name: Schema check
+        id: schema_check
+        run: |
+          python3 scripts/validate_manifest.py ./manifest.json "${{ steps.identity.outputs.slug }}" 2>&1 | tee error_reason_raw.txt
+
+      - name: Schema check — notify failure
+        if: failure() && steps.schema_check.outcome == 'failure'
+        run: |
+          REASON=$(grep -E 'Rejection:|Error:' error_reason_raw.txt | tail -n 1 || echo "")
+          if [ -z "$REASON" ]; then
+            REASON="Schema validation failed: manifest.json is invalid or mismatched."
+          fi
+          echo "$REASON" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" schema_validation failure "$REASON"
 
       # ─────────────────────────────────────────────
       # 3. Security scan — CVEs + non-root check
       # ─────────────────────────────────────────────
+      - name: Security scan — notify running
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" security_scan running
+
       - name: Security scan — CVE check
+        id: security_cve
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.extract.outputs.image_tag }}
           exit-code: 1
-          severity: CRITICAL   # loosened from CRITICAL,HIGH — HIGH-severity
-                                # findings are common in base image tooling
-                                # (pip/setuptools/wheel) that developers
-                                # didn't write themselves; blocking only on
-                                # CRITICAL reduces friction while still
-                                # catching the most severe issues
+          severity: CRITICAL
 
       - name: Security scan — non-root check
+        id: security_root
         run: |
           USER=$(docker inspect "${{ steps.extract.outputs.image_tag }}" --format='{{.Config.User}}')
           if [ -z "$USER" ] || [ "$USER" = "root" ] || [ "$USER" = "0" ]; then
@@ -125,11 +142,33 @@ jobs:
           fi
           echo "Running as non-root user: $USER"
 
+      - name: Security scan — notify success
+        if: success()
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" security_scan success
+
+      - name: Security scan — notify failure
+        if: failure() && (steps.security_cve.outcome == 'failure' || steps.security_root.outcome == 'failure')
+        run: |
+          MSG="Security scan failed."
+          if [ "${{ steps.security_cve.outcome }}" = "failure" ]; then
+            MSG="Security scan failed: Critical CVE vulnerabilities detected in the container image."
+          elif [ "${{ steps.security_root.outcome }}" = "failure" ]; then
+            MSG="Security scan failed: The container must not run as root. Specify a non-root USER in your Dockerfile."
+          fi
+          echo "$MSG" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" security_scan failure "$MSG"
+
       # ─────────────────────────────────────────────
       # 4. Smoke test — spin up the container and hit
       #    its real endpoints with synthetic input
       # ─────────────────────────────────────────────
+      - name: Smoke test — notify running
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" smoke_test running
+
       - name: Smoke test
+        id: smoke_test
         run: |
           SLUG="${{ steps.identity.outputs.slug }}"
           IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
@@ -150,6 +189,18 @@ jobs:
           docker stop "smoke-test-$SLUG" || true
           docker rm "smoke-test-$SLUG" || true
 
+      - name: Smoke test — notify success
+        if: success()
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" smoke_test success
+
+      - name: Smoke test — notify failure
+        if: failure() && steps.smoke_test.outcome == 'failure'
+        run: |
+          MSG="Smoke test failed: The agent did not respond properly to health check or invoke request."
+          echo "$MSG" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" smoke_test failure "$MSG"
+
       # ─────────────────────────────────────────────
       # 5. Load the image into minikube's own daemon
       #    (avoids re-pulling from ghcr.io inside the
@@ -163,6 +214,10 @@ jobs:
       # ─────────────────────────────────────────────
       # 6. Deploy — namespace, quota, deployment, service
       # ─────────────────────────────────────────────
+      - name: Deploy to cluster — notify running
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" deploy running
+
       - name: Deploy to cluster
         id: deploy
         run: |
@@ -246,14 +301,19 @@ jobs:
           kubectl wait --for=condition=ready pod \
             -l app="$SLUG" -n "$NAMESPACE" --timeout=60s
 
-          # NOTE — for local dev with Django running outside the
-          # cluster, this cluster-internal DNS name is only reachable
-          # via kubectl port-forward (set the registry's
-          # k8s_service_url manually afterward) or minikube tunnel +
-          # LoadBalancer. In production, Django itself runs as a pod
-          # inside the cluster, so this DNS name resolves correctly
-          # as-is with no extra step needed.
           echo "service_url=http://${SLUG}-svc.${NAMESPACE}.svc.cluster.local" >> $GITHUB_OUTPUT
+
+      - name: Deploy to cluster — notify success
+        if: success()
+        run: |
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" deploy success
+
+      - name: Deploy to cluster — notify failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          MSG="Deployment failed: Kubernetes cluster took too long to start the pod or was out of resources."
+          echo "$MSG" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" deploy failure "$MSG"
 
       # ─────────────────────────────────────────────
       # 7. Notify Django — payload matches the ACTUAL
@@ -280,7 +340,12 @@ jobs:
         if: failure()
         run: |
           SLUG="${{ steps.identity.outputs.slug }}"
-          PAYLOAD=$(printf '{"agent_slug":"%s","status":"failure","rejection_reason":"Pipeline validation failed - check the Actions run logs for the specific step and reason."}' "$SLUG")
+          if [ -f error_reason.txt ]; then
+            REASON=$(cat error_reason.txt)
+          else
+            REASON="Pipeline validation failed - check the Actions run logs for the specific step and reason."
+          fi
+          PAYLOAD=$(printf '{"agent_slug":"%s","status":"failure","rejection_reason":"%s"}' "$SLUG" "$REASON")
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
 

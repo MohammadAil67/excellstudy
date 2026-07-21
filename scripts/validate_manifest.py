@@ -69,7 +69,11 @@ def main():
 
     # 5. Validate required endpoints are present
     required_endpoints = ['invoke', 'health', 'capabilities']
-    missing_endpoints = [ep for ep in required_endpoints if ep not in manifest]
+    endpoints_section = manifest.get('endpoints', {})
+    missing_endpoints = [
+        ep for ep in required_endpoints 
+        if ep not in manifest and ep not in endpoints_section
+    ]
     if missing_endpoints:
         print(f"Rejection: Missing required endpoint declarations in manifest: {missing_endpoints}", file=sys.stderr)
         sys.exit(1)

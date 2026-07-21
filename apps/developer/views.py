@@ -1,9 +1,14 @@
+import redis
+import logging
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from apps.core.models import AgentRegistry, Developer
 from apps.developer.forms import AgentRegistrationForm
+
+logger = logging.getLogger(__name__)
 
 
 class MyAgentsListView(LoginRequiredMixin, View):
@@ -105,14 +110,24 @@ def pipeline_status(request, job_id):
     """Pipeline status page — shows the real deployment state of an agent."""
     agent = get_object_or_404(AgentRegistry, slug=job_id, developer__user=request.user)
 
-    # Derive pipeline state from agent's registry status
+    # Check if pipeline validation is active in Redis
+    is_running = False
+    try:
+        r = redis.Redis.from_url(settings.REDIS_URL)
+        is_running = r.exists(f"pipeline_run_active:{agent.slug}")
+    except Exception as e:
+        logger.error(f"Failed to check pipeline_run_active in Redis: {e}")
+
+    # Derive pipeline state from agent's registry status and Redis run state
     if agent.status == 'live':
         pipeline_state = 'success'
     elif agent.status == 'rejected':
         pipeline_state = 'failed'
     elif agent.status == 'pending':
-        # Agent registered but image not pushed yet → nothing to run
-        pipeline_state = 'awaiting_push'
+        if is_running:
+            pipeline_state = 'running'
+        else:
+            pipeline_state = 'awaiting_push'
     else:
         pipeline_state = 'pending'
 
@@ -153,26 +168,37 @@ class TriggerPipelineView(LoginRequiredMixin, View):
     """
 
     def post(self, request, agent_slug):
+        from django.contrib import messages
         agent = get_object_or_404(AgentRegistry, slug=agent_slug, developer__user=request.user)
 
-        if agent.status != "pending":
-            from django.contrib import messages
+        if agent.status not in ("pending", "rejected"):
             if agent.status == "live":
                 messages.warning(request, "This agent is already live.")
-            elif agent.status == "rejected":
-                messages.warning(request, "This agent is already rejected — fix and re-register a new version/agent if needed.")
             elif agent.status == "suspended":
                 messages.warning(request, "This agent is suspended — reactivate it via the portal.")
             else:
                 messages.warning(request, f"This agent cannot be triggered (current status: {agent.status}).")
             return redirect('developer:pipeline_status', job_id=agent.slug)
 
-        version = request.POST.get("version", "v1").strip()
+        version = request.POST.get("version", "1.0.0").strip()
         if not version:
-            version = "v1"
+            version = "1.0.0"
+
+        from django.core.exceptions import ValidationError
+        # Validate version tag format
+        old_version = agent.version
+        agent.version = version
+        try:
+            agent.full_clean(exclude=['developer', 'name'])
+        except ValidationError as e:
+            agent.version = old_version  # restore
+            messages.error(request, f"Invalid version format: {e.message_dict.get('version', e.messages)[0]}")
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                return redirect(referer)
+            return redirect('developer:pipeline_status', job_id=agent.slug)
 
         from apps.developer.github_dispatch import image_exists_in_registry, trigger_pipeline
-        from django.contrib import messages
 
         if not image_exists_in_registry(agent.slug, version):
             messages.error(
@@ -186,6 +212,20 @@ class TriggerPipelineView(LoginRequiredMixin, View):
 
         success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace)
         if success:
+            # Set active run indicator in Redis
+            try:
+                r = redis.Redis.from_url(settings.REDIS_URL)
+                r.set(f"pipeline_run_active:{agent.slug}", "true", ex=3600)
+            except Exception as e:
+                logger.error(f"Failed to set pipeline_run_active in Redis: {e}")
+
+            # Reset status and update version
+            if agent.status == 'rejected':
+                agent.status = 'pending'
+                agent.rejection_reason = ''
+            agent.version = version
+            agent.save()
+
             messages.success(request, f"Validation pipeline successfully started for {agent.name} (version {version})!")
             return redirect('developer:pipeline_status', job_id=agent.slug)
         else:
@@ -194,5 +234,52 @@ class TriggerPipelineView(LoginRequiredMixin, View):
             if referer:
                 return redirect(referer)
             return redirect('developer:pipeline_status', job_id=agent.slug)
+
+
+class DeleteAgentView(LoginRequiredMixin, View):
+    """
+    POST -> Permanently delete an agent registry from the database
+    and remove its deployment/service in the Kubernetes cluster.
+    """
+
+    def post(self, request, agent_slug):
+        import subprocess
+        agent = get_object_or_404(AgentRegistry, slug=agent_slug, developer__user=request.user)
+        from apps.agents.registry import invalidate_agent
+        from django.contrib import messages
+
+        slug = agent.slug
+        namespace = agent.developer.namespace
+
+        # 1. Delete Kubernetes resources (Deployment & Service)
+        try:
+            # Delete deployment
+            subprocess.run(
+                ["kubectl", "delete", "deployment", slug, "-n", namespace],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            # Delete service
+            subprocess.run(
+                ["kubectl", "delete", "service", f"{slug}-svc", "-n", namespace],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+        except Exception as e:
+            logger.error(f"Failed to delete Kubernetes resources for {slug}: {e}")
+
+        # 2. Invalidate in Redis
+        try:
+            invalidate_agent(slug)
+        except Exception as e:
+            logger.error(f"Failed to invalidate agent in Redis: {e}")
+
+        # 3. Delete from database
+        agent.delete()
+
+        messages.success(request, f"Agent '{slug}' was successfully deleted and removed from the cluster.")
+        return redirect('developer:portal')
 
 

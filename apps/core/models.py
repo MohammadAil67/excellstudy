@@ -110,6 +110,9 @@ class Developer(models.Model):
     )
     api_key = models.UUIDField(default=uuid.uuid4, editable=False)
 
+    quota_pods = models.PositiveSmallIntegerField(default=3)
+    quota_memory_gb = models.DecimalField(max_digits=4, decimal_places=1, default=2.0)
+
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default='pending',
         db_index=True,
@@ -125,6 +128,26 @@ class Developer(models.Model):
             self.namespace = slugify(f'dev-{self.user.username}')
         self.full_clean()
         super().save(*args, **kwargs)
+
+    @property
+    def active_pods_count(self):
+        return self.agents.filter(status='live').count()
+
+    @property
+    def active_memory_gb(self):
+        return self.active_pods_count * 0.6
+
+    @property
+    def memory_percentage(self):
+        if self.quota_memory_gb:
+            return min(int((self.active_memory_gb / float(self.quota_memory_gb)) * 100), 100)
+        return 0
+
+    @property
+    def pods_percentage(self):
+        if self.quota_pods:
+            return min(int((self.active_pods_count / self.quota_pods) * 100), 100)
+        return 0
 
 
 # ─────────────────────────────────────────────────────────────────────

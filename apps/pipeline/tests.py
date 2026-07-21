@@ -1,6 +1,7 @@
 import json
 import hmac
 import hashlib
+from unittest.mock import patch
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.conf import settings
@@ -105,3 +106,51 @@ class PipelineWebhookTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("Validation failed", response.json()["error"])
+
+    @patch('redis.Redis.from_url')
+    def test_step_update_success(self, mock_redis_conn):
+        import redis
+        mock_redis = mock_redis_conn.return_value
+        
+        url = reverse('pipeline:step_update', kwargs={'slug': 'test-agent'})
+        payload = {
+            "step": "schema_validation",
+            "status": "running",
+            "message": "Starting schema check..."
+        }
+        data = json.dumps(payload).encode()
+        
+        secret = settings.PIPELINE_WEBHOOK_SECRET
+        sig = hmac.new(secret.encode(), data, hashlib.sha256).hexdigest()
+
+        response = self.client.post(
+            url,
+            data=data,
+            content_type="application/json",
+            HTTP_X_PIPELINE_SIGNATURE=sig
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+        mock_redis.publish.assert_called_once()
+
+    def test_step_update_invalid_signature(self):
+        url = reverse('pipeline:step_update', kwargs={'slug': 'test-agent'})
+        payload = {
+            "step": "schema_validation",
+            "status": "running"
+        }
+        data = json.dumps(payload).encode()
+        
+        response = self.client.post(
+            url,
+            data=data,
+            content_type="application/json",
+            HTTP_X_PIPELINE_SIGNATURE="bad-sig"
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_events_stream_connect(self):
+        url = reverse('pipeline:events_stream', kwargs={'slug': 'test-agent'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/event-stream')

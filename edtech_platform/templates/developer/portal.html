@@ -127,33 +127,7 @@
   <!-- ════ MAIN COLUMN (2/3) ════ -->
   <div class="lg:col-span-2 space-y-6">
 
-    <!-- API Key Card -->
-    <div class="card portal-section" style="padding:24px;">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:rgba(83,74,183,0.1);">
-            <i data-lucide="key" class="w-5 h-5" style="color:var(--primary);"></i>
-          </div>
-          <h2 class="text-lg font-semibold">Your API Key</h2>
-        </div>
-        <span class="badge" style="background:rgba(29,158,117,0.1); color:var(--accent); font-size:0.7rem;">Active</span>
-      </div>
-      <div class="flex items-center gap-3 p-3 rounded-lg" style="background:var(--bg); border:1px solid var(--border);">
-        <code id="api-key-display" class="flex-1 text-sm font-mono tracking-wider text-[#1A1A2E]">xxxx-xxxx-xxxx-7890</code>
-        <button onclick="copyApiKey()" class="btn-pill btn-outline" style="padding:6px 14px; font-size:0.75rem;">
-          <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
-          <span id="copy-key-text">Copy</span>
-        </button>
-        <button onclick="showRegenModal()" class="btn-pill btn-outline" style="padding:6px 14px; font-size:0.75rem; border-color:var(--error); color:var(--error);">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Regenerate
-        </button>
-      </div>
-      <p class="text-xs text-[#9CA3AF] mt-3 flex items-center gap-1">
-        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-        Never share your API key publicly. Rotate regularly for security.
-      </p>
-      <input type="hidden" id="api-key-full" value="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
-    </div>
+
 
     <!-- Quick Start -->
     <div class="card portal-section" style="padding:24px;">
@@ -166,13 +140,8 @@
           <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> Copy
         </button>
         <pre id="quick-start-code"><span class="comment"># Build and push your agent image</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/mohammadail67/my-agent:1.0.0</span> .
-<span class="cmd">docker</span> push <span class="url">ghcr.io/mohammadail67/my-agent:1.0.0</span>
-
-<span class="comment"># Register with the platform</span>
-<span class="cmd">curl</span> <span class="flag">-X POST</span> <span class="url">http://localhost:8000/api/v1/agents/register</span> \
-  <span class="flag">-H</span> "Authorization: Bearer YOUR_API_KEY" \
-  <span class="flag">-d</span> @manifest.json</pre>
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/mohammadail67/{{ developer.namespace }}/your-agent-name:1.0.0</span> .
+<span class="cmd">docker</span> push <span class="url">ghcr.io/mohammadail67/{{ developer.namespace }}/your-agent-name:1.0.0</span></pre>
       </div>
       <!-- Steps -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
@@ -255,7 +224,12 @@
                         {% csrf_token %}
                       </form>
                     {% endif %}
-                    <a href="#" class="danger"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-2"></i>Delete</a>
+                    <a href="#" class="danger" onclick="if(confirm('Are you sure you want to delete this agent? This will permanently delete it from the database and remove the Kubernetes pod.')) { document.getElementById('delete-form-{{ agent.slug }}').submit(); } return false;">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-2"></i>Delete
+                    </a>
+                    <form id="delete-form-{{ agent.slug }}" action="{% url 'developer:delete-agent' agent.slug %}" method="post" style="display:none;">
+                      {% csrf_token %}
+                    </form>
                   </div>
                 </div>
               </td>
@@ -347,37 +321,22 @@
         <div>
           <div class="flex justify-between text-xs mb-1">
             <span class="text-[#6B7280]">Pods</span>
-            <span class="font-semibold">2 / 3</span>
+            <span class="font-semibold">{{ developer.active_pods_count }} / {{ developer.quota_pods }}</span>
           </div>
           <div class="w-full h-2 rounded-full" style="background:var(--border);">
-            <div class="h-2 rounded-full" style="width:66%; background:var(--primary); transition:width 1s ease;"></div>
+            <div class="h-2 rounded-full" style="width:{{ developer.pods_percentage }}%; background:var(--primary); transition:width 1s ease;"></div>
           </div>
         </div>
         <div>
           <div class="flex justify-between text-xs mb-1">
             <span class="text-[#6B7280]">Memory</span>
-            <span class="font-semibold">1.2 / 2.0 GB</span>
+            <span class="font-semibold">{{ developer.active_memory_gb|floatformat:1 }} / {{ developer.quota_memory_gb|floatformat:1 }} GB</span>
           </div>
           <div class="w-full h-2 rounded-full" style="background:var(--border);">
-            <div class="h-2 rounded-full" style="width:60%; background:var(--accent); transition:width 1s ease;"></div>
+            <div class="h-2 rounded-full" style="width:{{ developer.memory_percentage }}%; background:var(--accent); transition:width 1s ease;"></div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Regenerate Key Modal -->
-<div id="regen-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
-      <i data-lucide="alert-triangle" class="w-5 h-5" style="color:var(--highlight);"></i>
-      Regenerate API Key?
-    </h3>
-    <p class="text-sm text-[#6B7280] mb-5">This will invalidate your current key. All integrations using the old key will stop working immediately.</p>
-    <div class="flex gap-3 justify-end">
-      <button onclick="closeRegenModal()" class="btn-pill btn-outline">Cancel</button>
-      <button onclick="regenerateKey()" class="btn-pill" style="background:var(--error);color:#fff;">Regenerate</button>
     </div>
   </div>
 </div>
@@ -388,15 +347,6 @@
 <script>
   // Re-init Lucide for this template
   lucide.createIcons();
-
-  function copyApiKey() {
-    var key = document.getElementById('api-key-full').value;
-    navigator.clipboard.writeText(key).then(function() {
-      document.getElementById('copy-key-text').textContent = 'Copied!';
-      if (typeof showToast === 'function') showToast('API key copied to clipboard', 'success');
-      setTimeout(function() { document.getElementById('copy-key-text').textContent = 'Copy'; }, 2000);
-    });
-  }
 
   function copyCode() {
     var code = document.getElementById('quick-start-code').textContent;
@@ -418,18 +368,6 @@
       document.querySelectorAll('.actions-menu.show').forEach(function(m) { m.classList.remove('show'); });
     }
   });
-
-  function showRegenModal() { document.getElementById('regen-modal').classList.add('show'); }
-  function closeRegenModal() { document.getElementById('regen-modal').classList.remove('show'); }
-
-  function regenerateKey() {
-    // Simulate key regeneration
-    var newKey = 'xxxxxxxx-xxxx-xxxx-xxxx-' + Math.random().toString(36).substring(2, 14);
-    document.getElementById('api-key-full').value = newKey;
-    document.getElementById('api-key-display').textContent = 'xxxx-xxxx-xxxx-' + newKey.slice(-4);
-    closeRegenModal();
-    if (typeof showToast === 'function') showToast('API key regenerated successfully', 'success');
-  }
 
   function toggleManifest() {
     var content = document.getElementById('manifest-content');

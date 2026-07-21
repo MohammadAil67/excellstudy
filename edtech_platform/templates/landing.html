@@ -683,17 +683,12 @@
             <div style="width:12px;height:12px;border-radius:50%;background:#1D9E75;"></div>
             <span class="ml-3" style="color:#6B7280; font-size:0.75rem;">terminal</span>
           </div>
-<pre style="margin:0;"><span style="color:#6B7280;"># Register your agent</span>
-<span style="color:#1D9E75;">$</span> curl -X POST /api/v1/agents/register \
-    -H <span style="color:#BA7517;">"Authorization: Bearer $API_KEY"</span> \
-    -d @manifest.json
+<pre style="margin:0;"><span style="color:#6B7280;"># Build and push your agent image</span>
+<span style="color:#1D9E75;">$</span> docker build -t ghcr.io/your-username/my-agent:1.0.0 .
+<span style="color:#1D9E75;">$</span> docker push ghcr.io/your-username/my-agent:1.0.0
 
-<span style="color:#6B7280;"># Response</span>
-{
-  <span style="color:#8B5CF6;">"status"</span>: <span style="color:#1D9E75;">"accepted"</span>,
-  <span style="color:#8B5CF6;">"pipeline_id"</span>: <span style="color:#1D9E75;">"job-a7f3c2"</span>,
-  <span style="color:#8B5CF6;">"message"</span>: <span style="color:#1D9E75;">"Running safety checks..."</span>
-}</pre>
+<span style="color:#6B7280;"># Trigger validation via the Developer Portal dashboard.</span>
+<span style="color:#6B7280;"># Live container deployment starts automatically!</span></pre>
         </div>
       </div>
 

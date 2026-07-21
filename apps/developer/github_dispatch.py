@@ -25,29 +25,49 @@ def image_exists_in_registry(slug: str, version: str) -> bool:
         logger.warning("GITHUB_DISPATCH_TOKEN or GITHUB_REPO_OWNER settings not configured.")
         return False
 
-    url = f"https://api.github.com/users/{owner}/packages/container/{slug}/versions"
+    # GHCR / GitHub Packages API requires lowercase owner names
+    owner_lower = owner.lower()
+
+    url = f"https://api.github.com/users/{owner_lower}/packages/container/{slug}/versions"
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "User-Agent": "ExcellStudy-Platform",
     }
 
+    logger.info(f"Checking registry: GET {url}  (looking for tag '{version}')")
+
     try:
         response = requests.get(url, headers=headers, timeout=10)
+        logger.info(f"Registry response: status={response.status_code}")
+
         if response.status_code != 200:
+            if response.status_code in (401, 403):
+                logger.warning(
+                    f"GitHub registry check returned status {response.status_code} (permission denied). "
+                    "This likely means the GITHUB_DISPATCH_TOKEN lacks 'read:packages' scope. "
+                    "Skipping registry check and proceeding to trigger pipeline anyway."
+                )
+                return True
             logger.error(
-                f"Failed to fetch package versions from GitHub. status_code={response.status_code}, response={response.text}"
+                f"Failed to fetch package versions from GitHub. "
+                f"status_code={response.status_code}, response={response.text}"
             )
             return False
 
-        versions = response.json()
-        for v in versions:
+        versions_list = response.json()
+        logger.info(f"Found {len(versions_list)} version(s) for package '{slug}'")
+
+        for v in versions_list:
             metadata = v.get("metadata", {})
             container = metadata.get("container", {})
             tags = container.get("tags", [])
+            logger.debug(f"  Version id={v.get('id')}, tags={tags}")
             if version in tags:
+                logger.info(f"Tag '{version}' found for '{slug}'")
                 return True
 
+        logger.warning(f"Tag '{version}' NOT found in any version of '{slug}'")
         return False
     except Exception as e:
         logger.error(f"Error checking registry for image: {e}")

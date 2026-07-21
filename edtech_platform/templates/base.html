@@ -512,6 +512,13 @@
           showToast("My Courses feature is coming soon!", "info");
         });
       });
+
+      // Display Django messages as toast notifications
+      {% if messages %}
+        {% for message in messages %}
+          showToast("{{ message|escapejs }}", "{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %}");
+        {% endfor %}
+      {% endif %}
     });
 
     // ── Sidebar toggle ──
