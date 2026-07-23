@@ -212,7 +212,8 @@ class TriggerPipelineView(LoginRequiredMixin, View):
                 return redirect(referer)
             return redirect('developer:pipeline_status', job_id=agent.slug)
 
-        success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace)
+        dev_username = agent.developer.user.username if (agent.developer and agent.developer.user) else None
+        success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace, dev_username)
         if success:
             # Set active run indicator in Redis
             try:

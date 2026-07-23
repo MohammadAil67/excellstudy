@@ -19,6 +19,11 @@ on:
         required: true
         type: string
         default: ''
+      developer_username:
+        description: 'GitHub username of developer (e.g. shafayat-hossain)'
+        required: false
+        type: string
+        default: ''
 
 env:
   PLATFORM_API_URL: "https://excellstudy.site"
@@ -44,10 +49,16 @@ jobs:
             echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
             echo "developer_namespace=${{ inputs.developer_namespace }}" >> $GITHUB_OUTPUT
+            DEV_USER="${{ inputs.developer_username }}"
+            if [ -z "$DEV_USER" ]; then
+              DEV_USER="$OWNER_LOWER"
+            fi
+            echo "developer_username=$(echo "$DEV_USER" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
           else
             echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
             echo "version=${{ github.event.registry_package.package_version.container_metadata.tag.name }}" >> $GITHUB_OUTPUT
             echo "developer_namespace=dev-${{ github.actor }}" >> $GITHUB_OUTPUT
+            echo "developer_username=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Repository
@@ -94,7 +105,7 @@ jobs:
       - name: Pull image and extract manifest
         id: extract
         run: |
-          IMAGE_TAG="ghcr.io/${{ steps.identity.outputs.owner_lower }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
+          IMAGE_TAG="ghcr.io/${{ steps.identity.outputs.developer_username }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
           docker pull "$IMAGE_TAG"
@@ -105,7 +116,7 @@ jobs:
       - name: Pull image — notify failure
         if: failure() && steps.extract.outcome == 'failure'
         run: |
-          MSG="Image pull failed: ghcr.io/${{ steps.identity.outputs.owner_lower }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }} could not be pulled from registry or /app/manifest.json was missing."
+          MSG="Image pull failed: ghcr.io/${{ steps.identity.outputs.developer_username }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }} could not be pulled from registry or /app/manifest.json was missing."
           echo "$MSG" > error_reason.txt
           python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" extract failure "$MSG"
 

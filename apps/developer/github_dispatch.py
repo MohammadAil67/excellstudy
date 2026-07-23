@@ -74,7 +74,7 @@ def image_exists_in_registry(slug: str, version: str) -> bool:
         return False
 
 
-def trigger_pipeline(agent_slug: str, version: str, developer_namespace: str) -> tuple[bool, str]:
+def trigger_pipeline(agent_slug: str, version: str, developer_namespace: str, developer_username: str = None) -> tuple[bool, str]:
     """
     POST to:
       https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/actions/workflows/agent-pipeline.yml/dispatches
@@ -84,7 +84,7 @@ def trigger_pipeline(agent_slug: str, version: str, developer_namespace: str) ->
       Accept: application/vnd.github+json
 
     Body:
-      {"ref": "main", "inputs": {"agent_slug": agent_slug, "version": version, "developer_namespace": developer_namespace}}
+      {"ref": "main", "inputs": {"agent_slug": agent_slug, "version": version, "developer_namespace": developer_namespace, "developer_username": developer_username}}
 
     developer_namespace is REQUIRED, not optional.
 
@@ -111,6 +111,7 @@ def trigger_pipeline(agent_slug: str, version: str, developer_namespace: str) ->
             "agent_slug": agent_slug,
             "version": version,
             "developer_namespace": developer_namespace,
+            "developer_username": developer_username or owner,
         },
     }
 
