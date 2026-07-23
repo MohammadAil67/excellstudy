@@ -50,6 +50,11 @@ class RegisterAgentView(LoginRequiredMixin, View):
 
         form = AgentRegistrationForm(request.POST)
         if form.is_valid():
+            gh_user = form.cleaned_data.get('github_username', '').strip()
+            if gh_user and developer:
+                developer.github_username = gh_user
+                developer.save()
+
             agent = form.save(commit=False)
             agent.developer = developer
             agent.status = 'pending'

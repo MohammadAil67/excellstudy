@@ -30,6 +30,12 @@ class AgentRegistrationForm(forms.ModelForm):
         help_text="Comma-separated list of capabilities."
     )
 
+    github_username = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. ShafayatHossain423', 'class': 'form-input'}),
+        help_text="Your exact GitHub handle for GHCR image tags."
+    )
+
     class Meta:
         model = AgentRegistry
         fields = ['name', 'input_type', 'output_types', 'subject_areas', 'age_groups', 'capabilities']

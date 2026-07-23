@@ -139,9 +139,12 @@
         <button class="copy-btn" onclick="copyCode()">
           <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> Copy
         </button>
-        <pre id="quick-start-code"><span class="comment"># Build and push your agent image</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/mohammadail67/{{ developer.namespace }}/your-agent-name:1.0.0</span> .
-<span class="cmd">docker</span> push <span class="url">ghcr.io/mohammadail67/{{ developer.namespace }}/your-agent-name:1.0.0</span></pre>
+        <pre id="quick-start-code"><span class="comment"># 1. Log in to GitHub Container Registry</span>
+<span class="cmd">echo</span> <span class="flag">"YOUR_GITHUB_PAT_TOKEN"</span> | <span class="cmd">docker</span> login <span class="url">ghcr.io</span> <span class="flag">-u</span> <span class="url">{{ developer.gh_username }}</span> <span class="flag">--password-stdin</span>
+
+<span class="comment"># 2. Build and push your agent image</span>
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/{{ developer.gh_username }}/your-agent-slug:1.0.0</span> .
+<span class="cmd">docker</span> push <span class="url">ghcr.io/{{ developer.gh_username }}/your-agent-slug:1.0.0</span></pre>
       </div>
       <!-- Steps -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">

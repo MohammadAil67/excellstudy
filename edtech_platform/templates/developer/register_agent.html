@@ -57,6 +57,16 @@
         {% endif %}
       </div>
 
+      <!-- GitHub Username -->
+      <div class="form-group">
+        <label class="form-label" for="id_github_username">GitHub Username / Handle</label>
+        {{ form.github_username }}
+        <p class="text-xs text-[#9CA3AF] mt-1">Your exact GitHub username (e.g. <code style="background:rgba(83,74,183,0.08); padding:1px 5px; border-radius:3px;">ShafayatHossain423</code>). Used for image tags.</p>
+        {% if form.github_username.errors %}
+          <p class="text-xs text-red-500 mt-1">{{ form.github_username.errors.0 }}</p>
+        {% endif %}
+      </div>
+
       <!-- Input Type (Single Select) -->
       <div class="form-group">
         <label class="form-label" for="id_input_type">Input Format Type</label>
