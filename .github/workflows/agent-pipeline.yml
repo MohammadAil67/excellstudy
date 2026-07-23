@@ -59,21 +59,26 @@ jobs:
       # cover this runner's exact Debian/WSL2 environment.
       # The runner already has Python 3.13.5 installed natively —
       # use that instead of trying to download a separate one.
-      - name: Verify Python is available
+      - name: Ensure Python and Pip are available
+        id: setup_python
         run: |
+          if ! python3 -m pip --version >/dev/null 2>&1; then
+            echo "pip missing on runner system. Installing python3-pip and python3-requests..."
+            sudo apt-get update && sudo apt-get install -y python3-pip python3-requests || true
+          fi
           python3 --version
-          python3 -m pip --version
 
-      # FIXED — added --break-system-packages to both pip calls.
-      # Debian 12+/newer Python enforces PEP 668, which blocks
-      # `pip install` from touching the system-managed Python
-      # environment by default. This is a throwaway CI runner
-      # environment (not your dev machine's Python), so bypassing
-      # this protection here is low-risk.
       - name: Install Dependencies
+        id: install_deps
         run: |
-          python3 -m pip install --upgrade pip --break-system-packages || true
-          python3 -m pip install requests --break-system-packages
+          python3 -m pip install requests --break-system-packages || sudo apt-get install -y python3-requests || true
+
+      - name: Runner setup — notify failure
+        if: failure() && (steps.setup_python.outcome == 'failure' || steps.install_deps.outcome == 'failure')
+        run: |
+          MSG="Runner environment setup failed: Python 3 or pip/requests dependencies missing on CI runner."
+          echo "$MSG" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" runner_setup failure "$MSG" || true
 
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
