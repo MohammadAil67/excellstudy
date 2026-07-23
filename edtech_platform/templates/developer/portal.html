@@ -271,6 +271,17 @@
           <p class="text-xs text-[#6B7280]">Sessions Today</p>
         </div>
       </div>
+    <!-- GitHub Handle Settings -->
+    <div class="card portal-section" style="padding:20px;">
+      <h3 class="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">GitHub Account Handle</h3>
+      <form method="POST" action="{% url 'developer:update-github-username' %}" class="flex items-center gap-2">
+        {% csrf_token %}
+        <div class="relative flex-1">
+          <input type="text" name="github_username" value="{{ developer.github_username }}" placeholder="{{ developer.gh_username }}" class="w-full text-xs font-mono px-3 py-2 border rounded-lg focus:outline-none focus:border-[#534AB7]" style="border-color:var(--border);">
+        </div>
+        <button type="submit" class="btn btn-primary text-xs py-2 px-3">Save</button>
+      </form>
+      <p class="text-[11px] text-[#9CA3AF] mt-2">Used for image tags (`ghcr.io/&lt;handle&gt;/...`)</p>
     </div>
 
     <!-- Documentation Links -->

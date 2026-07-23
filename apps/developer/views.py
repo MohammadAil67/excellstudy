@@ -146,6 +146,25 @@ def pipeline_status(request, job_id):
     return render(request, 'developer/pipeline_status.html', context)
 
 
+class UpdateGithubUsernameView(LoginRequiredMixin, View):
+    """
+    POST -> Update developer's GitHub handle from portal sidebar.
+    """
+
+    def post(self, request):
+        from django.contrib import messages
+        gh_user = request.POST.get('github_username', '').strip()
+        try:
+            developer = request.user.developer_profile
+        except Developer.DoesNotExist:
+            developer = Developer.objects.create(user=request.user)
+
+        developer.github_username = gh_user
+        developer.save()
+        messages.success(request, f"GitHub handle updated to '{developer.gh_username}'!")
+        return redirect('developer:portal')
+
+
 class ToggleAgentStatusView(LoginRequiredMixin, View):
     """
     POST -> toggle agent status between 'live' and 'suspended'.
