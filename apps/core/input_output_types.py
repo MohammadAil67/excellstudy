@@ -9,6 +9,8 @@ class ValidationError(Exception):
 APPROVED_INPUT_TYPES = [
     "text_with_units",
     "image_upload",
+    "file_upload",
+    "file",
     "multiple_choice",
     "free_text",
     "number",
@@ -30,6 +32,8 @@ INPUT_TYPE_SCHEMAS = {
     "text_with_units": {"value": str},
     "number": {"value": (int, float)},
     "image_upload": {"image_url": str},
+    "file_upload": {"file_url": str},
+    "file": {"file_url": str},
     "multiple_choice": {"selected_index": int},
     "free_text": {"value": str},
 }
