@@ -342,7 +342,7 @@ jobs:
           EOF
 
           kubectl wait --for=condition=ready pod \
-            -l app="$SLUG" -n "$NAMESPACE" --timeout=60s
+            -l app="$SLUG" -n "$NAMESPACE" --timeout=300s
 
           echo "service_url=http://${SLUG}-svc.${NAMESPACE}.svc.cluster.local" >> $GITHUB_OUTPUT
 
