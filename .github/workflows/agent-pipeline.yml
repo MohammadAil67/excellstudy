@@ -22,6 +22,7 @@ on:
 
 env:
   PLATFORM_API_URL: "https://excellstudy.site"
+  EXCELLSTUDY_HOST: "https://excellstudy.site"
   PIPELINE_WEBHOOK_SECRET: ${{ secrets.PIPELINE_WEBHOOK_SECRET }}
 
 jobs:

@@ -26,7 +26,7 @@ def main():
         sys.exit(1)
 
     # 2. Call Django API check-registration
-    host = os.environ.get('EXCELLSTUDY_HOST', 'http://localhost:8000')
+    host = os.environ.get('PLATFORM_API_URL') or os.environ.get('EXCELLSTUDY_HOST', 'http://localhost:8000')
     url = f"{host.rstrip('/')}/developer/api/agents/check-registration/?slug={agent_slug}"
 
     print(f"Querying platform registration for slug: {agent_slug} at {url}...")

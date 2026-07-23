@@ -194,6 +194,16 @@ def pipeline_step_update(request, slug):
     if not step or not status:
         return JsonResponse({'error': 'Missing step or status in payload'}, status=400)
 
+    # Save failure message to DB row if step failed
+    if status == 'failure' and message:
+        try:
+            agent = AgentRegistry.objects.get(slug=slug)
+            agent.status = 'rejected'
+            agent.rejection_reason = message
+            agent.save(update_fields=['status', 'rejection_reason'])
+        except Exception as e:
+            logger.error(f"Failed to record step rejection reason for {slug}: {e}")
+
     # Publish step update to Redis Pub/Sub channel
     try:
         r = redis.Redis.from_url(settings.REDIS_URL)
