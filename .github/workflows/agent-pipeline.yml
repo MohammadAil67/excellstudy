@@ -53,12 +53,12 @@ jobs:
             if [ -z "$DEV_USER" ]; then
               DEV_USER="$OWNER_LOWER"
             fi
-            echo "developer_username=$(echo "$DEV_USER" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+            echo "developer_username=$(echo "$DEV_USER" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" >> $GITHUB_OUTPUT
           else
             echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
             echo "version=${{ github.event.registry_package.package_version.container_metadata.tag.name }}" >> $GITHUB_OUTPUT
             echo "developer_namespace=dev-${{ github.actor }}" >> $GITHUB_OUTPUT
-            echo "developer_username=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+            echo "developer_username=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Repository

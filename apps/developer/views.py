@@ -202,7 +202,8 @@ class TriggerPipelineView(LoginRequiredMixin, View):
 
         from apps.developer.github_dispatch import image_exists_in_registry, trigger_pipeline
 
-        dev_username = agent.developer.user.username if (agent.developer and agent.developer.user) else None
+        raw_username = agent.developer.user.username if (agent.developer and agent.developer.user) else ""
+        dev_username = raw_username.replace(" ", "").strip()
         if not image_exists_in_registry(agent.slug, version, dev_username):
             messages.error(
                 request,
