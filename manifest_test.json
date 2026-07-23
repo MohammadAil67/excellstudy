@@ -1,0 +1,17 @@
+{
+  "name": "dev-alex304-physics-tutor",
+  "version": "1.0.0",
+  "subject_areas": ["Physics"],
+  "age_groups": ["15"],
+  "input_type": "text_with_units",
+  "output_types": ["text"],
+  "options": [],
+  "invoke": "/invoke",
+  "health": "/health",
+  "capabilities": "/capabilities",
+  "endpoints": {
+    "invoke": "/invoke",
+    "health": "/health",
+    "capabilities": "/capabilities"
+  }
+}

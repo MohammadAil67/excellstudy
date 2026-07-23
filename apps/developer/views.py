@@ -78,10 +78,10 @@ class CheckRegistrationView(View):
             return JsonResponse({'error': 'Missing slug parameter'}, status=400)
 
         try:
-            agent = AgentRegistry.objects.get(slug=slug, status='pending')
+            agent = AgentRegistry.objects.get(slug=slug)
         except AgentRegistry.DoesNotExist:
             return JsonResponse(
-                {'error': f'Pending agent registry not found for slug: {slug}'},
+                {'error': f'Agent registry not found for slug: {slug}'},
                 status=404
             )
 
