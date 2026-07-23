@@ -402,22 +402,18 @@
 
   <!-- ═══════ STATS BAR ═══════ -->
   <section style="background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
-    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
       <div class="reveal">
-        <div class="stat-number">2.4K</div>
+        <div class="stat-number">{{ learners_display }}</div>
         <p class="text-sm mt-2" style="color:var(--text-secondary);">Active Learners</p>
       </div>
       <div class="reveal" style="transition-delay:0.1s;">
-        <div class="stat-number">45+</div>
+        <div class="stat-number">{{ agents_display }}</div>
         <p class="text-sm mt-2" style="color:var(--text-secondary);">AI Agents</p>
       </div>
       <div class="reveal" style="transition-delay:0.2s;">
-        <div class="stat-number">12</div>
+        <div class="stat-number">{{ total_subjects }}</div>
         <p class="text-sm mt-2" style="color:var(--text-secondary);">Subject Areas</p>
-      </div>
-      <div class="reveal" style="transition-delay:0.3s;">
-        <div class="stat-number">98%</div>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Satisfaction Rate</p>
       </div>
     </div>
   </section>
@@ -588,58 +584,35 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+        {% for agent in featured_agents %}
         <div class="feature-card reveal" style="border-left:4px solid var(--primary);">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(83,74,183,0.1);">
-              <i data-lucide="calculator" class="w-6 h-6" style="color:var(--primary);"></i>
+              <i data-lucide="bot" class="w-6 h-6" style="color:var(--primary);"></i>
             </div>
             <div>
-              <h3 class="font-bold">MathMentor AI</h3>
-              <p class="text-xs" style="color:var(--text-secondary);">@edu-labs · v2.1.0</p>
+              <h3 class="font-bold">{{ agent.name }}</h3>
+              <p class="text-xs" style="color:var(--text-secondary);">@{{ agent.developer.user.username }} · v{{ agent.version }}</p>
             </div>
           </div>
-          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Step-by-step problem solving with adaptive difficulty. From basic arithmetic to calculus.</p>
+          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">
+            {% if agent.capabilities %}
+              Specialized in {{ agent.capabilities|join:", " }}.
+            {% else %}
+              Interactive AI learning assistant for {{ agent.subject_areas|join:", "|default:"various subjects" }}.
+            {% endif %}
+          </p>
           <div class="flex items-center justify-between">
             <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★★</div>
             <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
           </div>
         </div>
-
-        <div class="feature-card reveal" style="border-left:4px solid var(--accent); transition-delay:0.1s;">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(29,158,117,0.1);">
-              <i data-lucide="flask-conical" class="w-6 h-6" style="color:var(--accent);"></i>
-            </div>
-            <div>
-              <h3 class="font-bold">ScienceExplorer</h3>
-              <p class="text-xs" style="color:var(--text-secondary);">@sci-team · v1.3.0</p>
-            </div>
-          </div>
-          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Interactive experiments, visual concept maps, and hands-on learning for K-12 science.</p>
-          <div class="flex items-center justify-between">
-            <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★☆</div>
-            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
-          </div>
+        {% empty %}
+        <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0] w-full">
+          <i data-lucide="bot-off" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
+          <p class="text-sm text-gray-500">No active agents currently featured. Explore our marketplace to discover available agents.</p>
         </div>
-
-        <div class="feature-card reveal" style="border-left:4px solid var(--highlight); transition-delay:0.2s;">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(186,117,23,0.1);">
-              <i data-lucide="code" class="w-6 h-6" style="color:var(--highlight);"></i>
-            </div>
-            <div>
-              <h3 class="font-bold">CodeMaster Pro</h3>
-              <p class="text-xs" style="color:var(--text-secondary);">@dev-edu · v1.0.0</p>
-            </div>
-          </div>
-          <p class="text-sm mb-4" style="color:var(--text-secondary); line-height:1.7;">Learn Python, JavaScript, and more with real-time feedback, challenges, and project-based paths.</p>
-          <div class="flex items-center justify-between">
-            <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★★</div>
-            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
-          </div>
-        </div>
-
+        {% endfor %}
       </div>
 
       <div class="text-center mt-10 reveal">

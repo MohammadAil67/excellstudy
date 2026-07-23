@@ -83,3 +83,15 @@ def test_agent_invoke_url_resolves():
     url = reverse('agent-invoke', kwargs={'agent_slug': 'dev-testdev-biohelper'})
     assert url == '/api/v1/agents/dev-testdev-biohelper/invoke/'
 
+
+def test_rate_limiting_helper():
+    from apps.agents.views import _is_rate_limited
+    # Test rate limit logic helper with a test IP
+    test_ip = "192.168.1.99"
+    # Call within limit
+    assert _is_rate_limited(test_ip, limit=5, window_seconds=10) is False
+    # Exceed limit
+    for _ in range(5):
+        _is_rate_limited(test_ip, limit=5, window_seconds=10)
+    assert _is_rate_limited(test_ip, limit=5, window_seconds=10) is True
+

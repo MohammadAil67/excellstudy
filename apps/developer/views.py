@@ -22,10 +22,12 @@ class MyAgentsListView(LoginRequiredMixin, View):
             developer = Developer.objects.create(user=request.user)
 
         agents = AgentRegistry.objects.filter(developer=developer).order_by('-created_at')
+        total_sessions_today = sum(a.sessions_today for a in agents)
         context = {
             'user_type': 'developer',
             'developer': developer,
             'agents': agents,
+            'total_sessions_today': total_sessions_today,
         }
         return render(request, 'developer/portal.html', context)
 
@@ -243,7 +245,6 @@ class DeleteAgentView(LoginRequiredMixin, View):
     """
 
     def post(self, request, agent_slug):
-        import subprocess
         agent = get_object_or_404(AgentRegistry, slug=agent_slug, developer__user=request.user)
         from apps.agents.registry import invalidate_agent
         from django.contrib import messages
@@ -253,20 +254,7 @@ class DeleteAgentView(LoginRequiredMixin, View):
 
         # 1. Delete Kubernetes resources (Deployment & Service)
         try:
-            # Delete deployment
-            subprocess.run(
-                ["kubectl", "delete", "deployment", slug, "-n", namespace],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
-            # Delete service
-            subprocess.run(
-                ["kubectl", "delete", "service", f"{slug}-svc", "-n", namespace],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            self._delete_k8s_resources(slug, namespace)
         except Exception as e:
             logger.error(f"Failed to delete Kubernetes resources for {slug}: {e}")
 
@@ -281,5 +269,33 @@ class DeleteAgentView(LoginRequiredMixin, View):
 
         messages.success(request, f"Agent '{slug}' was successfully deleted and removed from the cluster.")
         return redirect('developer:portal')
+
+    def _delete_k8s_resources(self, slug: str, namespace: str):
+        """Delete Deployment and Service using official kubernetes SDK with in-cluster/kubeconfig fallback."""
+        try:
+            from apps.developer.k8s_utils import get_k8s_clients
+            from kubernetes.client.exceptions import ApiException
+
+            apps_api, core_api = get_k8s_clients()
+
+            # Delete Deployment
+            try:
+                apps_api.delete_namespaced_deployment(name=slug, namespace=namespace)
+            except ApiException as e:
+                if e.status != 404:
+                    logger.warning(f"K8s API error deleting deployment {slug}: {e}")
+
+            # Delete Service
+            try:
+                core_api.delete_namespaced_service(name=f"{slug}-svc", namespace=namespace)
+            except ApiException as e:
+                if e.status != 404:
+                    logger.warning(f"K8s API error deleting service {slug}-svc: {e}")
+
+        except Exception as e:
+            logger.warning(f"Kubernetes Python SDK call failed ({e}). Falling back to subprocess kubectl.")
+            import subprocess
+            subprocess.run(["kubectl", "delete", "deployment", slug, "-n", namespace], capture_output=True, text=True, timeout=10)
+            subprocess.run(["kubectl", "delete", "service", f"{slug}-svc", "-n", namespace], capture_output=True, text=True, timeout=10)
 
 

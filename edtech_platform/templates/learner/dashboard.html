@@ -135,7 +135,7 @@
       {% empty %}
       <div class="col-span-2 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0]">
         <i data-lucide="bot-off" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
-        No active agents are currently online. Visit the Marketplace to explore.
+        You haven't interacted with any agents yet. Visit the <a href="{% url 'marketplace:browse' %}" class="text-[#534AB7] font-semibold underline">Marketplace</a> to explore and start a session!
       </div>
       {% endfor %}
     </div>

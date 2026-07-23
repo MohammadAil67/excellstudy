@@ -15,7 +15,7 @@ CACHE_TTL_SECONDS = 300  # bounded — was previously None (cached forever),
 
 
 def register_agent(agent_data: dict) -> str:
-    """Register an agent in the Redis cache by slug."""
+    """Register an agent in the Redis cache by slug and agent_key."""
     slug = agent_data.get('slug')
     if not slug:
         raise ValueError(
@@ -26,6 +26,12 @@ def register_agent(agent_data: dict) -> str:
     agent_data.setdefault('health_status', 'unknown')
     key = f"{REGISTRY_PREFIX}{slug}"
     cache.set(key, json.dumps(agent_data), timeout=CACHE_TTL_SECONDS)
+
+    # Index by agent_key for FastMCP RBAC validation
+    agent_key = agent_data.get('api_key') or agent_data.get('agent_key') or slug
+    agent_type = agent_data.get('type', 'third_party')
+    cache.set(f"agent:key:{agent_key}", json.dumps({"type": agent_type, "slug": slug}), timeout=CACHE_TTL_SECONDS)
+
     logger.info(f"Registered agent: {key}")
     return key
 

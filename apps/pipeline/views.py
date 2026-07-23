@@ -93,6 +93,8 @@ def pipeline_webhook(request):
             'sessions_today': agent.sessions_today,
             'k8s_service_url': agent.k8s_service_url,
             'status': agent.status,
+            'agent_key': str(agent.developer.api_key),
+            'type': 'third_party',
         }
         try:
             register_agent(agent_data)
@@ -162,6 +164,7 @@ def agent_pipeline_status(request, slug):
     })
 
 
+#Deadcode or perhaps later on can be used for pipeline step updates and SSE streaming of events.
 @csrf_exempt
 def pipeline_step_update(request, slug):
     """

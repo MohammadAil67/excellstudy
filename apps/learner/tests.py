@@ -30,6 +30,16 @@ class LearnerPortalTests(TestCase):
         self.assertEqual(learner.skill_levels, {})
 
     def test_dashboard_view(self):
+        from apps.core.models import LearnerProgress
+        from django.utils import timezone
+        learner, _ = Learner.objects.get_or_create(user=self.user)
+        # Create an interaction progress entry first so it shows on the dashboard
+        LearnerProgress.objects.create(
+            learner=learner,
+            completed_at=timezone.now(),
+            score=100,
+            agent_used=self.agent
+        )
         url = reverse('learner:dashboard')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

@@ -21,7 +21,11 @@ Port: 8002
 """
 
 import os
+import sys
 import django
+
+# Ensure project root is in sys.path for standalone microservice execution
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 # ── Bootstrap Django ORM ──────────────────────────────────────────────────────
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ExcellStudy.settings")
@@ -151,4 +155,5 @@ async def get_concept(concept_key: str) -> dict:
 
 if __name__ == "__main__":
     port = int(os.environ.get("MCP_SERVER_PORT", 8002))
-    mcp.run(transport="streamable-http", port=port)
+    host = os.environ.get("MCP_SERVER_HOST", "0.0.0.0")
+    mcp.run(transport="streamable-http", host=host, port=port)

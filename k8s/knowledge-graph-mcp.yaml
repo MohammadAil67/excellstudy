@@ -14,7 +14,7 @@ metadata:
     app: knowledge-graph-mcp-server
     component: mcp-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: knowledge-graph-mcp-server
@@ -26,26 +26,25 @@ spec:
     spec:
       containers:
         - name: knowledge-graph-mcp
-          image: platform/knowledge-graph-mcp:v1
+          image: ghcr.io/mohammadail67/knowledge-graph-mcp:v1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8002
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "125m"
+              memory: "64Mi"
+              cpu: "30m"
             limits:
               memory: "256Mi"
               cpu: "250m"
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8002
             initialDelaySeconds: 10
             periodSeconds: 15
             failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8002
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -84,7 +83,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: platform
+              kubernetes.io/metadata.name: platform
     - from:
         - namespaceSelector:
             matchLabels:

@@ -9,8 +9,37 @@ from apps.core import views as core_views
 
 
 def home(request):
-    """Render the landing page."""
-    return render(request, 'landing.html')
+    """Render the landing page with real database statistics and live agents."""
+    from apps.core.models import Learner, AgentRegistry, Course
+    
+    total_learners = Learner.objects.count()
+    live_agents_qs = AgentRegistry.objects.filter(status='live').select_related('developer', 'developer__user')
+    total_agents = live_agents_qs.count()
+    
+    # Calculate unique subjects from courses and live agents
+    subjects = set(Course.objects.values_list('subject', flat=True).distinct())
+    for agent in live_agents_qs:
+        if isinstance(agent.subject_areas, list):
+            subjects.update(agent.subject_areas)
+    total_subjects = len(subjects)
+
+    # Format numbers
+    if total_learners >= 1000:
+        learners_display = f"{total_learners/1000:.1f}K"
+    else:
+        learners_display = str(total_learners)
+
+    agents_display = f"{total_agents}+" if total_agents > 0 else "0"
+
+    featured_agents = list(live_agents_qs[:6])
+
+    context = {
+        'learners_display': learners_display,
+        'agents_display': agents_display,
+        'total_subjects': total_subjects,
+        'featured_agents': featured_agents,
+    }
+    return render(request, 'landing.html', context)
 
 
 urlpatterns = [

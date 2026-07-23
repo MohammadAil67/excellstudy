@@ -15,6 +15,9 @@ redis
 fastmcp>=2.0
 neo4j
 asyncpg
+django-storages
+boto3
+kubernetes
 
 # Testing
 pytest

@@ -4,6 +4,8 @@ from asgiref.sync import sync_to_async
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+import redis
+from django.conf import settings
 from apps.agents.registry import get_agent, list_agents
 from apps.agents.router import forward_to_agent
 from apps.agents.exceptions import (
@@ -29,6 +31,20 @@ def _error_envelope(error_code: str, message: str, detail: str, request_id: str,
     )
 
 
+def _is_rate_limited(ip_address: str, limit: int = 60, window_seconds: int = 60) -> bool:
+    """Check if client IP has exceeded the allowed invoke requests per minute in Redis."""
+    try:
+        r = redis.Redis.from_url(getattr(settings, 'REDIS_URL', 'redis://localhost:6379/0'))
+        key = f"ratelimit:invoke:{ip_address}"
+        current = r.incr(key)
+        if current == 1:
+            r.expire(key, window_seconds)
+        return current > limit
+    except Exception as exc:
+        logger.warning(f"Rate limit check failed (allowing request): {exc}")
+        return False
+
+
 @csrf_exempt
 async def invoke_agent(request, agent_slug):
     """
@@ -39,6 +55,18 @@ async def invoke_agent(request, agent_slug):
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
     request_id = getattr(request, "request_id", "unknown")
+
+    # ── Rate Limiting (60 requests / minute / IP) ──
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '127.0.0.1')).split(',')[0].strip()
+    is_limited = await sync_to_async(_is_rate_limited)(client_ip, limit=60, window_seconds=60)
+    if is_limited:
+        return _error_envelope(
+            "RATE_LIMIT_EXCEEDED",
+            "Rate limit exceeded. Please wait a moment before sending more requests.",
+            "Maximum 60 requests per minute allowed.",
+            request_id,
+            429,
+        )
 
     try:
         body = json.loads(request.body)

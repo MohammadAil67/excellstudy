@@ -18,7 +18,16 @@ def dashboard(request):
     # Get or create learner profile to prevent crashes
     learner_profile, _ = Learner.objects.get_or_create(user=request.user)
     
-    active_agents = AgentRegistry.objects.filter(status='live')
+    # Only show agents that this learner has actually interacted with
+    interacted_agent_ids = LearnerProgress.objects.filter(
+        learner=learner_profile,
+        agent_used__status='live'
+    ).values_list('agent_used_id', flat=True).distinct()
+
+    active_agents = AgentRegistry.objects.filter(
+        id__in=interacted_agent_ids,
+        status='live'
+    )
     
     # Query progress records for live agents used by this learner
     progress_entries = LearnerProgress.objects.filter(
