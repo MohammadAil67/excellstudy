@@ -353,7 +353,7 @@ jobs:
           else
             REASON="Pipeline validation failed - check the Actions run logs for the specific step and reason."
           fi
-          PAYLOAD=$(printf '{"agent_slug":"%s","status":"failure","rejection_reason":"%s"}' "$SLUG" "$REASON")
+          PAYLOAD=$(python3 -c 'import json, sys; print(json.dumps({"agent_slug": sys.argv[1], "status": "failure", "rejection_reason": sys.argv[2]}))' "$SLUG" "$REASON")
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
 
