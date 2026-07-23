@@ -117,11 +117,21 @@ class Developer(models.Model):
         max_length=20, choices=STATUS_CHOICES, default='pending',
         db_index=True,
     )
+    github_username = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text="Developer's exact GitHub handle for GHCR image tags (e.g. ShafayatHossain423).",
+    )
     registry_token_added_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.namespace
+
+    @property
+    def gh_username(self):
+        if self.github_username and self.github_username.strip():
+            return self.github_username.strip()
+        return self.user.username.replace(' ', '').strip()
 
     def save(self, *args, **kwargs):
         if not self.namespace:
