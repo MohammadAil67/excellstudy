@@ -9,6 +9,8 @@ function initAgentInputForm() {
 
   if (form.dataset.inputType === "image_upload") {
     initImageUploadHandler(form);
+  } else if (form.dataset.inputType === "file_upload" || form.dataset.inputType === "file") {
+    initFileUploadHandler(form);
   }
 
   form.addEventListener("submit", async (e) => {
@@ -39,6 +41,13 @@ function serializeFormToInputPayload(form) {
     const url = form.querySelector('input[name="image_url"]').value;
     return {
       image_url: url
+    };
+  }
+
+  if (inputType === "file_upload" || inputType === "file") {
+    const url = form.querySelector('input[name="file_url"]').value;
+    return {
+      file_url: url
     };
   }
 
@@ -221,6 +230,107 @@ function showErrorBanner(message, code) {
 
 function hideErrorBanner() {
   document.getElementById("invoke-error").style.display = "none";
+}
+
+function initFileUploadHandler(form) {
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input");
+  const statusContainer = document.getElementById("upload-status-container");
+  const filenameText = document.getElementById("upload-filename");
+  const progressText = document.getElementById("upload-progress-text");
+  const removeBtn = document.getElementById("remove-file-btn");
+  const submitBtn = document.getElementById("file-submit-btn");
+  const hiddenUrlInput = document.getElementById("hidden-file-url");
+
+  if (!dropZone || !fileInput) return;
+
+  dropZone.addEventListener("click", () => fileInput.click());
+
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = "var(--primary)";
+    dropZone.style.background = "rgba(83,74,183,0.05)";
+  });
+
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.borderColor = "var(--primary)/30";
+    dropZone.style.background = "#F8F7FF";
+  });
+
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = "var(--primary)/30";
+    dropZone.style.background = "#F8F7FF";
+    
+    if (e.dataTransfer.files.length > 0) {
+      handleGeneralFileUpload(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) {
+      handleGeneralFileUpload(fileInput.files[0]);
+    }
+  });
+
+  removeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    resetUpload();
+  });
+
+  async function handleGeneralFileUpload(file) {
+    if (file.size > 25 * 1024 * 1024) {
+      alert("File too large. Max size is 25MB.");
+      return;
+    }
+
+    filenameText.textContent = file.name;
+    progressText.textContent = "Uploading file...";
+    statusContainer.classList.remove("hidden");
+    dropZone.classList.add("hidden");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const csrfElement = form.querySelector('[name=csrfmiddlewaretoken]');
+      const csrfToken = csrfElement ? csrfElement.value : "";
+
+      const res = await fetch("/learner/upload-image/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken
+        },
+        body: formData
+      });
+
+      const responseData = await res.json();
+      if (res.ok && responseData.status === "success") {
+        const uploadedUrl = responseData.data.image_url || responseData.data.file_url;
+        hiddenUrlInput.value = uploadedUrl;
+        progressText.textContent = "Upload complete!";
+        progressText.classList.add("text-[#1D9E75]");
+        submitBtn.disabled = false;
+      } else {
+        throw new Error(responseData.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error(err);
+      progressText.textContent = "Upload failed";
+      progressText.classList.add("text-[#E05252]");
+      alert("Failed to upload file. Please try again.");
+    }
+  }
+
+  function resetUpload() {
+    fileInput.value = "";
+    hiddenUrlInput.value = "";
+    statusContainer.classList.add("hidden");
+    dropZone.classList.remove("hidden");
+    submitBtn.disabled = true;
+    progressText.textContent = "Ready to submit";
+    progressText.className = "text-[10px] text-[#6B7280]";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initAgentInputForm);

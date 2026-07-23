@@ -130,6 +130,8 @@
       {% include 'learner/inputs/number.html' %}
     {% elif input_type == 'image_upload' %}
       {% include 'learner/inputs/image_upload.html' %}
+    {% elif input_type == 'file_upload' or input_type == 'file' %}
+      {% include 'learner/inputs/file_upload.html' %}
     {% elif input_type == 'multiple_choice' %}
       {% include 'learner/inputs/multiple_choice.html' %}
     {% elif input_type == 'free_text' %}
