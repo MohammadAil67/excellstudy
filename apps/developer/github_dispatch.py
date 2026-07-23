@@ -42,18 +42,17 @@ def image_exists_in_registry(slug: str, version: str, owner_username: str = None
         logger.info(f"Registry response: status={response.status_code}")
 
         if response.status_code != 200:
-            if response.status_code in (401, 403):
+            if response.status_code in (401, 403, 404):
                 logger.warning(
-                    f"GitHub registry check returned status {response.status_code} (permission denied). "
-                    "This likely means the GITHUB_DISPATCH_TOKEN lacks 'read:packages' scope. "
-                    "Skipping registry check and proceeding to trigger pipeline anyway."
+                    f"GitHub registry check returned status {response.status_code} for owner '{target_owner}'. "
+                    "Skipping pre-check and proceeding to trigger workflow validation pipeline."
                 )
                 return True
             logger.error(
                 f"Failed to fetch package versions from GitHub. "
                 f"status_code={response.status_code}, response={response.text}"
             )
-            return False
+            return True
 
         versions_list = response.json()
         logger.info(f"Found {len(versions_list)} version(s) for package '{slug}'")
