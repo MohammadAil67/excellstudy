@@ -194,7 +194,15 @@ jobs:
           IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
 
           docker run -d --name "smoke-test-$SLUG" -p 8099:8080 "$IMAGE_TAG"
-          sleep 8
+          
+          # Poll /health for up to 30 seconds until the container is ready
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8099/health > /dev/null 2>&1; then
+              echo "Container is healthy and ready!"
+              break
+            fi
+            sleep 1
+          done
 
           curl -sf http://localhost:8099/health
 
