@@ -216,8 +216,7 @@ jobs:
           SLUG="${{ steps.identity.outputs.slug }}"
           LOGS=$(docker logs "smoke-test-$SLUG" 2>&1 | tail -n 10 || echo "")
           if [ -n "$LOGS" ]; then
-            MSG="Smoke test failed: Agent health check or invoke request failed. Container logs:
-$LOGS"
+            MSG="Smoke test failed: Agent health check or invoke request failed. Container logs: $LOGS"
           else
             MSG="Smoke test failed: The agent did not respond properly to health check or invoke request."
           fi
