@@ -5,7 +5,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def image_exists_in_registry(slug: str, version: str) -> bool:
+def image_exists_in_registry(slug: str, version: str, owner_username: str = None) -> bool:
     """
     Check GHCR for the pushed image BEFORE dispatching the
     pipeline, so a developer who clicks the button too early
@@ -26,9 +26,9 @@ def image_exists_in_registry(slug: str, version: str) -> bool:
         return False
 
     # GHCR / GitHub Packages API requires lowercase owner names
-    owner_lower = owner.lower()
+    target_owner = (owner_username or owner).lower()
 
-    url = f"https://api.github.com/users/{owner_lower}/packages/container/{slug}/versions"
+    url = f"https://api.github.com/users/{target_owner}/packages/container/{slug}/versions"
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",

@@ -202,7 +202,8 @@ class TriggerPipelineView(LoginRequiredMixin, View):
 
         from apps.developer.github_dispatch import image_exists_in_registry, trigger_pipeline
 
-        if not image_exists_in_registry(agent.slug, version):
+        dev_username = agent.developer.user.username if (agent.developer and agent.developer.user) else None
+        if not image_exists_in_registry(agent.slug, version, dev_username):
             messages.error(
                 request,
                 f"No image found tagged '{version}' for slug '{agent.slug}'. Push it first, then click this button."
@@ -212,7 +213,6 @@ class TriggerPipelineView(LoginRequiredMixin, View):
                 return redirect(referer)
             return redirect('developer:pipeline_status', job_id=agent.slug)
 
-        dev_username = agent.developer.user.username if (agent.developer and agent.developer.user) else None
         success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace, dev_username)
         if success:
             # Set active run indicator in Redis
