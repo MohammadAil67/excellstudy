@@ -61,7 +61,7 @@ jobs:
       - name: Verify Python is available
         run: |
           python3 --version
-          pip3 --version
+          python3 -m pip --version
 
       # FIXED — added --break-system-packages to both pip calls.
       # Debian 12+/newer Python enforces PEP 668, which blocks
@@ -71,16 +71,19 @@ jobs:
       # this protection here is low-risk.
       - name: Install Dependencies
         run: |
-          python3 -m pip install --upgrade pip --break-system-packages
-          pip3 install requests --break-system-packages
+          python3 -m pip install --upgrade pip --break-system-packages || true
+          python3 -m pip install requests --break-system-packages
 
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
       # ─────────────────────────────────────────────
       - name: Docker login to ghcr.io
         run: |
-          echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io \
-            -u ${{ github.actor }} --password-stdin
+          TOKEN="${{ secrets.GHCR_PULL_TOKEN }}"
+          if [ -z "$TOKEN" ]; then
+            TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          fi
+          echo "$TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull image and extract manifest
         id: extract
@@ -92,6 +95,13 @@ jobs:
           CONTAINER_ID=$(docker create "$IMAGE_TAG")
           docker cp "$CONTAINER_ID:/app/manifest.json" ./manifest.json
           docker rm "$CONTAINER_ID"
+
+      - name: Pull image — notify failure
+        if: failure() && steps.extract.outcome == 'failure'
+        run: |
+          MSG="Image pull failed: ghcr.io/${{ steps.identity.outputs.owner_lower }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }} could not be pulled from registry or /app/manifest.json was missing."
+          echo "$MSG" > error_reason.txt
+          python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" extract failure "$MSG"
 
       # ─────────────────────────────────────────────
       # 2. Schema check — cross-validate against the
@@ -325,7 +335,7 @@ jobs:
           SLUG="${{ steps.identity.outputs.slug }}"
           VERSION="${{ steps.identity.outputs.version }}"
           K8S_URL="${{ steps.deploy.outputs.service_url }}"
-          PAYLOAD=$(printf '{"agent_slug":"%s","status":"success","version":"%s","k8s_service_url":"%s"}' "$SLUG" "$VERSION" "$K8S_URL")
+          PAYLOAD=$(python3 -c 'import json, sys; print(json.dumps({"agent_slug": sys.argv[1], "status": "success", "version": sys.argv[2], "k8s_service_url": sys.argv[3]}))' "$SLUG" "$VERSION" "$K8S_URL")
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.PIPELINE_WEBHOOK_SECRET }}" | sed 's/^.* //')
 
