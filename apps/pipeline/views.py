@@ -226,6 +226,7 @@ def pipeline_events_stream(request, slug):
     Server-Sent Events endpoint streaming pipeline progress updates to the browser.
     """
     def event_generator():
+        import time
         r = redis.Redis.from_url(settings.REDIS_URL)
         pubsub = r.pubsub()
         pubsub.subscribe(f"pipeline_events:{slug}")
@@ -233,23 +234,29 @@ def pipeline_events_stream(request, slug):
         # Send initial connection event
         yield f"data: {json.dumps({'type': 'connected'})}\n\n"
         
+        start_time = time.time()
         try:
-            for message in pubsub.listen():
-                if message['type'] == 'message':
+            while time.time() - start_time < 25:
+                message = pubsub.get_message(timeout=1.0)
+                if message and message['type'] == 'message':
                     data = message['data'].decode('utf-8')
                     yield f"data: {data}\n\n"
-                    # If it's a completion message, terminate the SSE stream
                     try:
                         parsed = json.loads(data)
                         if parsed.get('type') == 'completion':
                             break
                     except Exception:
                         pass
+                else:
+                    yield ": heartbeat\n\n"
         except GeneratorExit:
             logger.info(f"SSE stream generator exit for slug {slug}")
         finally:
-            pubsub.unsubscribe(f"pipeline_events:{slug}")
-            pubsub.close()
+            try:
+                pubsub.unsubscribe(f"pipeline_events:{slug}")
+                pubsub.close()
+            except Exception:
+                pass
             
     response = StreamingHttpResponse(event_generator(), content_type="text/event-stream")
     response['Cache-Control'] = 'no-cache'

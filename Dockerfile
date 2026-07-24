@@ -32,4 +32,4 @@ USER djangouser
 EXPOSE 8000
 
 # Default CMD - run production WSGI via Gunicorn
-CMD ["gunicorn", "ExcellStudy.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
+CMD ["gunicorn", "ExcellStudy.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "4", "--timeout", "120"]
