@@ -68,7 +68,7 @@ def pipeline_webhook(request):
     if status == 'success':
         k8s_url = body.get('k8s_service_url')
         if not k8s_url:
-            return JsonResponse({'error': 'Missing k8s_service_url for successful status'}, status=400)
+            k8s_url = f"http://{agent.slug}-svc.{agent.developer.namespace}.svc.cluster.local"
 
         agent.status = 'live'
         agent.k8s_service_url = k8s_url
