@@ -20,12 +20,18 @@ async def forward_to_agent(agent: dict, input_payload: dict, learner_context: di
     """
     Forward a single request to an already-resolved agent's service URL.
 
-    agent: dict from registry.get_agent() — must contain k8s_service_url
-    Raises AgentTimeoutError / AgentUnavailableError on failure —
-    caller is responsible for turning these into an HTTP response.
+    agent: dict from registry.get_agent() — must contain k8s_service_url or fallback slug/namespace.
+    Raises AgentTimeoutError / AgentUnavailableError on failure.
     """
-    #there might be problem in the below line
-    invoke_url = f"{agent['k8s_service_url'].rstrip('/')}/invoke"
+    service_url = agent.get('k8s_service_url')
+    if not service_url:
+        slug = agent.get('slug', '')
+        namespace = agent.get('developer__namespace', '')
+        if not namespace:
+            namespace = "platform"
+        service_url = f"http://{slug}-svc.{namespace}.svc.cluster.local"
+
+    invoke_url = f"{service_url.rstrip('/')}/invoke"
     payload = {"input": input_payload, "context": learner_context}
 
     try:
@@ -40,7 +46,7 @@ async def forward_to_agent(agent: dict, input_payload: dict, learner_context: di
             request_id=request_id, agent_name=agent.get("name", agent.get("slug", "unknown")),
             detail=f"timeout calling {invoke_url}: {exc}",
         )
-    except httpx.ConnectError as exc:
+    except (httpx.ConnectError, httpx.HTTPError, Exception) as exc:
         raise AgentUnavailableError(
             request_id=request_id, agent_name=agent.get("name", agent.get("slug", "unknown")),
             detail=f"connect error calling {invoke_url}: {exc}",
