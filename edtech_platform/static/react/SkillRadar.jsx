@@ -13,8 +13,8 @@ const { useState, useEffect, useRef, useCallback } = React;
 function getColorForLevel(level) {
   if (level <= 30) return '#E05252';
   if (level <= 60) return '#BA7517';
-  if (level <= 80) return '#534AB7';
-  return '#1D9E75';
+  if (level <= 80) return '#0A0A0A';
+  return '#FFE000';
 }
 
 function getLabelForLevel(level) {
@@ -30,12 +30,12 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     background: '#FFFFFF',
     borderRadius: '12px',
-    boxShadow: '0 2px 12px rgba(83,74,183,0.08)',
+    boxShadow: '0 2px 12px rgba(10, 10, 10,0.08)',
     padding: '24px',
-    border: '1px solid #F0EFF5',
+    border: '1px solid #F0F0EE',
   },
   title: {
-    fontSize: '18px', fontWeight: 700, color: '#1A1A2E', margin: 0,
+    fontSize: '18px', fontWeight: 700, color: '#0A0A0A', margin: 0,
   },
   subtitle: {
     fontSize: '13px', color: '#9CA3AF', marginTop: '4px', marginBottom: '20px',
@@ -45,10 +45,10 @@ const S = {
   },
   skillName: {
     width: '130px', flexShrink: 0, fontSize: '13px', fontWeight: 500,
-    color: '#1A1A2E', textAlign: 'right',
+    color: '#0A0A0A', textAlign: 'right',
   },
   barTrack: {
-    flex: 1, height: '12px', background: '#F0EFF5', borderRadius: '6px',
+    flex: 1, height: '12px', background: '#F0F0EE', borderRadius: '6px',
     overflow: 'hidden', position: 'relative',
   },
   pct: {
@@ -60,20 +60,20 @@ const S = {
   },
   tooltip: {
     position: 'absolute', top: '-34px', padding: '4px 10px',
-    background: '#1A1A2E', color: '#fff', borderRadius: '6px',
+    background: '#0A0A0A', color: '#fff', borderRadius: '6px',
     fontSize: '11px', fontWeight: 600, whiteSpace: 'nowrap',
     transform: 'translateX(-50%)', pointerEvents: 'none', zIndex: 10,
   },
   summaryRow: {
     display: 'flex', justifyContent: 'space-between', gap: '12px',
-    marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #F0EFF5',
+    marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #F0F0EE',
   },
   summaryCard: {
     flex: 1, textAlign: 'center', padding: '10px',
-    background: '#F8F7FF', borderRadius: '8px',
+    background: '#FAFAF8', borderRadius: '8px',
   },
   summaryLabel: { fontSize: '11px', color: '#9CA3AF', marginBottom: '4px' },
-  summaryValue: { fontSize: '16px', fontWeight: 700, color: '#1A1A2E' },
+  summaryValue: { fontSize: '16px', fontWeight: 700, color: '#0A0A0A' },
 };
 
 /* ---- component ---- */

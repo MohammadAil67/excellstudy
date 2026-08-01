@@ -12,8 +12,8 @@
     to { stroke-dashoffset: 0; }
   }
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(83,74,183,0.3); }
-    50% { box-shadow: 0 0 0 8px rgba(83,74,183,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(10, 10, 10,0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(10, 10, 10,0); }
   }
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -78,7 +78,7 @@
 
   .log-panel {
     max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease;
-    background: #1A1A2E; border-radius: 8px; margin-top: 0;
+    background: #0A0A0A; border-radius: 8px; margin-top: 0;
     font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
     color: #e2e8f0; line-height: 1.8;
   }
@@ -93,13 +93,13 @@
     margin-top: 24px; animation: fadeInUp 0.5s ease 0.6s both;
   }
   .banner-running {
-    background: linear-gradient(135deg, rgba(83,74,183,0.1), rgba(83,74,183,0.05));
-    border: 1px solid rgba(83,74,183,0.2);
+    background: linear-gradient(135deg, rgba(10, 10, 10,0.1), rgba(10, 10, 10,0.05));
+    border: 1px solid rgba(10, 10, 10,0.2);
     animation: bannerPulse 2s ease infinite;
   }
   .banner-success {
-    background: linear-gradient(135deg, rgba(29,158,117,0.12), rgba(29,158,117,0.04));
-    border: 1px solid rgba(29,158,117,0.25);
+    background: linear-gradient(135deg, rgba(186, 117, 23,0.12), rgba(186, 117, 23,0.04));
+    border: 1px solid rgba(186, 117, 23,0.25);
   }
   .banner-failure {
     background: linear-gradient(135deg, rgba(224,82,82,0.12), rgba(224,82,82,0.04));
@@ -123,7 +123,7 @@
     animation: fadeInUp 0.5s ease 0.2s both;
   }
   .command-block {
-    background: #1A1A2E;
+    background: #0A0A0A;
     border-radius: 10px;
     padding: 18px 22px;
     font-family: 'JetBrains Mono', monospace;
@@ -157,7 +157,7 @@
   .step-label .step-num {
     width: 24px; height: 24px;
     border-radius: 50%;
-    background: rgba(83,74,183,0.1);
+    background: rgba(10, 10, 10,0.1);
     color: var(--primary);
     font-weight: 700; font-size: 0.75rem;
     display: flex; align-items: center; justify-content: center;
@@ -189,7 +189,7 @@
 
   <!-- Header -->
   <div style="animation: fadeInUp 0.4s ease both;" class="mb-8">
-    <a href="/developer/" class="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#534AB7] mb-4 transition-colors">
+    <a href="/developer/" class="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#0A0A0A] mb-4 transition-colors">
       <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to My Agents
     </a>
     <div class="flex items-center gap-4">
@@ -213,14 +213,14 @@
   <!-- ── AWAITING IMAGE PUSH STATE ── -->
   <div class="awaiting-card">
     <div class="awaiting-illustration mb-6">
-      <div class="w-20 h-20 rounded-2xl bg-[#534AB7]/10 flex items-center justify-center mx-auto">
-        <i data-lucide="git-branch" class="w-10 h-10 text-[#534AB7]"></i>
+      <div class="w-20 h-20 rounded-2xl bg-[#0A0A0A]/10 flex items-center justify-center mx-auto">
+        <i data-lucide="git-branch" class="w-10 h-10 text-[#0A0A0A]"></i>
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-[#1A1A2E] mb-2">Waiting for Your Agent Image</h2>
+    <h2 class="text-xl font-bold text-[#0A0A0A] mb-2">Waiting for Your Agent Image</h2>
     <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-8">
-      Your agent <strong class="text-[#1A1A2E]">{{ agent.name }}</strong> has been registered.
+      Your agent <strong class="text-[#0A0A0A]">{{ agent.name }}</strong> has been registered.
       Tag and push your image to the package registry, then trigger the validation pipeline below.
     </p>
 
@@ -239,7 +239,7 @@
         Click the button below to validate your agent
       </div>
     <!-- Command Snippet Box -->
-    <div style="background:#1A1A2E; border-radius:12px; padding:20px; text-align:left; max-width:620px; margin:0 auto 24px; position:relative; font-family:'JetBrains Mono',monospace; box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+    <div style="background:#0A0A0A; border-radius:12px; padding:20px; text-align:left; max-width:620px; margin:0 auto 24px; position:relative; font-family:'JetBrains Mono',monospace; box-shadow:0 8px 24px rgba(0,0,0,0.12);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
         <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;"><i data-lucide="terminal" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Terminal Commands</span>
         <button class="copy-btn" onclick="copyCommand(this)" style="background:rgba(255,255,255,0.1); color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Copy</button>
@@ -272,7 +272,7 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
       <!-- Running layout with large spinner -->
       <div id="pipeline-running-view">
         <div class="large-spinner"></div>
-        <h2 class="text-xl font-bold text-[#1A1A2E] mb-2">Validation Pipeline is Running</h2>
+        <h2 class="text-xl font-bold text-[#0A0A0A] mb-2">Validation Pipeline is Running</h2>
         <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-2">
           Your container image is being checked for schema structure, security compliance, and endpoint availability.
         </p>
@@ -303,7 +303,7 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
         <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
           The validation checks encountered errors. Review the failure details below.
         </p>
-        <div style="background: #1A1A2E; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="background: #0A0A0A; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
           <div style="font-size: 0.75rem; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Rejection Reason</div>
           <pre id="sse-failure-reason" style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: #fff; white-space: pre-wrap; word-break: break-word; line-height: 1.5;"></pre>
         </div>
@@ -337,7 +337,7 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
         <p class="text-[#6B7280] text-sm max-w-md mx-auto mb-6">
           The validation checks encountered errors. Review the failure details below.
         </p>
-        <div style="background: #1A1A2E; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="background: #0A0A0A; border-left: 4px solid var(--error); border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
           <div style="font-size: 0.75rem; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Rejection Reason</div>
           <pre style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: #fff; white-space: pre-wrap; word-break: break-word; line-height: 1.5;">{{ agent.rejection_reason }}</pre>
         </div>
@@ -372,8 +372,8 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
     <!-- Push commands -->
     <div class="command-block">
       <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-      <div><span style="color:#1D9E75;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
-      <div style="margin-top:4px;"><span style="color:#1D9E75;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div><span style="color:#FFE000;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div style="margin-top:4px;"><span style="color:#FFE000;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
     </div>
 
     <!-- Trigger Form -->
@@ -403,12 +403,12 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
     <!-- Accordion header -->
     <button onclick="toggleManifest()" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:none; border:none; cursor:pointer; text-align:left;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:32px; height:32px; border-radius:8px; background:rgba(83,74,183,0.1); display:flex; align-items:center; justify-content:center;">
+        <div style="width:32px; height:32px; border-radius:8px; background:rgba(10, 10, 10,0.1); display:flex; align-items:center; justify-content:center;">
           <i data-lucide="file-json" style="width:16px; height:16px; color:var(--primary);"></i>
         </div>
         <div>
           <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">manifest.json Generator</div>
-          <div style="font-size:0.75rem; color:var(--text-secondary);">Pre-filled from your registration — copy and drop into <code style="background:rgba(83,74,183,0.08); padding:1px 5px; border-radius:3px; font-size:0.72rem;">/app/manifest.json</code></div>
+          <div style="font-size:0.75rem; color:var(--text-secondary);">Pre-filled from your registration — copy and drop into <code style="background:rgba(10, 10, 10,0.08); padding:1px 5px; border-radius:3px; font-size:0.72rem;">/app/manifest.json</code></div>
         </div>
       </div>
       <i data-lucide="chevron-down" id="manifest-chevron" style="width:18px; height:18px; color:var(--text-secondary); transition:transform 0.25s; flex-shrink:0;"></i>
@@ -416,9 +416,9 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
 
     <!-- Accordion content -->
     <div id="manifest-content" style="display:none; border-top:1px solid var(--border);">
-      <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:rgba(29,158,117,0.05); border-bottom:1px solid rgba(29,158,117,0.15);">
-        <i data-lucide="check-circle-2" style="width:15px; height:15px; color:#1D9E75; flex-shrink:0; margin-top:2px;"></i>
-        <p style="font-size:0.78rem; color:#0f5c3d; margin:0;">
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:rgba(186, 117, 23,0.05); border-bottom:1px solid rgba(186, 117, 23,0.15);">
+        <i data-lucide="check-circle-2" style="width:15px; height:15px; color:#BA7517; flex-shrink:0; margin-top:2px;"></i>
+        <p style="font-size:0.78rem; color:var(--text-secondary); margin:0;">
           This manifest is generated from your registered data. The pipeline cross-checks it exactly — if they don't match, the schema check will fail. Keep this file in sync with what you registered.
         </p>
       </div>
@@ -428,7 +428,7 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
         <button class="copy-btn" style="top:12px; right:12px;" onclick="copyManifest(this)">
           <i data-lucide="copy" style="width:11px; height:11px; display:inline-block; vertical-align:middle;"></i> Copy
         </button>
-        <pre id="manifest-json" style="margin:0; padding:20px 22px; padding-right:70px; background:#1A1A2E; font-family:'JetBrains Mono',monospace; font-size:0.775rem; color:#e2e8f0; line-height:1.85; overflow-x:auto; white-space:pre;">{
+        <pre id="manifest-json" style="margin:0; padding:20px 22px; padding-right:70px; background:#0A0A0A; font-family:'JetBrains Mono',monospace; font-size:0.775rem; color:#e2e8f0; line-height:1.85; overflow-x:auto; white-space:pre;">{
   <span style="color:#93C5FD;">"name"</span>: <span style="color:#FDE68A;">"{{ agent.slug }}"</span>,
   <span style="color:#93C5FD;">"version"</span>: <span style="color:#FDE68A;">"{{ agent.version }}"</span>,
   <span style="color:#93C5FD;">"subject_areas"</span>: {{ agent.subject_areas|default:"[]"|safe }},
@@ -447,7 +447,7 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
       <!-- Footer hint -->
       <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--border); flex-wrap:wrap; gap:8px;">
         <span style="font-size:0.75rem; color:var(--text-secondary);">
-          Drop this file at <code style="background:rgba(83,74,183,0.08); padding:1px 6px; border-radius:3px;">/app/manifest.json</code> inside your Docker image.
+          Drop this file at <code style="background:rgba(10, 10, 10,0.08); padding:1px 6px; border-radius:3px;">/app/manifest.json</code> inside your Docker image.
         </span>
         <a href="{% url 'developer:creation-guide' %}#manifest" style="font-size:0.75rem; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
           <i data-lucide="book-open" style="width:13px; height:13px;"></i> Manifest spec →

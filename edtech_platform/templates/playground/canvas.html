@@ -81,8 +81,8 @@
   }
   .pg-canvas {
     width: 100%; height: 100%; position: relative;
-    background-color: #1A1A2E;
-    background-image: radial-gradient(circle, #2A2A4E 1px, transparent 1px);
+    background-color: #0A0A0A;
+    background-image: radial-gradient(circle, #2A2A2A 1px, transparent 1px);
     background-size: 20px 20px;
     overflow: auto;
   }
@@ -96,7 +96,7 @@
   }
   .canvas-node:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
   .canvas-node.selected {
-    box-shadow: 0 0 0 3px var(--primary), 0 6px 24px rgba(83,74,183,0.4);
+    box-shadow: 0 0 0 3px var(--primary), 0 6px 24px rgba(10, 10, 10,0.4);
   }
   .node-header {
     display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
@@ -104,7 +104,7 @@
   .node-type-dot {
     width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
   }
-  .node-label { font-size: 0.8125rem; font-weight: 600; color: #1A1A2E; }
+  .node-label { font-size: 0.8125rem; font-weight: 600; color: #0A0A0A; }
   .node-id { font-size: 0.65rem; color: #9CA3AF; }
 
   /* Ports */
@@ -161,12 +161,12 @@
 
   /* Bottom console */
   .pg-console {
-    height: 180px; background: #1A1A2E; flex-shrink: 0;
-    border-top: 1px solid #2A2A4E; display: flex; flex-direction: column;
+    height: 180px; background: #0A0A0A; flex-shrink: 0;
+    border-top: 1px solid #2A2A2A; display: flex; flex-direction: column;
   }
   .console-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 16px; border-bottom: 1px solid #2A2A4E;
+    padding: 8px 16px; border-bottom: 1px solid #2A2A2A;
   }
   .console-header span { color: #9CA3AF; font-size: 0.75rem; font-weight: 600; }
   .console-output {
@@ -213,11 +213,11 @@
     <!-- Left: Node Palette -->
     <div class="pg-palette">
       <h3 class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Components</h3>
-      <div class="palette-item" draggable="true" data-type="llm" style="background:#534AB7;"
+      <div class="palette-item" draggable="true" data-type="llm" style="background:#0A0A0A;"
            ondragstart="onPaletteDrag(event, 'llm')">
         <i data-lucide="brain" class="w-4 h-4"></i> LLM Call
       </div>
-      <div class="palette-item" draggable="true" data-type="tool" style="background:#1D9E75;"
+      <div class="palette-item" draggable="true" data-type="tool" style="background:#FFE000;"
            ondragstart="onPaletteDrag(event, 'tool')">
         <i data-lucide="wrench" class="w-4 h-4"></i> Tool
       </div>
@@ -229,7 +229,7 @@
            ondragstart="onPaletteDrag(event, 'memory')">
         <i data-lucide="database" class="w-4 h-4"></i> Memory
       </div>
-      <div class="palette-item" draggable="true" data-type="human" style="background:#E07B5E;"
+      <div class="palette-item" draggable="true" data-type="human" style="background:#3F3F46;"
            ondragstart="onPaletteDrag(event, 'human')">
         <i data-lucide="user" class="w-4 h-4"></i> Human Input
       </div>
@@ -342,7 +342,7 @@
         <span class="status-dot disconnected" id="ws-status-dot"></span>
         <span class="text-[10px]" id="ws-status-text" style="color:#9CA3AF;">Disconnected</span>
       </div>
-      <button onclick="clearConsole()" style="background:none; border:1px solid #2A2A4E; color:#9CA3AF; padding:3px 10px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
+      <button onclick="clearConsole()" style="background:none; border:1px solid #2A2A2A; color:#9CA3AF; padding:3px 10px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
         Clear
       </button>
     </div>
@@ -361,12 +361,12 @@
 
   // ── Node type definitions ──
   var NODE_TYPES = {
-    llm:       { label: 'LLM Call',        color: '#534AB7', icon: 'brain' },
-    tool:      { label: 'Tool',            color: '#1D9E75', icon: 'wrench' },
+    llm:       { label: 'LLM Call',        color: '#0A0A0A', icon: 'brain' },
+    tool:      { label: 'Tool',            color: '#FFE000', icon: 'wrench' },
     condition: { label: 'Condition',        color: '#BA7517', icon: 'git-branch' },
     memory:    { label: 'Memory',           color: '#6B7280', icon: 'database' },
-    human:     { label: 'Human Input',      color: '#E07B5E', icon: 'user' },
-    agent:     { label: 'Platform Agent',   color: '#1D9E75', icon: 'bot' }
+    human:     { label: 'Human Input',      color: '#3F3F46', icon: 'user' },
+    agent:     { label: 'Platform Agent',   color: '#FFE000', icon: 'bot' }
   };
 
   var nodes = {};

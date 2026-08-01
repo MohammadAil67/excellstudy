@@ -10,42 +10,47 @@
    ------------------------------------------------------------ */
 :root {
   /* Primary palette */
-  --primary: #534AB7;
-  --primary-light: #6B63C7;
-  --primary-dark: #3D3590;
-  --primary-rgb: 83, 74, 183;
+  --primary: #0A0A0A;
+  --primary-light: #FFE000;
+  --primary-dark: #000000;
+  --primary-rgb: 10, 10, 10;
 
   /* Accent palette */
-  --accent: #1D9E75;
-  --accent-light: #25C290;
-  --accent-rgb: 29, 158, 117;
+  --accent: #BA7517;
+  --accent-light: #0A0A0A;
+  --accent-rgb: 186, 117, 23;
 
   /* Highlight palette */
   --highlight: #BA7517;
   --highlight-light: #D4891E;
+
+  /* Success palette */
+  --success: #1F8A55;
+  --success-light: #26A365;
+  --success-rgb: 31, 138, 85;
 
   /* Error palette */
   --error: #E05252;
   --error-light: #F07070;
 
   /* Backgrounds */
-  --bg: #F8F7FF;
+  --bg: #FAFAF8;
   --bg-card: #FFFFFF;
-  --bg-dark: #1A1A2E;
+  --bg-dark: #0A0A0A;
 
   /* Text */
-  --text-primary: #1A1A2E;
+  --text-primary: #0A0A0A;
   --text-secondary: #6B7280;
   --text-muted: #9CA3AF;
 
   /* Borders */
-  --border: #E5E4F0;
-  --border-light: #F0EFF5;
+  --border: #E5E5E2;
+  --border-light: #F0F0EE;
 
   /* Elevation */
-  --shadow: 0 2px 12px rgba(83, 74, 183, 0.08);
-  --shadow-hover: 0 8px 24px rgba(83, 74, 183, 0.15);
-  --shadow-lg: 0 12px 40px rgba(83, 74, 183, 0.12);
+  --shadow: 0 2px 12px rgba(10, 10, 10, 0.08);
+  --shadow-hover: 0 8px 24px rgba(10, 10, 10, 0.15);
+  --shadow-lg: 0 12px 40px rgba(10, 10, 10, 0.12);
 
   /* Border radii */
   --radius-card: 12px;
@@ -297,7 +302,7 @@ p {
 }
 
 .btn--accent:hover {
-  background: #178A65;
+  background: #8F6A00;
   box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.35);
 }
 
@@ -387,8 +392,8 @@ p {
 }
 
 .badge--live {
-  background: rgba(var(--accent-rgb), 0.12);
-  color: var(--accent);
+  background: rgba(var(--success-rgb), 0.12);
+  color: var(--success);
 }
 
 .badge--live::before {
@@ -396,7 +401,7 @@ p {
   width: 6px;
   height: 6px;
   border-radius: var(--radius-circle);
-  background: var(--accent);
+  background: var(--success);
   animation: pulse 2s infinite;
 }
 
@@ -571,7 +576,7 @@ p {
 }
 
 .progress-bar--green .progress-bar__fill {
-  background: var(--accent);
+  background: var(--success);
 }
 
 .progress-bar--amber .progress-bar__fill {
@@ -630,7 +635,7 @@ p {
 }
 
 .toast--success {
-  border-left-color: var(--accent);
+  border-left-color: var(--success);
 }
 
 .toast--error {
@@ -886,7 +891,8 @@ p {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-circle);
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
   color: #FFFFFF;
   font-weight: 600;
   font-size: var(--text-sm);
@@ -1100,7 +1106,7 @@ p {
 }
 
 .stepper__step--passed:not(:last-child)::before {
-  background: var(--accent);
+  background: var(--success);
 }
 
 .stepper__step--running:not(:last-child)::before {
@@ -1123,8 +1129,8 @@ p {
 }
 
 .stepper__step--passed .stepper__icon {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--success);
+  border-color: var(--success);
   color: #FFFFFF;
 }
 

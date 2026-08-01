@@ -29,7 +29,7 @@
 
   .subject-pill {
     display: inline-flex; padding: 3px 10px; border-radius: var(--radius-pill);
-    font-size: 0.7rem; font-weight: 600; background: rgba(83,74,183,0.1);
+    font-size: 0.7rem; font-weight: 600; background: rgba(10, 10, 10,0.1);
     color: var(--primary);
   }
 
@@ -68,7 +68,7 @@
   }
   .search-bar input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(83,74,183,0.1);
+    box-shadow: 0 0 0 4px rgba(10, 10, 10,0.1);
   }
   .search-bar .search-icon {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
@@ -125,7 +125,7 @@
       </div>
     </div>
     {% empty %}
-    <div class="w-full text-center p-6 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0]">
+    <div class="w-full text-center p-6 text-[#6B7280] bg-white rounded-lg border border-[#E5E5E2]">
       No featured agents at this time.
     </div>
     {% endfor %}
@@ -188,7 +188,7 @@
         <button type="submit" class="btn-pill btn-primary w-full justify-center mt-2" style="padding:10px 20px;">
           Apply Filters
         </button>
-        <button type="reset" onclick="resetFilters()" class="w-full text-center text-xs text-[#6B7280] hover:text-[#534AB7] mt-2 cursor-pointer" style="background:none;border:none;">
+        <button type="reset" onclick="resetFilters()" class="w-full text-center text-xs text-[#6B7280] hover:text-[#0A0A0A] mt-2 cursor-pointer" style="background:none;border:none;">
           Clear All
         </button>
       </form>
@@ -221,7 +221,7 @@
         </div>
       </div>
       {% empty %}
-      <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E4F0] w-full">
+      <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E5E2] w-full">
         <i data-lucide="bot-off" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
         No registered agents found in the marketplace.
       </div>

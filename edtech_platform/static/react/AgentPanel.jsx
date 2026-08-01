@@ -18,12 +18,12 @@ var h           = React.createElement;
 
 /* ---- colour palette ---- */
 var C = {
-  primary: '#534AB7', primaryLight: '#6B63C7',
-  accent: '#1D9E75', accentLight: '#25C290',
+  primary: '#0A0A0A', primaryLight: '#FFE000',
+  accent: '#FFE000', accentLight: '#0A0A0A',
   highlight: '#BA7517', error: '#E05252', errorLight: '#F07070',
-  bg: '#F8F7FF', card: '#FFFFFF', dark: '#1A1A2E',
-  textPrimary: '#1A1A2E', textSecondary: '#6B7280', textMuted: '#9CA3AF',
-  border: '#E5E4F0', borderLight: '#F0EFF5',
+  bg: '#FAFAF8', card: '#FFFFFF', dark: '#0A0A0A',
+  textPrimary: '#0A0A0A', textSecondary: '#6B7280', textMuted: '#9CA3AF',
+  border: '#E5E5E2', borderLight: '#F0F0EE',
 };
 
 /* ---- TypingIndicator ---- */
@@ -221,7 +221,7 @@ function AgentPanel(props) {
       case 'tool_result':
         return h('div', { key: msg.id, style: wrapper },
           h('div', { style: Object.assign({}, base, {
-            background: 'rgba(29,158,117,0.08)', border: '1px solid rgba(29,158,117,0.2)',
+            background: 'rgba(186, 117, 23,0.08)', border: '1px solid rgba(186, 117, 23,0.2)',
             fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: C.textPrimary,
           }) },
             h('div', { style: { fontSize: '10px', color: C.accent, marginBottom: '4px' } }, '✓ Tool Result'),
@@ -243,7 +243,7 @@ function AgentPanel(props) {
     style: {
       fontFamily: "'Inter', sans-serif",
       background: C.card, borderRadius: '12px',
-      boxShadow: '0 2px 12px rgba(83,74,183,0.08)',
+      boxShadow: '0 2px 12px rgba(10, 10, 10,0.08)',
       border: '1px solid ' + C.borderLight,
       display: 'flex', flexDirection: 'column',
       height: '520px', overflow: 'hidden',
