@@ -84,6 +84,7 @@
       background: var(--bg);
       color: var(--text-primary);
       transition: opacity 0.3s ease;
+      overflow-x: hidden;
     }
 
     /* ── Custom scrollbar ── */
@@ -299,6 +300,57 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
+
+    /* ── Mobile navigation drawer ── */
+    #sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      top: 64px;
+      background: rgba(10, 10, 10, 0.4);
+      z-index: 39;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    #sidebar-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 767px) {
+      #sidebar {
+        width: 260px !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: var(--shadow-hover);
+      }
+      #sidebar.sidebar-mobile-open {
+        transform: translateX(0);
+      }
+      #sidebar .sidebar-label {
+        opacity: 1 !important;
+        width: auto !important;
+        overflow: visible !important;
+      }
+      #sidebar-collapse-btn {
+        display: none;
+      }
+      #main-content {
+        margin-left: 0 !important;
+        padding: 16px !important;
+      }
+      #toast-container {
+        left: 16px !important;
+        right: 16px !important;
+        bottom: 16px !important;
+        align-items: stretch !important;
+      }
+      #toast-container > div {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -308,12 +360,17 @@
        TOP NAVIGATION BAR
        ════════════════════════════════════════════════════════════════════ -->
   <nav id="top-navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E5E2]" style="height:64px; box-shadow: var(--shadow);">
-    <div class="flex items-center justify-between h-full px-6">
+    <div class="flex items-center justify-between h-full px-4 md:px-6">
 
-      <!-- LEFT: Logo -->
-      <a href="/" class="logo-mark flex items-center select-none" style="text-decoration:none;">
-        <img src="{% static 'img/logo.png' %}" alt="EXcell.study" style="height:26px;width:auto;display:block;">
-      </a>
+      <!-- LEFT: Mobile menu toggle + Logo -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors" aria-label="Toggle menu">
+          <i data-lucide="menu" class="w-5 h-5 text-gray-600" id="mobile-menu-icon"></i>
+        </button>
+        <a href="/" class="logo-mark flex items-center select-none" style="text-decoration:none;">
+          <img src="{% static 'img/logo.png' %}" alt="EXcell.study" class="h-5 md:h-[26px] w-auto block">
+        </a>
+      </div>
 
       <!-- CENTER: Navigation links -->
       <div class="hidden md:flex items-center gap-1">
@@ -374,6 +431,11 @@
     </div>
   </nav>
 
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       MOBILE SIDEBAR BACKDROP
+       ════════════════════════════════════════════════════════════════════ -->
+  <div id="sidebar-backdrop" onclick="toggleMobileMenu()"></div>
 
   <!-- ════════════════════════════════════════════════════════════════════
        SIDEBAR
@@ -551,6 +613,32 @@
       // Re-render the collapse icon
       lucide.createIcons();
     }
+
+    // ── Mobile sidebar drawer toggle ──
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const icon = document.getElementById('mobile-menu-icon');
+      const isOpen = sidebar.classList.toggle('sidebar-mobile-open');
+      backdrop.classList.toggle('open', isOpen);
+      icon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      lucide.createIcons();
+    }
+
+    // Close the mobile drawer when a nav item is tapped or the viewport grows to desktop
+    document.querySelectorAll('.sidebar-nav-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('sidebar-mobile-open')) toggleMobileMenu();
+      });
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('sidebar-mobile-open')) toggleMobileMenu();
+      }
+    });
 
     // ── User dropdown toggle ──
     function toggleDropdown() {

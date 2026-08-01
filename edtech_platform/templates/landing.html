@@ -267,10 +267,13 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      .hero-content h1 { font-size: 2.5rem !important; }
+      .hero h1 { font-size: 2.5rem !important; }
+      .hero-scroll-hint { display: none !important; }
       .step-connector { display: none; }
       .agent-orbit-wrap { width: 280px; height: 280px; }
       .orbit-ring { width: 220px; height: 220px; margin: -110px 0 0 -110px; }
+      .terminal-mock { font-size: 0.625rem !important; padding: 14px !important; }
+      #landing-nav .max-w-7xl { height: 60px !important; }
     }
   </style>
 </head>
@@ -278,9 +281,9 @@
 
   <!-- ═══════ NAVBAR ═══════ -->
   <nav class="landing-nav" id="landing-nav">
-    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between" style="height:72px;">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between" style="height:72px;">
       <a href="/" class="logo-mark flex items-center select-none" style="text-decoration:none;">
-        <img src="{% static 'img/logo.png' %}" alt="EXcell.study" style="height:30px;width:auto;display:block;">
+        <img src="{% static 'img/logo.png' %}" alt="EXcell.study" class="h-6 md:h-[30px] w-auto block">
       </a>
 
       <div class="hidden md:flex items-center gap-8">
@@ -290,7 +293,7 @@
         <a href="#developers" class="text-sm font-medium text-gray-600 hover:text-[#0A0A0A] transition-colors">Developers</a>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3">
         {% if user.is_authenticated %}
           {% if user.developer_profile %}
             <a href="{% url 'developer:portal' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Developer Portal</a>
@@ -302,6 +305,34 @@
           <a href="{% url 'login' %}" class="btn btn-outline" style="padding:10px 24px; font-size:0.8125rem;">Log In</a>
           <a href="{% url 'signup' %}" class="btn btn-primary" style="padding:10px 24px; font-size:0.8125rem;">Get Started</a>
         {% endif %}
+      </div>
+
+      <!-- Mobile menu toggle -->
+      <button id="landing-mobile-btn" onclick="toggleLandingMenu()" class="md:hidden p-2 -mr-2 rounded-lg hover:bg-black/5 transition-colors" aria-label="Toggle menu">
+        <i data-lucide="menu" class="w-6 h-6" id="landing-mobile-icon"></i>
+      </button>
+    </div>
+
+    <!-- Mobile dropdown panel -->
+    <div id="landing-mobile-menu" class="md:hidden" style="max-height:0; overflow:hidden; transition:max-height 0.3s ease; background:#fff; border-top:1px solid var(--border);">
+      <div class="px-4 py-4 flex flex-col gap-1">
+        <a href="#features" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Features</a>
+        <a href="#how-it-works" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">How It Works</a>
+        <a href="#agents" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Agents</a>
+        <a href="#developers" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Developers</a>
+        <div class="flex flex-col gap-2 mt-3 pt-3" style="border-top:1px solid var(--border);">
+          {% if user.is_authenticated %}
+            {% if user.developer_profile %}
+              <a href="{% url 'developer:portal' %}" class="btn btn-primary justify-center w-full" style="padding:12px 24px; font-size:0.875rem;">Developer Portal</a>
+            {% else %}
+              <a href="{% url 'learner:dashboard' %}" class="btn btn-primary justify-center w-full" style="padding:12px 24px; font-size:0.875rem;">Dashboard</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="btn btn-outline justify-center w-full" style="padding:12px 24px; font-size:0.875rem;">Log Out</a>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline justify-center w-full" style="padding:12px 24px; font-size:0.875rem;">Log In</a>
+            <a href="{% url 'signup' %}" class="btn btn-primary justify-center w-full" style="padding:12px 24px; font-size:0.875rem;">Get Started</a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </nav>
@@ -382,7 +413,7 @@
     </div>
 
     <!-- Scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 anim-fade-up anim-delay-6 flex flex-col items-center gap-2">
+    <div class="hero-scroll-hint absolute bottom-8 left-1/2 -translate-x-1/2 anim-fade-up anim-delay-6 flex flex-col items-center gap-2">
       <span class="text-xs" style="color:var(--text-secondary);">Scroll to explore</span>
       <div style="width:24px;height:40px;border:2px solid var(--border);border-radius:12px;display:flex;justify-content:center;padding-top:8px;">
         <div style="width:4px;height:8px;border-radius:2px;background:var(--primary);animation:float 1.5s ease-in-out infinite;"></div>
@@ -640,7 +671,7 @@
       </div>
 
       <div class="reveal" style="transition-delay:0.2s;">
-        <div style="background:#0D0D1A; border-radius:var(--radius-card); padding:24px; border:1px solid rgba(255,255,255,0.06); font-family:'JetBrains Mono',monospace; font-size:0.8125rem; line-height:1.8; color:#e2e8f0; overflow-x:auto;">
+        <div class="terminal-mock" style="background:#0D0D1A; border-radius:var(--radius-card); padding:24px; border:1px solid rgba(255,255,255,0.06); font-family:'JetBrains Mono',monospace; font-size:0.8125rem; line-height:1.8; color:#e2e8f0; overflow-x:auto;">
           <div class="flex items-center gap-2 mb-4 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06);">
             <div style="width:12px;height:12px;border-radius:50%;background:#E05252;"></div>
             <div style="width:12px;height:12px;border-radius:50%;background:#BA7517;"></div>
@@ -732,6 +763,24 @@
     window.addEventListener('scroll', function() {
       var nav = document.getElementById('landing-nav');
       nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile nav dropdown
+    function toggleLandingMenu() {
+      var menu = document.getElementById('landing-mobile-menu');
+      var icon = document.getElementById('landing-mobile-icon');
+      var isOpen = menu.style.maxHeight && menu.style.maxHeight !== '0px';
+      menu.style.maxHeight = isOpen ? '0px' : menu.scrollHeight + 'px';
+      icon.setAttribute('data-lucide', isOpen ? 'menu' : 'x');
+      lucide.createIcons();
+    }
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        document.getElementById('landing-mobile-menu').style.maxHeight = '0px';
+        var icon = document.getElementById('landing-mobile-icon');
+        icon.setAttribute('data-lucide', 'menu');
+        lucide.createIcons();
+      }
     });
 
     // Intersection Observer for reveal animations
