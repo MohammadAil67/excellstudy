@@ -24,8 +24,8 @@
       --primary: #0A0A0A;
       --primary-light: #FFE000;
       --primary-dark: #000000;
-      --accent: #BA7517;
-      --accent-light: #0A0A0A;
+      --accent: #FFE000;
+      --accent-ink: #0A0A0A;
       --highlight: #BA7517;
       --highlight-light: #D4891E;
       --error: #E05252;
@@ -36,7 +36,9 @@
       --border: #E5E5E2;
       --shadow: 0 2px 12px rgba(10, 10, 10,0.08);
       --shadow-hover: 0 8px 24px rgba(10, 10, 10,0.15);
-      --radius-card: 12px;
+      --shadow-hard: 6px 6px 0 #0A0A0A;
+      --shadow-hard-sm: 4px 4px 0 #0A0A0A;
+      --radius-card: 16px;
       --radius-input: 8px;
       --radius-pill: 20px;
     }
@@ -132,60 +134,90 @@
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 14px 32px; border-radius: var(--radius-pill);
-      font-size: 0.9375rem; font-weight: 600; cursor: pointer;
-      transition: all 0.3s ease; text-decoration: none; border: none;
+      font-size: 0.9375rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+      text-decoration: none; border: 2px solid var(--primary);
     }
     .btn-primary {
       background: var(--primary); color: #fff;
-      box-shadow: 0 4px 20px rgba(10, 10, 10,0.3);
+      box-shadow: var(--shadow-hard);
     }
     .btn-primary:hover {
-      background: var(--primary-light);
+      background: var(--accent);
       color: var(--primary);
-      box-shadow: 0 8px 30px rgba(255, 224, 0, 0.45);
-      transform: translateY(-2px);
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #0A0A0A;
     }
     .btn-accent {
-      background: var(--accent); color: #fff;
-      box-shadow: 0 4px 20px rgba(186, 117, 23,0.3);
+      background: var(--accent); color: var(--accent-ink);
+      box-shadow: var(--shadow-hard);
     }
     .btn-accent:hover {
-      background: var(--accent-light);
-      box-shadow: 0 8px 30px rgba(186, 117, 23,0.4);
-      transform: translateY(-2px);
+      background: var(--primary);
+      color: #fff;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--accent);
     }
     .btn-outline {
       background: transparent; color: var(--primary);
-      border: 2px solid var(--border);
+      border: 2px solid var(--primary);
     }
     .btn-outline:hover {
-      border-color: var(--primary);
-      background: rgba(10, 10, 10,0.04);
-      transform: translateY(-2px);
+      background: var(--primary);
+      color: #fff;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--accent);
     }
 
     /* ── Feature Cards ── */
     .feature-card {
-      background: #fff; border: 1px solid var(--border);
+      background: #fff; border: 2px solid var(--primary);
       border-radius: var(--radius-card); padding: 32px;
-      transition: all 0.35s ease; position: relative; overflow: hidden;
-    }
-    .feature-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 4px; background: var(--primary);
-      transform: scaleX(0); transition: transform 0.35s ease;
-      transform-origin: left;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      position: relative; overflow: hidden;
+      box-shadow: var(--shadow-hard-sm);
     }
     .feature-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
+      transform: translate(-3px, -3px);
+      box-shadow: 7px 7px 0 #0A0A0A;
     }
-    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card.is-flagship {
+      background: var(--accent);
+    }
 
     .feature-icon {
-      width: 56px; height: 56px; border-radius: 14px;
+      width: 52px; height: 52px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 20px;
+      border: 2px solid var(--primary);
+    }
+
+    /* ── Highlight marker (yellow highlighter stroke behind text) ── */
+    .mark {
+      position: relative;
+      white-space: nowrap;
+    }
+    .mark::before {
+      content: '';
+      position: absolute;
+      left: -4px; right: -4px; bottom: 0.05em; top: 0.42em;
+      background: var(--accent);
+      z-index: -1;
+      transform: skewX(-6deg);
+    }
+
+    /* ── Chip badge (solid yellow, black text/border) ── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: var(--radius-pill);
+      font-size: 0.75rem; font-weight: 700;
+      background: var(--accent); color: var(--accent-ink);
+      border: 2px solid var(--primary);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .chip-dark {
+      background: var(--primary); color: var(--accent);
+      border: 2px solid var(--primary);
     }
 
     /* ── Step Cards ── */
@@ -193,55 +225,52 @@
       text-align: center; position: relative;
     }
     .step-number {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 52px; height: 52px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.25rem; font-weight: 800; margin: 0 auto 16px;
       position: relative; z-index: 2;
+      background: var(--primary); color: var(--accent);
+      border: 2px solid var(--primary);
     }
     .step-connector {
-      position: absolute; top: 24px; left: calc(50% + 28px);
-      width: calc(100% - 56px); height: 2px;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      opacity: 0.3;
-    }
-
-    /* ── Agent Showcase ── */
-    .agent-orbit-wrap {
-      position: relative; width: 360px; height: 360px;
-      margin: 0 auto;
-    }
-    .orbit-center {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 100px; height: 100px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 40px rgba(10, 10, 10,0.3);
-      z-index: 5;
-    }
-    .orbit-ring {
-      position: absolute; top: 50%; left: 50%;
-      width: 280px; height: 280px;
-      margin: -140px 0 0 -140px;
-      border-radius: 50%;
-      border: 1px dashed rgba(10, 10, 10,0.15);
-    }
-    .orbit-item {
-      position: absolute; top: 50%; left: 50%;
-      margin: -24px 0 0 -24px;
-      width: 48px; height: 48px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 700; color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 3;
+      position: absolute; top: 26px; left: calc(50% + 30px);
+      width: calc(100% - 60px); height: 3px;
+      background-image: linear-gradient(90deg, var(--primary) 50%, transparent 50%);
+      background-size: 14px 3px;
     }
 
     /* ── Stats ── */
     .stat-number {
-      font-size: 2.75rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; line-height: 1;
+      font-size: 3rem; font-weight: 800;
+      color: var(--primary); line-height: 1;
     }
+    .stat-underline {
+      width: 40px; height: 5px; background: var(--accent);
+      margin: 10px auto 0; border-radius: 3px;
+    }
+
+    /* ── Hero illustration frame ── */
+    .hero-illustration-frame {
+      position: relative;
+      background: #fff;
+      border: 3px solid var(--primary);
+      border-radius: 24px;
+      box-shadow: 10px 10px 0 var(--accent);
+      padding: 20px;
+      overflow: hidden;
+    }
+    .hero-illustration-frame img { display: block; width: 100%; height: auto; }
+    .hero-illustration-badge {
+      position: absolute; top: -18px; right: -18px;
+      width: 84px; height: 84px; border-radius: 50%;
+      background: var(--accent); border: 3px solid var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; font-size: 0.6rem; font-weight: 800;
+      line-height: 1.15; letter-spacing: -0.01em;
+      color: var(--primary);
+      animation: spin-slow 14s linear infinite;
+    }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     /* ── Navbar ── */
     .landing-nav {
@@ -258,6 +287,30 @@
     .logo-mark img { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .logo-mark:hover img { transform: scale(1.045) rotate(-1deg); }
 
+    /* ── Marquee ticker ── */
+    .marquee-strip {
+      background: var(--primary); overflow: hidden; padding: 14px 0;
+      border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary);
+    }
+    .marquee-track {
+      display: inline-flex; white-space: nowrap;
+      animation: marquee-scroll 28s linear infinite;
+      will-change: transform;
+    }
+    .marquee-item {
+      display: inline-block; padding: 0 20px;
+      font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.02em;
+      color: #fff;
+    }
+    .marquee-item:nth-child(2n) { color: var(--accent); }
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track { animation: none; }
+    }
+
     /* ── Footer ── */
     .footer {
       background: #0A0A0A; color: #9CA3AF; padding: 60px 0 30px;
@@ -267,13 +320,12 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2.5rem !important; }
+      .hero h1 { font-size: 2.75rem !important; }
       .hero-scroll-hint { display: none !important; }
       .step-connector { display: none; }
-      .agent-orbit-wrap { width: 280px; height: 280px; }
-      .orbit-ring { width: 220px; height: 220px; margin: -110px 0 0 -110px; }
       .terminal-mock { font-size: 0.625rem !important; padding: 14px !important; }
       #landing-nav .max-w-7xl { height: 60px !important; }
+      .hero-illustration-badge { width: 66px; height: 66px; font-size: 0.5rem; top: -12px; right: -12px; }
     }
   </style>
 </head>
@@ -349,14 +401,14 @@
 
       <!-- Left: Text -->
       <div>
-        <div class="anim-fade-up anim-delay-1 inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:rgba(10, 10, 10,0.08); border:1px solid rgba(10, 10, 10,0.15);">
-          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
-          <span class="text-sm font-semibold" style="color:var(--primary);">Now in Open Beta</span>
+        <div class="anim-fade-up anim-delay-1 chip mb-6">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--primary);display:inline-block;"></span>
+          Now in Open Beta
         </div>
 
-        <h1 class="anim-fade-up anim-delay-2" style="font-size:3.5rem; font-weight:800; line-height:1.1; letter-spacing:-0.03em; margin-bottom:24px;">
+        <h1 class="anim-fade-up anim-delay-2" style="font-size:clamp(2.75rem, 5.5vw, 4.25rem); font-weight:800; line-height:1.05; letter-spacing:-0.03em; margin-bottom:24px;">
           Learning that<br>
-          <span style="background:linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">adapts to you</span>
+          <span class="mark">adapts to you</span>
         </h1>
 
         <p class="anim-fade-up anim-delay-3 text-lg mb-8" style="color:var(--text-secondary); max-width:480px; line-height:1.7;">
@@ -387,27 +439,13 @@
       </div>
 
       <!-- Right: Visual -->
-      <div class="anim-fade-up anim-delay-3 hidden lg:block">
-        <div class="agent-orbit-wrap" style="animation: float 6s ease-in-out infinite;">
-          <!-- Center logo -->
-          <div class="orbit-center">
-            <span style="font-family:'Inter',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-0.03em;color:#fff;">EX</span>
-          </div>
-          <!-- Orbit ring -->
-          <div class="orbit-ring"></div>
-          <!-- Orbiting agents -->
-          <div class="orbit-item" style="background:#0A0A0A; animation: orbit 12s linear infinite;">
-            <i data-lucide="brain" class="w-5 h-5"></i>
-          </div>
-          <div class="orbit-item" style="background:#FFE000; animation: orbit 12s linear infinite 3s;">
-            <i data-lucide="flask-conical" class="w-5 h-5" style="color:#0A0A0A;"></i>
-          </div>
-          <div class="orbit-item" style="background:#BA7517; animation: orbit 12s linear infinite 6s;">
-            <i data-lucide="code" class="w-5 h-5"></i>
-          </div>
-          <div class="orbit-item" style="background:#3F3F46; animation: orbit 12s linear infinite 9s;">
-            <i data-lucide="book-open" class="w-5 h-5"></i>
-          </div>
+      <div class="anim-fade-up anim-delay-3 hidden lg:block" style="max-width:420px; margin:0 auto;">
+        <div class="hero-illustration-frame" style="animation: float 6s ease-in-out infinite;">
+          <picture>
+            <source srcset="{% static 'img/hero_illustration.webp' %}" type="image/webp">
+            <img src="{% static 'img/hero_illustration.png' %}" alt="Student learning with an AI teaching agent" width="840" height="863" loading="eager">
+          </picture>
+          <div class="hero-illustration-badge">AI<br>Powered</div>
         </div>
       </div>
     </div>
@@ -422,20 +460,31 @@
   </section>
 
 
+  <!-- ═══════ MARQUEE TICKER ═══════ -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span class="marquee-item">Mathematics</span><span class="marquee-item">★</span><span class="marquee-item">Science</span><span class="marquee-item">★</span><span class="marquee-item">English</span><span class="marquee-item">★</span><span class="marquee-item">History</span><span class="marquee-item">★</span><span class="marquee-item">Computer Science</span><span class="marquee-item">★</span><span class="marquee-item">Creative Writing</span><span class="marquee-item">★</span><span class="marquee-item">Test Prep</span><span class="marquee-item">★</span><span class="marquee-item">Mathematics</span><span class="marquee-item">★</span><span class="marquee-item">Science</span><span class="marquee-item">★</span><span class="marquee-item">English</span><span class="marquee-item">★</span><span class="marquee-item">History</span><span class="marquee-item">★</span><span class="marquee-item">Computer Science</span><span class="marquee-item">★</span><span class="marquee-item">Creative Writing</span><span class="marquee-item">★</span><span class="marquee-item">Test Prep</span><span class="marquee-item">★</span>
+    </div>
+  </div>
+
+
   <!-- ═══════ STATS BAR ═══════ -->
   <section style="background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
     <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
       <div class="reveal">
         <div class="stat-number">{{ learners_display }}</div>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Active Learners</p>
+        <div class="stat-underline"></div>
+        <p class="text-sm mt-3" style="color:var(--text-secondary);">Active Learners</p>
       </div>
       <div class="reveal" style="transition-delay:0.1s;">
         <div class="stat-number">{{ agents_display }}</div>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">AI Agents</p>
+        <div class="stat-underline"></div>
+        <p class="text-sm mt-3" style="color:var(--text-secondary);">AI Agents</p>
       </div>
       <div class="reveal" style="transition-delay:0.2s;">
         <div class="stat-number">{{ total_subjects }}</div>
-        <p class="text-sm mt-2" style="color:var(--text-secondary);">Subject Areas</p>
+        <div class="stat-underline"></div>
+        <p class="text-sm mt-3" style="color:var(--text-secondary);">Subject Areas</p>
       </div>
     </div>
   </section>
@@ -445,10 +494,10 @@
   <section id="features" class="py-24">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(186, 117, 23,0.1); color:var(--accent);">
+        <span class="chip mb-4">
           <i data-lucide="layers" class="w-3.5 h-3.5"></i> Platform Features
         </span>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Everything you need to <span style="color:var(--primary);">excel</span></h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Everything you need to <span class="mark">excel</span></h2>
         <p class="text-base mx-auto" style="color:var(--text-secondary); max-width:560px;">
           A comprehensive ecosystem where AI agents, learners, and developers come together to create personalized learning experiences.
         </p>
@@ -456,18 +505,18 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        <div class="feature-card reveal">
-          <div class="feature-icon" style="background:rgba(10, 10, 10,0.1);">
+        <div class="feature-card reveal is-flagship">
+          <div class="feature-icon" style="background:#fff;">
             <i data-lucide="brain" class="w-7 h-7" style="color:var(--primary);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Adaptive AI Tutoring</h3>
-          <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
+          <p class="text-sm" style="color:#1A1A1A; line-height:1.7;">
             AI agents adjust difficulty, pace, and teaching style in real-time based on each learner's profile.
           </p>
         </div>
 
         <div class="feature-card reveal" style="transition-delay:0.1s;">
-          <div class="feature-icon" style="background:rgba(186, 117, 23,0.1);">
+          <div class="feature-icon" style="background:var(--primary);">
             <i data-lucide="store" class="w-7 h-7" style="color:var(--accent);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Agent Marketplace</h3>
@@ -477,17 +526,17 @@
         </div>
 
         <div class="feature-card reveal" style="transition-delay:0.2s;">
-          <div class="feature-icon" style="background:rgba(186,117,23,0.1);">
-            <i data-lucide="code-2" class="w-7 h-7" style="color:var(--highlight);"></i>
+          <div class="feature-icon" style="background:var(--primary);">
+            <i data-lucide="code-2" class="w-7 h-7" style="color:var(--accent);"></i>
           </div>
-          <h3 class="text-lg font-bold mb-2">Visual Playground <span style="background:rgba(10, 10, 10,0.1); color:var(--primary); font-size:0.65rem; padding:2px 8px; border-radius:12px; margin-left:4px; font-weight:600;">Coming Soon</span></h3>
+          <h3 class="text-lg font-bold mb-2">Visual Playground <span class="chip-dark" style="padding:2px 8px; font-size:0.6rem; border-radius:12px; margin-left:2px;">Soon</span></h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
             Build and test agent workflows with a drag-and-drop canvas — no coding required.
           </p>
         </div>
 
         <div class="feature-card reveal" style="transition-delay:0.3s;">
-          <div class="feature-icon" style="background:rgba(224,82,82,0.1);">
+          <div class="feature-icon" style="background:#fff; border-color:var(--error);">
             <i data-lucide="shield-check" class="w-7 h-7" style="color:var(--error);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Safety Pipeline</h3>
@@ -504,16 +553,16 @@
   <section id="how-it-works" class="py-24" style="background:#fff;">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(10, 10, 10,0.1); color:var(--primary);">
+        <span class="chip mb-4">
           <i data-lucide="zap" class="w-3.5 h-3.5"></i> How It Works
         </span>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Start learning in <span style="color:var(--accent);">3 steps</span></h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Start learning in <span class="mark">3 steps</span></h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
         <div class="step-card reveal">
           <div class="step-connector hidden md:block"></div>
-          <div class="step-number" style="background:rgba(10, 10, 10,0.1); color:var(--primary);">1</div>
+          <div class="step-number">1</div>
           <i data-lucide="user-plus" class="w-10 h-10 mx-auto mb-4" style="color:var(--primary);"></i>
           <h3 class="text-lg font-bold mb-2">Create Your Profile</h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
@@ -523,8 +572,8 @@
 
         <div class="step-card reveal" style="transition-delay:0.15s;">
           <div class="step-connector hidden md:block"></div>
-          <div class="step-number" style="background:rgba(186, 117, 23,0.1); color:var(--accent);">2</div>
-          <i data-lucide="bot" class="w-10 h-10 mx-auto mb-4" style="color:var(--accent);"></i>
+          <div class="step-number">2</div>
+          <i data-lucide="bot" class="w-10 h-10 mx-auto mb-4" style="color:var(--primary);"></i>
           <h3 class="text-lg font-bold mb-2">Meet Your Agents</h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
             We match you with AI agents that specialize in your subjects and adapt to your learning style.
@@ -532,8 +581,8 @@
         </div>
 
         <div class="step-card reveal" style="transition-delay:0.3s;">
-          <div class="step-number" style="background:rgba(186,117,23,0.1); color:var(--highlight);">3</div>
-          <i data-lucide="trending-up" class="w-10 h-10 mx-auto mb-4" style="color:var(--highlight);"></i>
+          <div class="step-number">3</div>
+          <i data-lucide="trending-up" class="w-10 h-10 mx-auto mb-4" style="color:var(--primary);"></i>
           <h3 class="text-lg font-bold mb-2">Learn & Grow</h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
             Work through modules, get real-time feedback, track your progress, and watch your skills level up.
@@ -548,19 +597,19 @@
   <section id="coming-soon" class="py-24" style="background:#FAFAF8;">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(186,117,23,0.1); color:var(--highlight);">
+        <span class="chip mb-4">
           <i data-lucide="clock" class="w-3.5 h-3.5"></i> Coming Soon
         </span>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Next generation <span style="color:var(--primary);">AI features</span></h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Next generation <span class="mark">AI features</span></h2>
         <p class="text-base mx-auto" style="color:var(--text-secondary); max-width:560px;">
           We are constantly building new ways to enhance teaching and learning. Here is what is arriving in our next major release.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="feature-card reveal" style="background:#fff; border:1px solid rgba(10, 10, 10,0.08);">
-          <div class="feature-icon mb-4" style="background:rgba(186,117,23,0.1);">
-            <i data-lucide="code-2" class="w-7 h-7" style="color:var(--highlight);"></i>
+        <div class="feature-card reveal">
+          <div class="feature-icon mb-4" style="background:#fff;">
+            <i data-lucide="code-2" class="w-7 h-7" style="color:var(--primary);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Visual Playground</h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
@@ -568,8 +617,8 @@
           </p>
         </div>
 
-        <div class="feature-card reveal" style="background:#fff; border:1px solid rgba(10, 10, 10,0.08); transition-delay:0.15s;">
-          <div class="feature-icon mb-4" style="background:rgba(10, 10, 10,0.1);">
+        <div class="feature-card reveal" style="transition-delay:0.15s;">
+          <div class="feature-icon mb-4" style="background:#fff;">
             <i data-lucide="users" class="w-7 h-7" style="color:var(--primary);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Multi-Agent Sessions</h3>
@@ -578,9 +627,9 @@
           </p>
         </div>
 
-        <div class="feature-card reveal" style="background:#fff; border:1px solid rgba(10, 10, 10,0.08); transition-delay:0.3s;">
-          <div class="feature-icon mb-4" style="background:rgba(186, 117, 23,0.1);">
-            <i data-lucide="mic" class="w-7 h-7" style="color:var(--accent);"></i>
+        <div class="feature-card reveal" style="transition-delay:0.3s;">
+          <div class="feature-icon mb-4" style="background:#fff;">
+            <i data-lucide="mic" class="w-7 h-7" style="color:var(--primary);"></i>
           </div>
           <h3 class="text-lg font-bold mb-2">Voice & Sketch Input</h3>
           <p class="text-sm" style="color:var(--text-secondary); line-height:1.7;">
@@ -596,10 +645,10 @@
   <section id="agents" class="py-24">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
-        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style="background:rgba(186,117,23,0.1); color:var(--highlight);">
+        <span class="chip mb-4">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Featured Agents
         </span>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Meet your AI <span style="color:var(--primary);">teaching team</span></h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">Meet your AI <span class="mark">teaching team</span></h2>
         <p class="text-base mx-auto" style="color:var(--text-secondary); max-width:480px;">
           Specialized agents built by top educators and developers, ready to help you excel.
         </p>
@@ -607,10 +656,10 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for agent in featured_agents %}
-        <div class="feature-card reveal" style="border-left:4px solid var(--primary);">
+        <div class="feature-card reveal">
           <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(10, 10, 10,0.1);">
-              <i data-lucide="bot" class="w-6 h-6" style="color:var(--primary);"></i>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:var(--primary); border:2px solid var(--primary);">
+              <i data-lucide="bot" class="w-6 h-6" style="color:var(--accent);"></i>
             </div>
             <div>
               <h3 class="font-bold">{{ agent.name }}</h3>
@@ -626,11 +675,11 @@
           </p>
           <div class="flex items-center justify-between">
             <div class="flex gap-0.5 text-sm" style="color:#F59E0B;">★★★★★</div>
-            <span class="text-sm font-semibold" style="color:var(--accent);">Free</span>
+            <span class="text-xs font-bold" style="background:var(--accent); color:var(--accent-ink); padding:3px 10px; border-radius:20px; border:1.5px solid var(--primary);">Free</span>
           </div>
         </div>
         {% empty %}
-        <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-lg border border-[#E5E5E2] w-full">
+        <div class="col-span-3 text-center p-8 text-[#6B7280] bg-white rounded-2xl border-2 border-[#0A0A0A] w-full">
           <i data-lucide="bot-off" class="w-8 h-8 mx-auto mb-2 text-[#9CA3AF]"></i>
           <p class="text-sm text-gray-500">No active agents currently featured. Explore our marketplace to discover available agents.</p>
         </div>
@@ -651,7 +700,7 @@
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
       <div class="reveal">
-        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-6" style="background:rgba(255,224,0,0.12); border:1px solid rgba(255,224,0,0.3); color:var(--primary-light);">
+        <span class="chip mb-6">
           <i data-lucide="terminal" class="w-3.5 h-3.5"></i> For Developers
         </span>
         <h2 class="text-3xl md:text-4xl font-bold text-white mb-4" style="letter-spacing:-0.02em;">
@@ -695,7 +744,7 @@
   <section class="py-24 text-center">
     <div class="max-w-3xl mx-auto px-6 reveal">
       <h2 class="text-3xl md:text-4xl font-bold mb-4" style="letter-spacing:-0.02em;">
-        Ready to <span style="background:linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">transform</span> your learning?
+        Ready to <span class="mark">transform</span> your learning?
       </h2>
       <p class="text-base mb-8" style="color:var(--text-secondary); max-width:480px; margin:0 auto;">
         Join thousands of learners and developers building the future of education.
