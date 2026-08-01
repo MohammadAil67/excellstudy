@@ -39,7 +39,7 @@
     transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 2px;
   }
   .toc-link:hover, .toc-link.active {
-    color: #1D9E75; background: rgba(29,158,117,0.06); border-left-color: #1D9E75;
+    color: #BA7517; background: rgba(186, 117, 23,0.06); border-left-color: #BA7517;
   }
   .toc-link.sub { padding-left: 22px; font-size: 0.775rem; }
 
@@ -51,7 +51,7 @@
 
   .section-label {
     font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.12em; color: #1D9E75; margin-bottom: 6px;
+    letter-spacing: 0.12em; color: #BA7517; margin-bottom: 6px;
   }
   .section-title {
     font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;
@@ -66,14 +66,14 @@
 
   /* Code block */
   .code-block {
-    background: #1A1A2E; border-radius: 10px; padding: 20px 22px;
+    background: #0A0A0A; border-radius: 10px; padding: 20px 22px;
     overflow-x: auto; position: relative;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 0.785rem; line-height: 1.85; color: #e2e8f0; margin: 14px 0;
     white-space: pre;
   }
   .code-block .comment { color: #6B7280; }
-  .code-block .cmd     { color: #1D9E75; }
+  .code-block .cmd     { color: #FFE000; }
   .code-block .flag    { color: #FDE68A; }
   .code-block .url     { color: #93C5FD; }
   .code-block .str     { color: #86EFAC; }
@@ -95,12 +95,12 @@
     margin: 14px 0; font-size: 0.875rem; line-height: 1.6;
   }
   .callout-warn  { background: rgba(186,117,23,0.08);  border: 1px solid rgba(186,117,23,0.25); color: #7a4208; }
-  .callout-info  { background: rgba(83,74,183,0.07);   border: 1px solid rgba(83,74,183,0.2);  color: #3D3590; }
-  .callout-tip   { background: rgba(29,158,117,0.07);  border: 1px solid rgba(29,158,117,0.2); color: #0f5c3d; }
+  .callout-info  { background: rgba(10, 10, 10,0.07);   border: 1px solid rgba(10, 10, 10,0.2);  color: #000000; }
+  .callout-tip   { background: rgba(186, 117, 23,0.07);  border: 1px solid rgba(186, 117, 23,0.2); color: #0f5c3d; }
   .callout strong { display: block; margin-bottom: 3px; }
 
   code.inline {
-    background: rgba(83,74,183,0.08); color: var(--primary);
+    background: rgba(10, 10, 10,0.08); color: var(--primary);
     padding: 2px 7px; border-radius: 4px; font-size: 0.8rem;
     font-family: 'JetBrains Mono', monospace;
   }
@@ -109,16 +109,16 @@
   .deploy-steps { position: relative; padding-left: 52px; }
   .deploy-steps::before {
     content: ''; position: absolute; left: 20px; top: 28px; bottom: 28px;
-    width: 2px; background: linear-gradient(to bottom, #1D9E75 0%, rgba(83,74,183,0.3) 100%);
+    width: 2px; background: linear-gradient(to bottom, #FFE000 0%, rgba(10, 10, 10,0.3) 100%);
   }
   .deploy-step { position: relative; margin-bottom: 28px; scroll-margin-top: 90px; }
   .step-bubble {
     position: absolute; left: -52px; top: 6px;
     width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, #1D9E75, #0f5c3d);
+    background: linear-gradient(135deg, #0A0A0A, #2A2A2A);
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; font-size: 0.875rem; color: #fff;
-    box-shadow: 0 4px 12px rgba(29,158,117,0.3); z-index: 2;
+    box-shadow: 0 4px 12px rgba(186, 117, 23,0.3); z-index: 2;
   }
   .step-card {
     background: #fff; border: 1px solid var(--border);
@@ -163,14 +163,14 @@
   .register-steps li::before {
     content: counter(rs); position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
     width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(29,158,117,0.12); color: #1D9E75;
+    background: rgba(186, 117, 23,0.12); color: #BA7517;
     font-weight: 700; font-size: 0.75rem;
     display: flex; align-items: center; justify-content: center;
   }
 
   /* Hero */
   .guide-hero {
-    background: linear-gradient(135deg, #1D9E75 0%, #0f5c3d 100%);
+    background: linear-gradient(135deg, #0A0A0A 0%, #2A2A2A 100%);
     border-radius: var(--radius-card); padding: 32px 36px; color: #fff;
     margin-bottom: 40px; position: relative; overflow: hidden;
     animation: fadeInUp 0.4s ease both;
@@ -190,8 +190,8 @@
 
   /* CTA */
   .cta-bar {
-    background: linear-gradient(135deg, rgba(29,158,117,0.07), rgba(83,74,183,0.04));
-    border: 1px solid rgba(29,158,117,0.18); border-radius: var(--radius-card);
+    background: linear-gradient(135deg, rgba(186, 117, 23,0.07), rgba(10, 10, 10,0.04));
+    border: 1px solid rgba(186, 117, 23,0.18); border-radius: var(--radius-card);
     padding: 24px 28px; display: flex; align-items: center;
     justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 40px;
   }
@@ -367,8 +367,8 @@
           <!-- Pipeline flow -->
           <div class="pipeline-flow" id="pipeline-stages" style="scroll-margin-top:90px;">
             <div class="flow-node">
-              <div class="flow-node-icon" style="background:rgba(83,74,183,0.1);">
-                <i data-lucide="file-check-2" style="width:16px;height:16px;color:#534AB7;"></i>
+              <div class="flow-node-icon" style="background:rgba(10, 10, 10,0.1);">
+                <i data-lucide="file-check-2" style="width:16px;height:16px;color:#0A0A0A;"></i>
               </div>
               <div class="flow-node-label">1. Schema Check</div>
               <div class="flow-node-sub">manifest.json vs. portal registration</div>
@@ -383,26 +383,26 @@
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-node">
-              <div class="flow-node-icon" style="background:rgba(29,158,117,0.1);">
-                <i data-lucide="flask-conical" style="width:16px;height:16px;color:#1D9E75;"></i>
+              <div class="flow-node-icon" style="background:rgba(186, 117, 23,0.1);">
+                <i data-lucide="flask-conical" style="width:16px;height:16px;color:#BA7517;"></i>
               </div>
               <div class="flow-node-label">3. Smoke Test</div>
               <div class="flow-node-sub">/health + /invoke with synthetic request</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-node">
-              <div class="flow-node-icon" style="background:rgba(29,158,117,0.1);">
-                <i data-lucide="server" style="width:16px;height:16px;color:#1D9E75;"></i>
+              <div class="flow-node-icon" style="background:rgba(186, 117, 23,0.1);">
+                <i data-lucide="server" style="width:16px;height:16px;color:#BA7517;"></i>
               </div>
               <div class="flow-node-label">4. Deploy</div>
               <div class="flow-node-sub">Isolated, quota-limited namespace</div>
             </div>
             <div class="flow-arrow">→</div>
-            <div class="flow-node" style="border-color:rgba(29,158,117,0.35);">
-              <div class="flow-node-icon" style="background:rgba(29,158,117,0.15);">
-                <i data-lucide="rocket" style="width:16px;height:16px;color:#1D9E75;"></i>
+            <div class="flow-node" style="border-color:rgba(186, 117, 23,0.35);">
+              <div class="flow-node-icon" style="background:rgba(186, 117, 23,0.15);">
+                <i data-lucide="rocket" style="width:16px;height:16px;color:#BA7517;"></i>
               </div>
-              <div class="flow-node-label" style="color:#1D9E75; font-weight:700;">Live</div>
+              <div class="flow-node-label" style="color:#1F8A55; font-weight:700;">Live</div>
               <div class="flow-node-sub">at /agents/{your-slug}/</div>
             </div>
           </div>

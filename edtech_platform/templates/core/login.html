@@ -1,10 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Log In — ExcellStudy</title>
-  
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,25 +20,30 @@
 
   <style>
     :root {
-      --primary: #534AB7;
-      --primary-light: #6B63C7;
-      --primary-dark: #3D3590;
-      --accent: #1D9E75;
-      --accent-light: #25C290;
-      --bg: #F8F7FF;
+      --primary: #0A0A0A;
+      --primary-light: #FFE000;
+      --primary-dark: #000000;
+      --accent: #BA7517;
+      --accent-light: #0A0A0A;
+      --bg: #FAFAF8;
       --bg-card: #FFFFFF;
-      --text-primary: #1A1A2E;
+      --text-primary: #0A0A0A;
       --text-secondary: #6B7280;
-      --border: #E5E4F0;
-      --shadow: 0 4px 20px rgba(83, 74, 183, 0.08);
+      --border: #E5E5E2;
+      --shadow: 0 4px 20px rgba(10, 10, 10, 0.08);
       --radius-card: 12px;
       --radius-input: 8px;
+    }
+
+    html {
+      overflow-x: hidden;
     }
 
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text-primary);
+      overflow-x: hidden;
     }
 
     .login-container {
@@ -59,8 +66,11 @@
     }
     .input-field:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+      box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.12);
     }
+
+    .logo-mark img { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .logo-mark:hover img { transform: scale(1.045) rotate(-1deg); }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
@@ -69,19 +79,11 @@
   <div class="absolute w-[400px] h-[400px] rounded-full filter blur-[100px] opacity-20 pointer-events-none -top-20 -left-20" style="background:var(--primary);"></div>
   <div class="absolute w-[400px] h-[400px] rounded-full filter blur-[100px] opacity-20 pointer-events-none -bottom-20 -right-20" style="background:var(--accent);"></div>
 
-  <div class="login-container w-full max-w-[420px] bg-white rounded-2xl border border-[#E5E4F0] p-8 relative z-10" style="box-shadow: var(--shadow);">
+  <div class="login-container w-full max-w-[420px] bg-white rounded-2xl border border-[#E5E5E2] p-8 relative z-10" style="box-shadow: var(--shadow);">
     
     <!-- Header Logo -->
-    <a href="/" class="flex items-center justify-center gap-2 select-none mb-8" style="text-decoration:none;">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
-        <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
-        <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
-      </svg>
-      <span class="text-xl tracking-tight">
-        <span class="font-bold" style="color:#534AB7;">Excell</span><span class="font-bold" style="color:#1D9E75;">Study</span>
-      </span>
+    <a href="/" class="logo-mark flex items-center justify-center select-none mb-8" style="text-decoration:none;">
+      <img src="{% static 'img/logo.png' %}" alt="EXcell.study" style="height:30px;width:auto;display:block;">
     </a>
 
     <h2 class="text-xl font-bold text-center mb-1">Welcome back</h2>
@@ -124,12 +126,12 @@
         </div>
       </div>
 
-      <button type="submit" class="w-full py-3 rounded-lg text-sm font-bold text-white transition-all select-none hover:shadow-lg mt-2" style="background:var(--primary); box-shadow: 0 4px 14px rgba(83, 74, 183, 0.2);">
+      <button type="submit" class="w-full py-3 rounded-lg text-sm font-bold text-white transition-all select-none hover:shadow-lg mt-2" style="background:var(--primary); box-shadow: 0 4px 14px rgba(10, 10, 10, 0.2);">
         Log In
       </button>
     </form>
 
-    <div class="mt-6 pt-6 border-t border-[#E5E4F0] text-center text-xs text-gray-500">
+    <div class="mt-6 pt-6 border-t border-[#E5E5E2] text-center text-xs text-gray-500">
       Don't have an account? 
       <a href="{% url 'signup' %}" class="font-semibold transition-colors hover:underline" style="color:var(--primary);">Sign Up</a>
     </div>
