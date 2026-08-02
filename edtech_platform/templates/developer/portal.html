@@ -17,7 +17,7 @@
   }
 
   .code-block {
-    background: #1A1A2E;
+    background: #0A0A0A;
     border-radius: var(--radius-card);
     padding: 20px 24px;
     overflow-x: auto;
@@ -28,7 +28,7 @@
     color: #e2e8f0;
   }
   .code-block .comment { color: #6B7280; }
-  .code-block .cmd { color: #1D9E75; }
+  .code-block .cmd { color: #FFE000; }
   .code-block .flag { color: #BA7517; }
   .code-block .url { color: #8B5CF6; }
 
@@ -70,7 +70,7 @@
     font-size: 0.875rem; color: var(--text-primary);
   }
   .agent-table tr { transition: background 0.15s ease; }
-  .agent-table tbody tr:hover { background: rgba(83,74,183,0.03); }
+  .agent-table tbody tr:hover { background: rgba(10, 10, 10,0.03); }
 
   .step-number {
     width: 32px; height: 32px; border-radius: 50%; display: flex;
@@ -112,7 +112,7 @@
 <div class="portal-section mb-6">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-[#1A1A2E]">Developer Portal</h1>
+      <h1 class="text-2xl font-bold text-[#0A0A0A]">Developer Portal</h1>
       <p class="text-sm text-[#6B7280] mt-1">Manage your agents, API keys, and deployments</p>
     </div>
     <div class="flex items-center gap-2">
@@ -149,11 +149,11 @@
       <!-- Steps -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
         <div class="flex items-center gap-3">
-          <div class="step-number" style="background:rgba(83,74,183,0.1); color:var(--primary);">1</div>
+          <div class="step-number" style="background:rgba(10, 10, 10,0.1); color:var(--primary);">1</div>
           <span class="text-sm font-medium">Build image</span>
         </div>
         <div class="flex items-center gap-3">
-          <div class="step-number" style="background:rgba(29,158,117,0.1); color:var(--accent);">2</div>
+          <div class="step-number" style="background:rgba(186, 117, 23,0.1); color:var(--accent);">2</div>
           <span class="text-sm font-medium">Push to registry</span>
         </div>
         <div class="flex items-center gap-3">
@@ -277,7 +277,7 @@
       <form method="POST" action="{% url 'developer:update-github-username' %}" class="flex items-center gap-2">
         {% csrf_token %}
         <div class="relative flex-1">
-          <input type="text" name="github_username" value="{{ developer.github_username }}" placeholder="{{ developer.gh_username }}" class="w-full text-xs font-mono px-3 py-2 border rounded-lg focus:outline-none focus:border-[#534AB7]" style="border-color:var(--border);">
+          <input type="text" name="github_username" value="{{ developer.github_username }}" placeholder="{{ developer.gh_username }}" class="w-full text-xs font-mono px-3 py-2 border rounded-lg focus:outline-none focus:border-[#0A0A0A]" style="border-color:var(--border);">
         </div>
         <button type="submit" class="btn btn-primary text-xs py-2 px-3">Save</button>
       </form>
@@ -288,17 +288,17 @@
     <div class="card portal-section" style="padding:20px;">
       <h3 class="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Documentation</h3>
       <div class="space-y-2">
-        <a href="{% url 'developer:creation-guide' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#F8F7FF] transition-colors">
+        <a href="{% url 'developer:creation-guide' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
           <i data-lucide="book" class="w-4 h-4" style="color:var(--primary);"></i>
           <span class="text-sm font-medium">Agent Creation Guide</span>
           <i data-lucide="external-link" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>
         </a>
-        <a href="{% url 'developer:deploy-guide' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#F8F7FF] transition-colors">
+        <a href="{% url 'developer:deploy-guide' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
           <i data-lucide="rocket" class="w-4 h-4" style="color:var(--accent);"></i>
           <span class="text-sm font-medium">Push &amp; Deploy Guide</span>
           <i data-lucide="external-link" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>
         </a>
-        <a href="{% url 'developer:deploy-guide' %}#b8" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#F8F7FF] transition-colors">
+        <a href="{% url 'developer:deploy-guide' %}#b8" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
           <i data-lucide="terminal" class="w-4 h-4" style="color:var(--highlight);"></i>
           <span class="text-sm font-medium">End-to-End Verification</span>
           <i data-lucide="external-link" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>

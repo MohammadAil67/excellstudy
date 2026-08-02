@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}ExcellStudy{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,21 +27,21 @@
   <style>
     /* ── CSS Variables ── */
     :root {
-      --primary: #534AB7;
-      --primary-light: #6B63C7;
-      --primary-dark: #3D3590;
-      --accent: #1D9E75;
-      --accent-light: #25C290;
+      --primary: #0A0A0A;
+      --primary-light: #FFE000;
+      --primary-dark: #000000;
+      --accent: #BA7517;
+      --accent-light: #0A0A0A;
       --highlight: #BA7517;
       --highlight-light: #D4891E;
       --error: #E05252;
-      --bg: #F8F7FF;
+      --bg: #FAFAF8;
       --bg-card: #FFFFFF;
-      --text-primary: #1A1A2E;
+      --text-primary: #0A0A0A;
       --text-secondary: #6B7280;
-      --border: #E5E4F0;
-      --shadow: 0 2px 12px rgba(83,74,183,0.08);
-      --shadow-hover: 0 8px 24px rgba(83,74,183,0.15);
+      --border: #E5E5E2;
+      --shadow: 0 2px 12px rgba(10, 10, 10,0.08);
+      --shadow-hover: 0 8px 24px rgba(10, 10, 10,0.15);
       --radius-card: 12px;
       --radius-input: 8px;
       --radius-pill: 20px;
@@ -83,17 +84,18 @@
       background: var(--bg);
       color: var(--text-primary);
       transition: opacity 0.3s ease;
+      overflow-x: hidden;
     }
 
     /* ── Custom scrollbar ── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb {
-      background: rgba(83, 74, 183, 0.2);
+      background: rgba(10, 10, 10, 0.2);
       border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(83, 74, 183, 0.35);
+      background: rgba(10, 10, 10, 0.35);
     }
 
     /* ── Interactive element transitions ── */
@@ -102,6 +104,10 @@
                   border-color 0.2s ease, box-shadow 0.2s ease,
                   transform 0.15s ease, opacity 0.2s ease;
     }
+
+    /* ── Logo micro-interaction ── */
+    .logo-mark img { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .logo-mark:hover img { transform: scale(1.045) rotate(-1deg); }
 
     /* ── Sidebar nav item base ── */
     .sidebar-nav-item {
@@ -125,7 +131,7 @@
       color: var(--primary);
     }
     .sidebar-nav-item.active {
-      background: rgba(83, 74, 183, 0.1);
+      background: rgba(10, 10, 10, 0.1);
       color: var(--primary);
       font-weight: 500;
     }
@@ -247,7 +253,8 @@
     }
     .btn-primary:hover {
       background: var(--primary-light);
-      box-shadow: 0 4px 14px rgba(83, 74, 183, 0.3);
+      color: var(--primary);
+      box-shadow: 0 4px 14px rgba(255, 224, 0, 0.4);
     }
     .btn-accent {
       background: var(--accent);
@@ -255,7 +262,7 @@
     }
     .btn-accent:hover {
       background: var(--accent-light);
-      box-shadow: 0 4px 14px rgba(29, 158, 117, 0.3);
+      box-shadow: 0 4px 14px rgba(186, 117, 23, 0.3);
     }
     .btn-outline {
       background: transparent;
@@ -265,7 +272,7 @@
     .btn-outline:hover {
       border-color: var(--primary);
       color: var(--primary);
-      background: rgba(83, 74, 183, 0.04);
+      background: rgba(10, 10, 10, 0.04);
     }
 
     /* ── Input ── */
@@ -281,7 +288,7 @@
     }
     .input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+      box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.12);
     }
 
     /* ── Badge ── */
@@ -293,31 +300,77 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
+
+    /* ── Mobile navigation drawer ── */
+    #sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      top: 64px;
+      background: rgba(10, 10, 10, 0.4);
+      z-index: 39;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    #sidebar-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 767px) {
+      #sidebar {
+        width: 260px !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: var(--shadow-hover);
+      }
+      #sidebar.sidebar-mobile-open {
+        transform: translateX(0);
+      }
+      #sidebar .sidebar-label {
+        opacity: 1 !important;
+        width: auto !important;
+        overflow: visible !important;
+      }
+      #sidebar-collapse-btn {
+        display: none;
+      }
+      #main-content {
+        margin-left: 0 !important;
+        padding: 16px !important;
+      }
+      #toast-container {
+        left: 16px !important;
+        right: 16px !important;
+        bottom: 16px !important;
+        align-items: stretch !important;
+      }
+      #toast-container > div {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
-<body class="bg-[#F8F7FF] font-['Inter'] text-[#1A1A2E]">
+<body class="bg-[#FAFAF8] font-['Inter'] text-[#0A0A0A]">
 
   <!-- ════════════════════════════════════════════════════════════════════
        TOP NAVIGATION BAR
        ════════════════════════════════════════════════════════════════════ -->
-  <nav id="top-navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E4F0]" style="height:64px; box-shadow: var(--shadow);">
-    <div class="flex items-center justify-between h-full px-6">
+  <nav id="top-navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E5E2]" style="height:64px; box-shadow: var(--shadow);">
+    <div class="flex items-center justify-between h-full px-4 md:px-6">
 
-      <!-- LEFT: Logo -->
-      <a href="/" class="flex items-center gap-2 select-none" style="text-decoration:none;">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="14,2 26,10 14,14 2,10" fill="#534AB7" opacity="0.9"/>
-          <polygon points="14,14 26,10 26,12 14,18 2,12 2,10" fill="#3D3590"/>
-          <line x1="14" y1="14" x2="14" y2="24" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="14" cy="24" r="1.8" fill="#1D9E75"/>
-          <line x1="22" y1="11" x2="22" y2="20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M20 20 L22 22 L24 20" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span class="text-lg tracking-tight" style="line-height:1;">
-          <span class="font-bold" style="color:#534AB7;">Excell</span><span class="font-bold" style="color:#1D9E75;">Study</span>
-        </span>
-      </a>
+      <!-- LEFT: Mobile menu toggle + Logo -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors" aria-label="Toggle menu">
+          <i data-lucide="menu" class="w-5 h-5 text-gray-600" id="mobile-menu-icon"></i>
+        </button>
+        <a href="/" class="logo-mark flex items-center select-none" style="text-decoration:none;">
+          <img src="{% static 'img/logo.png' %}" alt="EXcell.study" class="h-5 md:h-[26px] w-auto block">
+        </a>
+      </div>
 
       <!-- CENTER: Navigation links -->
       <div class="hidden md:flex items-center gap-1">
@@ -342,14 +395,14 @@
 
         <!-- User avatar & dropdown -->
         <div id="user-menu" class="relative">
-          <button id="avatar-btn" onclick="toggleDropdown()" class="flex items-center justify-center rounded-full font-semibold text-white select-none focus:outline-none focus:ring-2 focus:ring-[#534AB7]/30" style="width:40px;height:40px;background:var(--primary);font-size:0.875rem;">
+          <button id="avatar-btn" onclick="toggleDropdown()" class="flex items-center justify-center rounded-full font-semibold text-white select-none focus:outline-none focus:ring-2 focus:ring-[#0A0A0A]/30" style="width:40px;height:40px;background:var(--primary);font-size:0.875rem;">
             {{ user.first_name|default:'A'|make_list|first }}{{ user.last_name|default:'L'|make_list|first }}
           </button>
 
           <div id="user-dropdown" class="user-dropdown">
             <!-- User info header -->
-            <div class="px-4 py-3 border-b border-[#E5E4F0]">
-              <p class="text-sm font-semibold text-[#1A1A2E]">{{ user.first_name|default:'User' }} {{ user.last_name|default:'' }}</p>
+            <div class="px-4 py-3 border-b border-[#E5E5E2]">
+              <p class="text-sm font-semibold text-[#0A0A0A]">{{ user.first_name|default:'User' }} {{ user.last_name|default:'' }}</p>
               <p class="text-xs text-[#6B7280] mt-0.5">{{ user.email|default:'' }}</p>
             </div>
             <div class="py-1">
@@ -360,7 +413,7 @@
                 <i data-lucide="settings" class="w-4 h-4"></i> Settings
               </a>
             </div>
-            <div class="border-t border-[#E5E4F0]"></div>
+            <div class="border-t border-[#E5E5E2]"></div>
             <div class="py-1">
               <a href="{% url 'logout' %}" class="dropdown-item danger">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Logout
@@ -380,9 +433,14 @@
 
 
   <!-- ════════════════════════════════════════════════════════════════════
+       MOBILE SIDEBAR BACKDROP
+       ════════════════════════════════════════════════════════════════════ -->
+  <div id="sidebar-backdrop" onclick="toggleMobileMenu()"></div>
+
+  <!-- ════════════════════════════════════════════════════════════════════
        SIDEBAR
        ════════════════════════════════════════════════════════════════════ -->
-  <aside id="sidebar" class="fixed left-0 bg-white border-r border-[#E5E4F0] z-40 flex flex-col" style="top:64px; width:240px; height:calc(100vh - 64px); transition: width 0.3s ease;">
+  <aside id="sidebar" class="fixed left-0 bg-white border-r border-[#E5E5E2] z-40 flex flex-col" style="top:64px; width:240px; height:calc(100vh - 64px); transition: width 0.3s ease;">
 
     <div class="py-6 flex-1 flex flex-col">
 
@@ -436,7 +494,7 @@
       <div class="flex-1"></div>
 
       <!-- Collapse button -->
-      <button id="sidebar-collapse-btn" onclick="toggleSidebar()" class="flex items-center justify-center w-full py-3 border-t border-[#E5E4F0] text-[#6B7280] hover:text-[#534AB7] hover:bg-[#F8F7FF] transition-all duration-200" aria-label="Collapse sidebar">
+      <button id="sidebar-collapse-btn" onclick="toggleSidebar()" class="flex items-center justify-center w-full py-3 border-t border-[#E5E5E2] text-[#6B7280] hover:text-[#0A0A0A] hover:bg-[#FAFAF8] transition-all duration-200" aria-label="Collapse sidebar">
         <i data-lucide="chevrons-left" class="w-5 h-5" id="collapse-icon"></i>
       </button>
     </div>
@@ -556,6 +614,32 @@
       lucide.createIcons();
     }
 
+    // ── Mobile sidebar drawer toggle ──
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const icon = document.getElementById('mobile-menu-icon');
+      const isOpen = sidebar.classList.toggle('sidebar-mobile-open');
+      backdrop.classList.toggle('open', isOpen);
+      icon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      lucide.createIcons();
+    }
+
+    // Close the mobile drawer when a nav item is tapped or the viewport grows to desktop
+    document.querySelectorAll('.sidebar-nav-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('sidebar-mobile-open')) toggleMobileMenu();
+      });
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('sidebar-mobile-open')) toggleMobileMenu();
+      }
+    });
+
     // ── User dropdown toggle ──
     function toggleDropdown() {
       var dropdown = document.getElementById('user-dropdown');
@@ -582,10 +666,10 @@
       var container = document.getElementById('toast-container');
 
       var config = {
-        success: { border: '#1D9E75', icon: 'check-circle', iconColor: '#1D9E75' },
+        success: { border: '#1F8A55', icon: 'check-circle', iconColor: '#1F8A55' },
         error:   { border: '#E05252', icon: 'x-circle',     iconColor: '#E05252' },
         warning: { border: '#BA7517', icon: 'alert-triangle', iconColor: '#BA7517' },
-        info:    { border: '#534AB7', icon: 'info',          iconColor: '#534AB7' }
+        info:    { border: '#0A0A0A', icon: 'info',          iconColor: '#0A0A0A' }
       };
 
       var c = config[type] || config.info;
@@ -615,7 +699,7 @@
 
       // Message
       var msgEl = document.createElement('span');
-      msgEl.style.cssText = 'flex:1;font-size:0.875rem;color:#1A1A2E;font-weight:500;';
+      msgEl.style.cssText = 'flex:1;font-size:0.875rem;color:#0A0A0A;font-weight:500;';
       msgEl.textContent = message;
       toast.appendChild(msgEl);
 

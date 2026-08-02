@@ -11,7 +11,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
   .code-block {
-    background: #1A1A2E;
+    background: #0A0A0A;
     border-radius: var(--radius-card);
     padding: 20px 24px;
     overflow-x: auto;
@@ -23,7 +23,7 @@
     margin: 16px 0;
   }
   .code-block .comment { color: #6B7280; }
-  .code-block .cmd { color: #1D9E75; }
+  .code-block .cmd { color: #FFE000; }
   .code-block .flag { color: #BA7517; }
   .code-block .url { color: #8B5CF6; }
 
@@ -51,10 +51,10 @@
 
   <div class="card" style="padding:32px; border-top: 5px solid var(--primary);">
     <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(29,158,117,0.1);">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(186, 117, 23,0.1);">
         <i data-lucide="check-circle" class="w-6 h-6" style="color:var(--accent);"></i>
       </div>
-      <h1 class="text-2xl font-bold text-[#1A1A2E]">Agent Registered!</h1>
+      <h1 class="text-2xl font-bold text-[#0A0A0A]">Agent Registered!</h1>
     </div>
 
     <p class="text-sm text-[#6B7280] mb-6">
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Docker Commands -->
-    <h2 class="text-sm font-semibold text-[#1A1A2E] uppercase tracking-wider">Docker Deployment Commands</h2>
+    <h2 class="text-sm font-semibold text-[#0A0A0A] uppercase tracking-wider">Docker Deployment Commands</h2>
     <p class="text-xs text-[#6B7280] mt-1">Tag and push your agent Docker image using the matching slug tag below:</p>
 
     <div class="code-block">
@@ -93,7 +93,7 @@
 
     <!-- Trigger Validation Pipeline Form -->
     <div class="p-5 rounded-lg mb-8" style="background:#FDFDFF; border:1px solid var(--border);">
-      <h3 class="text-sm font-semibold text-[#1A1A2E] uppercase tracking-wider mb-2">Trigger Validation Pipeline</h3>
+      <h3 class="text-sm font-semibold text-[#0A0A0A] uppercase tracking-wider mb-2">Trigger Validation Pipeline</h3>
       <p class="text-xs text-[#6B7280] mb-4">Once you have successfully built and pushed your Docker image to the registry, trigger the validation pipeline below.</p>
       
       <form method="post" action="{% url 'developer:trigger-pipeline' slug %}">
