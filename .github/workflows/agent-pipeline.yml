@@ -305,7 +305,7 @@ jobs:
                 containers:
                 - name: $SLUG
                   image: $IMAGE_TAG
-                  imagePullPolicy: Always
+                  imagePullPolicy: IfNotPresent
                   ports:
                   - containerPort: 8080
                   resources:
