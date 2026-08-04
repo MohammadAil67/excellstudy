@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from apps.core.models import AgentRegistry, Developer
 from apps.developer.forms import AgentRegistrationForm
@@ -103,16 +104,19 @@ class CheckRegistrationView(View):
 
 
 
+@login_required
 def creation_guide(request):
     """Agent creation guide — constraints, manifest spec, I/O types."""
     return render(request, 'developer/agent_creation_guide.html', {'user_type': 'developer'})
 
 
+@login_required
 def deploy_guide(request):
     """Push and deploy guide — step-by-step deployment walkthrough."""
     return render(request, 'developer/deploy_guide.html', {'user_type': 'developer'})
 
 
+@login_required
 def pipeline_status(request, job_id):
     """Pipeline status page — shows the real deployment state of an agent."""
     agent = get_object_or_404(AgentRegistry, slug=job_id, developer__user=request.user)

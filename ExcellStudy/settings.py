@@ -128,6 +128,8 @@ if DATABASE_URL and 'YOURPASSWORD' not in DATABASE_URL and '[' not in DATABASE_U
             'PASSWORD': parsed.password,
             'HOST': parsed.hostname,
             'PORT': parsed.port or 5432,
+            'CONN_MAX_AGE': 0,           # Don't reuse connections — Supabase closes idle ones
+            'CONN_HEALTH_CHECKS': True,  # Validate connection before use
         }
     }
 else:
@@ -141,6 +143,10 @@ else:
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+# Redirect unauthenticated users to the login page
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/learner/'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

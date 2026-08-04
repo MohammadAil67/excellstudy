@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from apps.core.models import AgentRegistry
 
 
+@login_required
 def browse(request):
     """Marketplace browse view listing live registered agents."""
     live_agents = AgentRegistry.objects.filter(status='live')
