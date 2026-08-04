@@ -57,19 +57,28 @@ def signup_view(request):
             return render(request, 'core/signup.html')
             
         # Create user
-        user = User.objects.create_user(username=username, email=email, password=password)
-        
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+        except Exception:
+            messages.error(request, "Could not create account. Please try again.")
+            return render(request, 'core/signup.html')
+
         # Create profile based on selected role
-        if role == 'developer':
-            Developer.objects.create(user=user)
-            messages.success(request, "Developer account created! Welcome to ExcellStudy.")
-            login(request, user)
-            return redirect('developer:portal')
-        else:
-            Learner.objects.create(user=user)
-            messages.success(request, "Account created successfully! Welcome to ExcellStudy.")
-            login(request, user)
-            return redirect('learner:dashboard')
+        try:
+            if role == 'developer':
+                Developer.objects.create(user=user)
+                messages.success(request, "Developer account created! Welcome to ExcellStudy.")
+                login(request, user)
+                return redirect('developer:portal')
+            else:
+                Learner.objects.create(user=user)
+                messages.success(request, "Account created successfully! Welcome to ExcellStudy.")
+                login(request, user)
+                return redirect('learner:dashboard')
+        except Exception:
+            user.delete()  # Roll back — don't leave orphaned users
+            messages.error(request, "Could not complete registration. Please try again.")
+            return render(request, 'core/signup.html')
             
     return render(request, 'core/signup.html')
 

@@ -67,7 +67,7 @@ class Learner(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(age__gte=3) & models.Q(age__lte=120),
+                condition=models.Q(age__isnull=True) | (models.Q(age__gte=3) & models.Q(age__lte=120)),
                 name='learner_age_realistic_range',
             ),
         ]
