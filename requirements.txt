@@ -18,6 +18,8 @@ asyncpg
 django-storages
 boto3
 kubernetes
+markdown
+Pillow
 
 # Testing
 pytest

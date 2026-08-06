@@ -306,6 +306,28 @@
       </div>
     </div>
 
+    <!-- Blog -->
+    <div class="card portal-section" style="padding:20px;">
+      <h3 class="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Blog</h3>
+      <div class="space-y-2">
+        <a href="{% url 'developer:blog:create_blog' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
+          <i data-lucide="pen-line" class="w-4 h-4" style="color:var(--primary);"></i>
+          <span class="text-sm font-medium">Write a Post</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>
+        </a>
+        <a href="{% url 'developer:blog:my_blogs' %}" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
+          <i data-lucide="layout-list" class="w-4 h-4" style="color:var(--accent);"></i>
+          <span class="text-sm font-medium">My Posts</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>
+        </a>
+        <a href="/blog/" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FAFAF8] transition-colors">
+          <i data-lucide="globe" class="w-4 h-4" style="color:var(--highlight);"></i>
+          <span class="text-sm font-medium">Public Blog</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 ml-auto text-[#9CA3AF]"></i>
+        </a>
+      </div>
+    </div>
+
     <!-- manifest.json Spec -->
     <div class="card portal-section" style="padding:20px;">
       <button onclick="toggleManifest()" class="flex items-center justify-between w-full">

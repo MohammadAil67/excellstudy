@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import render
 from apps.core import views as core_views
+from apps.blog.urls import blog_urlpatterns, admin_panel_urlpatterns
 
 
 def home(request):
@@ -63,6 +64,12 @@ urlpatterns = [
     # API endpoints
     path('api/v1/agents/', include('apps.agents.urls')),
     path('api/v1/pipeline/', include('apps.pipeline.urls')),
+
+    # Blog
+    path('blog/', include((blog_urlpatterns, 'blog'))),
+
+    # Admin panel (superuser only)
+    path('admin-panel/', include((admin_panel_urlpatterns, 'admin_panel'))),
 ]
 
 from django.conf import settings

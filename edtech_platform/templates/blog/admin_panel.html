@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Approval Panel — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    /* Sidebar */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: #1e293b; padding: 24px 16px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; border-right: 1px solid #334155; }
+    .sidebar-logo { font-weight: 800; font-size: 1.1rem; color: #fff; padding: 8px 12px 20px; }
+    .sidebar-logo span { color: #f5c800; }
+    .sidebar-label { font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .08em; padding: 8px 12px 4px; }
+    .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8; font-size: 0.875rem; font-weight: 500; transition: all .15s; }
+    .sidebar-link:hover, .sidebar-link.active { background: #334155; color: #fff; }
+    .sidebar-link .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* Main */
+    .main { flex: 1; padding: 40px 40px; overflow-y: auto; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 800; color: #f1f5f9; }
+    .page-header p { color: #94a3b8; margin-top: 4px; font-size: 0.9rem; }
+
+    /* Messages */
+    .messages { margin-bottom: 20px; }
+    .msg { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 0.875rem; }
+    .msg-success { background: #064e3b; color: #6ee7b7; }
+    .msg-error   { background: #7f1d1d; color: #fca5a5; }
+
+    /* Section */
+    .section { margin-bottom: 40px; }
+    .section-title { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .count-badge { background: #f5c800; color: #111; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+    /* Cards */
+    .post-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 20px 24px; margin-bottom: 14px; display: flex; gap: 20px; align-items: flex-start; }
+    .post-card-body { flex: 1; }
+    .post-card-title { font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .post-card-meta { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
+    .post-card-excerpt { font-size: 0.875rem; color: #94a3b8; line-height: 1.6; }
+    .post-card-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+    /* Badge */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-pending  { background: #451a03; color: #fbbf24; }
+    .badge-approved { background: #064e3b; color: #6ee7b7; }
+    .badge-rejected { background: #7f1d1d; color: #fca5a5; }
+
+    /* Buttons */
+    .btn { padding: 8px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: inherit; transition: all .2s; }
+    .btn-approve { background: #059669; color: #fff; }
+    .btn-approve:hover { background: #047857; }
+    .btn-reject  { background: #dc2626; color: #fff; }
+    .btn-reject:hover  { background: #b91c1c; }
+    .btn-view    { background: #334155; color: #e2e8f0; }
+    .btn-view:hover { background: #475569; }
+
+    /* Empty */
+    .empty { text-align: center; padding: 40px; color: #475569; font-size: 0.9rem; }
+
+    /* Mini table for approved/rejected */
+    .mini-table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
+    .mini-table th { text-align: left; padding: 10px 16px; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; background: #0f172a; border-bottom: 1px solid #334155; }
+    .mini-table td { padding: 12px 16px; border-bottom: 1px solid #1e293b; font-size: 0.85rem; color: #cbd5e1; }
+    .mini-table tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Excell<span>Study</span><br><small style="font-size:.65rem;font-weight:500;color:#64748b;">Admin Panel</small></div>
+
+    <div class="sidebar-label">Content</div>
+    <a href="{% url 'admin_panel:blog' %}" class="sidebar-link active">
+      <span class="icon">✍️</span> Blog Posts
+    </a>
+
+    <div class="sidebar-label" style="margin-top:12px;">Links</div>
+    <a href="/admin/" class="sidebar-link">
+      <span class="icon">⚙️</span> Django Admin
+    </a>
+    <a href="/" class="sidebar-link">
+      <span class="icon">🏠</span> Back to Site
+    </a>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <div class="page-header">
+      <h1>Blog Approval</h1>
+      <p>Review and approve or reject developer blog posts before they go public.</p>
+    </div>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="msg msg-{% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Pending posts -->
+    <div class="section">
+      <div class="section-title">
+        ⏳ Pending Review
+        <span class="count-badge">{{ pending|length }}</span>
+      </div>
+
+      {% if pending %}
+        {% for post in pending %}
+          <div class="post-card">
+            <div class="post-card-body">
+              <div class="post-card-title">{{ post.title }}</div>
+              <div class="post-card-meta">
+                By <strong>{{ post.author.user.username }}</strong>
+                &nbsp;·&nbsp; Submitted {{ post.updated_at|date:"M j, Y" }}
+              </div>
+              <div class="post-card-excerpt">{{ post.excerpt|truncatechars:200 }}</div>
+              <div class="post-card-actions">
+                <form method="post" action="{% url 'admin_panel:approve_blog' post.slug %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-approve">✓ Approve</button>
+                </form>
+                <a href="{% url 'admin_panel:reject_blog' post.slug %}" class="btn btn-reject">✕ Reject</a>
+                <a href="/blog/{{ post.slug }}/" class="btn btn-view" target="_blank">Preview ↗</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">No posts pending review. 🎉</div>
+      {% endif %}
+    </div>
+
+    <!-- Recently approved -->
+    <div class="section">
+      <div class="section-title">✅ Recently Approved</div>
+      {% if approved %}
+        <table class="mini-table">
+          <thead><tr><th>Title</th><th>Author</th><th>Published</th></tr></thead>
+          <tbody>
+            {% for post in approved %}
+              <tr>
+                <td><a href="/blog/{{ post.slug }}/" style="color:#f5c800;text-decoration:none;">{{ post.title }}</a></td>
+                <td>{{ post.author.user.username }}</td>
+                <td>{{ post.published_at|date:"M j, Y" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty">No approved posts yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- Recently rejected -->
+    <div class="section">
+      <div class="section-title">❌ Recently Rejected</div>
+      {% if rejected %}
+        <table class="mini-table">
+          <thead><tr><th>Title</th><th>Author</th><th>Reason</th></tr></thead>
+          <tbody>
+            {% for post in rejected %}
+              <tr>
+                <td>{{ post.title }}</td>
+                <td>{{ post.author.user.username }}</td>
+                <td style="color:#94a3b8;">{{ post.rejection_reason|truncatechars:60 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty">No rejected posts.</div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from apps.blog.urls import developer_blog_urlpatterns
 
 app_name = 'developer'
 
@@ -15,4 +16,7 @@ urlpatterns = [
     path('agents/<slug:agent_slug>/toggle-status/', views.ToggleAgentStatusView.as_view(), name='toggle-agent-status'),
     path('agents/<slug:agent_slug>/trigger/', views.TriggerPipelineView.as_view(), name='trigger-pipeline'),
     path('agents/<slug:agent_slug>/delete/', views.DeleteAgentView.as_view(), name='delete-agent'),
+
+    # Blog management
+    path('blog/', include((developer_blog_urlpatterns, 'blog'))),
 ]

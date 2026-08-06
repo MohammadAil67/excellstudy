@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'apps.pipeline',
     'apps.playground',
     'apps.marketplace',
+    'apps.blog',
 ]
 
 MIDDLEWARE = [

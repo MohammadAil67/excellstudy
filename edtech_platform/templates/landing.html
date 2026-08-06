@@ -343,6 +343,7 @@
         <a href="#how-it-works" class="text-sm font-medium text-gray-600 hover:text-[#0A0A0A] transition-colors">How It Works</a>
         <a href="#agents" class="text-sm font-medium text-gray-600 hover:text-[#0A0A0A] transition-colors">Agents</a>
         <a href="#developers" class="text-sm font-medium text-gray-600 hover:text-[#0A0A0A] transition-colors">Developers</a>
+        <a href="/blog/" class="text-sm font-medium text-gray-600 hover:text-[#0A0A0A] transition-colors">Blog</a>
       </div>
 
       <div class="hidden md:flex items-center gap-3">
@@ -372,6 +373,7 @@
         <a href="#how-it-works" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">How It Works</a>
         <a href="#agents" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Agents</a>
         <a href="#developers" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Developers</a>
+        <a href="/blog/" onclick="toggleLandingMenu()" class="text-sm font-medium text-gray-700 py-2.5 px-2 rounded-lg hover:bg-black/5">Blog</a>
         <div class="flex flex-col gap-2 mt-3 pt-3" style="border-top:1px solid var(--border);">
           {% if user.is_authenticated %}
             {% if user.developer_profile %}
@@ -791,7 +793,7 @@
           <h4 class="text-white text-sm font-semibold mb-4">Company</h4>
           <div class="space-y-2">
             <a href="#" class="block text-sm">About</a>
-            <a href="#" class="block text-sm">Blog</a>
+            <a href="/blog/" class="block text-sm">Blog</a>
             <a href="#" class="block text-sm">Contact</a>
           </div>
         </div>

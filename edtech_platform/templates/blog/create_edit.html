@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if action == 'Edit' %}Edit Post{% else %}New Blog Post{% endif %} — ExcellStudy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- EasyMDE — Markdown rich editor -->
+  <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f9fafb; color: #111; }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 48px; background: #fff; border-bottom: 1px solid #e5e7eb; }
+    .nav-logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: #111; }
+    .nav-logo span { color: #f5c800; }
+    .nav-links a { text-decoration: none; color: #6b7280; font-size: 0.9rem; }
+
+    .main { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+    .page-header p { color: #6b7280; font-size: 0.9rem; }
+    .back-link { display: inline-block; color: #6b7280; text-decoration: none; font-size: 0.875rem; margin-bottom: 20px; }
+    .back-link:hover { color: #111; }
+
+    .form-card { background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; padding: 32px; }
+    .field { margin-bottom: 24px; }
+    .field label { display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .field .help { font-size: 0.78rem; color: #9ca3af; margin-top: 4px; }
+    .form-input, .form-textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px;
+      font-family: inherit; font-size: 0.9rem; color: #111; transition: border-color .2s;
+      background: #fff;
+    }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: #f5c800; }
+    .form-textarea { resize: vertical; }
+
+    /* EasyMDE overrides */
+    .EasyMDEContainer { border-radius: 8px; overflow: hidden; border: 1.5px solid #e5e7eb; }
+    .EasyMDEContainer:focus-within { border-color: #f5c800; }
+    .CodeMirror { font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+    .btn { padding: 10px 24px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; display: inline-block; cursor: pointer; border: none; font-family: inherit; transition: all .2s; }
+    .btn-primary { background: #111; color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-outline { background: transparent; color: #6b7280; border: 1.5px solid #e5e7eb; }
+    .btn-outline:hover { border-color: #111; color: #111; }
+
+    .error-list { background: #fee2e2; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; }
+    .error-list li { font-size: 0.875rem; color: #991b1b; margin-left: 16px; }
+
+    {% if action == 'Edit' and post.status == 'rejected' %}
+    .rejection-banner { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
+    .rejection-banner strong { color: #9a3412; display: block; margin-bottom: 4px; }
+    .rejection-banner p { font-size: 0.875rem; color: #9a3412; }
+    {% endif %}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">Excell<span>Study</span></a>
+  <div class="nav-links">
+    <a href="{% url 'developer:blog:my_blogs' %}">← My Posts</a>
+  </div>
+</nav>
+
+<div class="main">
+  <a href="{% url 'developer:blog:my_blogs' %}" class="back-link">← Back to My Posts</a>
+
+  <div class="page-header">
+    <h1>{% if action == 'Edit' %}Edit Blog Post{% else %}Write a New Post{% endif %}</h1>
+    <p>Use Markdown to format your content. Save as draft, then submit for review when ready.</p>
+  </div>
+
+  {% if action == 'Edit' and post.status == 'rejected' %}
+    <div class="rejection-banner">
+      <strong>⚠️ This post was rejected</strong>
+      <p>{{ post.rejection_reason }}</p>
+    </div>
+  {% endif %}
+
+  {% if form.errors %}
+    <ul class="error-list">
+      {% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}
+      {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title }}
+      </div>
+
+      <div class="field">
+        <label for="blog-content-editor">Content</label>
+        {{ form.content }}
+        <div class="help">Use Markdown — **bold**, *italic*, # Heading, ```code blocks```</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="{{ form.excerpt.id_for_label }}">Excerpt <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+          {{ form.excerpt }}
+          <div class="help">Short summary for the blog list. Auto-generated if left blank.</div>
+        </div>
+        <div class="field">
+          <label for="{{ form.cover_image.id_for_label }}">Cover Image <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+          {{ form.cover_image }}
+          {% if post.cover_image %}
+            <div class="help">Current image: <a href="{{ post.cover_image.url }}" target="_blank">View image</a></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'developer:blog:my_blogs' %}" class="btn btn-outline">Cancel</a>
+        <input type="hidden" name="form_action" id="form-action" value="draft">
+        <button type="submit" class="btn btn-outline"
+                onclick="document.getElementById('form-action').value='draft'">
+          Save Draft
+        </button>
+        <button type="submit" class="btn btn-primary"
+                onclick="document.getElementById('form-action').value='submit'">
+          Submit for Review
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>
+  const easyMDE = new EasyMDE({
+    element: document.getElementById('blog-content-editor'),
+    spellChecker: false,
+    forceSync: true,
+    placeholder: 'Write your blog post in Markdown...',
+    toolbar: [
+      'bold', 'italic', 'heading', '|',
+      'quote', 'unordered-list', 'ordered-list', '|',
+      'link', 'image', 'code', 'table', '|',
+      'preview', 'side-by-side', 'fullscreen', '|',
+      'guide'
+    ],
+  });
+
+  document.querySelector('form').addEventListener('submit', function () {
+    document.getElementById('blog-content-editor').value = easyMDE.value();
+  });
+</script>
+</body>
+</html>
