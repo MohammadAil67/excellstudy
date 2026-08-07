@@ -80,6 +80,13 @@
 {% endif %}
 
 <div class="article-wrap">
+  {% if is_preview %}
+    <div style="background:#fef3c7; border:1px solid #f59e0b; color:#92400e; padding:12px 16px; border-radius:10px; margin-bottom:24px; font-weight:600; font-size:0.9rem; display:flex; align-items:center; justify-content:space-between;">
+      <span>⚠️ <strong>PREVIEW MODE</strong> — Status: {{ post.get_status_display }}</span>
+      <span style="font-weight:400; font-size:0.8rem;">Not visible to the public</span>
+    </div>
+  {% endif %}
+
   <a href="/blog/" class="back-link">← Back to Blog</a>
 
   <div class="article-meta">

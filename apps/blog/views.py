@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 
 from apps.blog.models import Blog
 from apps.blog.forms import BlogForm, RejectionForm
@@ -51,8 +51,21 @@ def blog_list(request):
 
 
 def blog_detail(request, slug):
-    """Single approved blog post rendered from Markdown."""
-    post = get_object_or_404(Blog, slug=slug, status='approved')
+    """Single blog post rendered from Markdown. Approved posts are public; pending/draft/rejected posts can be previewed by superusers and the post author."""
+    post = get_object_or_404(Blog, slug=slug)
+
+    # Permission check for unapproved posts
+    if post.status != 'approved':
+        is_author = (
+            request.user.is_authenticated
+            and hasattr(request.user, 'developer_profile')
+            and post.author == request.user.developer_profile
+        )
+        is_superuser = request.user.is_authenticated and request.user.is_superuser
+
+        if not (is_author or is_superuser):
+            raise Http404("Blog post not found.")
+
     content_html = md.markdown(
         post.content,
         extensions=['extra', 'codehilite', 'nl2br', 'toc'],
@@ -60,6 +73,7 @@ def blog_detail(request, slug):
     return render(request, 'blog/detail.html', {
         'post': post,
         'content_html': content_html,
+        'is_preview': post.status != 'approved',
     })
 
 
