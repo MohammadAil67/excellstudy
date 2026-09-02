@@ -72,6 +72,7 @@ class RegisterAgentView(LoginRequiredMixin, View):
         return render(request, 'developer/register_agent.html', {'form': form})
 
 
+#Extra step here, Can be improved
 class CheckRegistrationView(View):
     """
     API endpoint for the external pipeline script to cross-validate image manifest

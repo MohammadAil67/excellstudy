@@ -221,6 +221,7 @@ def pipeline_step_update(request, slug):
     return JsonResponse({'status': 'ok'})
 
 
+#Deadcode or perhaps later on can be used for pipeline step updates and SSE streaming of events.
 def pipeline_events_stream(request, slug):
     """
     Server-Sent Events endpoint streaming pipeline progress updates to the browser.

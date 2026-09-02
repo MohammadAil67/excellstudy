@@ -6,7 +6,7 @@ from apps.core.models import AgentRegistry
 
 logger = logging.getLogger(__name__)
 
-
+# Unnecessary code.
 @shared_task
 def expire_stale_pending_agents():
     """

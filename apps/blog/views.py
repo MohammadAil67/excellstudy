@@ -9,8 +9,10 @@ from apps.blog.models import Blog
 from apps.blog.forms import BlogForm, RejectionForm
 from apps.core.models import Developer
 
+
 # ── Guard decorators ─────────────────────────────────────────────────────────
 
+# This decorator was unncessary. 
 def developer_required(view_func):
     """Redirect to login if user is not a developer."""
     @login_required

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.core.models import Developer, AgentRegistry
 
-
+#Left over code, OR potentially useful for future development, but not currently used in the codebase.
 class DeveloperSerializer(serializers.ModelSerializer):
     class Meta:
         model = Developer
