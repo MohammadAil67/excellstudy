@@ -156,22 +156,31 @@ Content marketing and knowledge-sharing platform integrated into the ecosystem.
 
 ```mermaid
 flowchart LR
-    %% Users
-    Users["Users (Learners & Developers)"] -->|HTTPS| Ingress["Ingress-NGINX<br>(Domain & TLS)"]
+    %% External: Users & CI/CD
+    Users["Users (Learners & Developers)"]
+    CICD["GitHub Actions (CI/CD)"]
 
-    %% Core Platform
-    Ingress --> Django["Django Core Platform<br>(Portal, Marketplace, API Gateway)"]
+    %% Kubernetes Boundary
+    subgraph K8s["Kubernetes"]
+        Ingress["Ingress-NGINX<br>(Domain & TLS)"]
+        Django["Django Core Platform<br>(Portal, Marketplace, API Gateway)"]
+        Redis[("Redis Cache")]
+        Agents["Agent Pods<br>(Isolated Namespaces)"]
 
-    %% Storage & State
-    Django <-->|Data & Progress| DB[("PostgreSQL / Supabase")]
-    Django <-->|Routing & Rate Limits| Redis[("Redis Cache")]
+        Ingress --> Django
+        Django <-->|Routing & Rate Limits| Redis
+        Django -->|Relay Prompt| Agents
+    end
 
-    %% Agent Execution
-    Django -->|Relay Prompt| Agents["Kubernetes Agent Pods<br>(Isolated Namespaces)"]
-    Agents -->|Generate Answer| LLM["External AI Models<br>(Google Gemini / Claude)"]
+    %% External Services
+    DB[("PostgreSQL / Supabase")]
+    LLM["External AI Models<br>(Google Gemini / Claude)"]
 
-    %% CI/CD
-    CICD["GitHub Actions (CI/CD)"] -->|Deploy / Rollout| Agents
+    %% Connections across boundary
+    Users -->|HTTPS| Ingress
+    Django <-->|Data & Progress| DB
+    Agents -->|Generate Answer| LLM
+    CICD -->|Deploy / Rollout| Agents
     CICD -.->|Status Webhooks| Django
 ```
 
