@@ -152,119 +152,27 @@ Content marketing and knowledge-sharing platform integrated into the ecosystem.
 
 ## 3. System Workings & Block Diagram
 
-### End-to-End Architecture Diagram
+### High-Level Architecture Diagram
 
 ```mermaid
-flowchart TD
-    %% Clients
-    subgraph Clients["Users & Clients"]
-        Learner["Learner Browser"]
-        Developer["Developer Browser"]
-        Admin["Administrator"]
-    end
+flowchart LR
+    %% Users
+    Users["Users (Learners & Developers)"] -->|HTTPS| Ingress["Ingress-NGINX<br>(Domain & TLS)"]
 
-    %% Ingress & Edge Layer
-    subgraph Edge["Edge & Ingress Layer"]
-        DNS["DNS (excellstudy.site)"]
-        DO_LB["DigitalOcean Cloud Load Balancer"]
-        Ingress["Ingress-NGINX Controller (TLS / Let's Encrypt)"]
-    end
+    %% Core Platform
+    Ingress --> Django["Django Core Platform<br>(Portal, Marketplace, API Gateway)"]
 
-    %% Django Platform Layer
-    subgraph K8s_Platform["Kubernetes: Platform Namespace"]
-        DjangoPod["Django Web Server (Gunicorn / ASGI)"]
-        
-        subgraph DjangoApps["Django Applications"]
-            AppCore["apps.core (Auth / Models / Middlewares)"]
-            AppAgents["apps.agents (Invocation Gateway / Router)"]
-            AppLearner["apps.learner (Dashboard / Sessions)"]
-            AppDev["apps.developer (Portal / Quotas)"]
-            AppPipeline["apps.pipeline (Webhook / SSE Streamer)"]
-            AppMarket["apps.marketplace (Catalog)"]
-            AppBlog["apps.blog (EasyMDE / Moderation)"]
-        end
+    %% Storage & State
+    Django <-->|Data & Progress| DB[("PostgreSQL / Supabase")]
+    Django <-->|Routing & Rate Limits| Redis[("Redis Cache")]
 
-        RedisPod[("Redis Server (Cache / PubSub / Celery Broker)")]
-        CeleryWorker["Celery Worker & Beat (Background Tasks)"]
-    end
+    %% Agent Execution
+    Django -->|Relay Prompt| Agents["Kubernetes Agent Pods<br>(Isolated Namespaces)"]
+    Agents -->|Generate Answer| LLM["External AI Models<br>(Google Gemini / Claude)"]
 
-    %% Storage & Database Layer
-    subgraph DataLayer["Persistence & External Services"]
-        SupabaseDB[("Supabase PostgreSQL (Data + pgvector)")]
-        S3Storage[("S3 Object Storage (Media / Uploads)")]
-        Neo4jDB[("Neo4j Graph Database (Knowledge Graph)")]
-    end
-
-    %% FastMCP Microservices
-    subgraph MCP_Services["Model Context Protocol (MCP) Services"]
-        ContentMCP["content-mcp-server (Semantic Course Search)"]
-        LearnerMCP["learner-context-mcp-server (Student Profile)"]
-        GraphMCP["knowledge-graph-mcp-server (Prerequisites)"]
-    end
-
-    %% Developer Workspaces
-    subgraph DeveloperNamespaces["Kubernetes: Developer Agent Namespaces"]
-        subgraph Dev1["Namespace: dev-shafayat-hossain"]
-            AgentPod1["Agent Pod: quick-steps (FastAPI :8080)"]
-        end
-        subgraph Dev2["Namespace: dev-alex304"]
-            AgentPod2["Agent Pod: general-knowledge-qa (FastAPI :8080)"]
-        end
-    end
-
-    %% CI/CD Engine
-    subgraph CICD["CI/CD Deployment System"]
-        GH_Actions["GitHub Actions Workflow Dispatch"]
-        Runner["Self-Hosted Runner (GCP VM)"]
-        GHCR["GitHub Container Registry (GHCR)"]
-        Trivy["Trivy Security Scanner"]
-    end
-
-    %% Client Traffic Flow
-    Learner -->|HTTPS Request| DNS
-    Developer -->|HTTPS Request| DNS
-    Admin -->|HTTPS Request| DNS
-    DNS --> DO_LB
-    DO_LB --> Ingress
-    Ingress --> DjangoPod
-
-    %% Internal Routing
-    DjangoPod --> AppCore
-    DjangoPod --> AppAgents
-    DjangoPod --> AppLearner
-    DjangoPod --> AppDev
-    DjangoPod --> AppPipeline
-    DjangoPod --> AppMarket
-    DjangoPod --> AppBlog
-
-    %% Platform to Data
-    DjangoPod <-->|Read / Write| SupabaseDB
-    DjangoPod <-->|Upload Media| S3Storage
-    DjangoPod <-->|Cache / Rate Limit| RedisPod
-    CeleryWorker <-->|Queue / Beat| RedisPod
-    CeleryWorker -->|Expire Stale Runs| SupabaseDB
-
-    %% Agent Invocation Flow
-    AppAgents -->|1. Check Cache| RedisPod
-    AppAgents -->|2. Forward Prompt| AgentPod1
-    AppAgents -->|2. Forward Prompt| AgentPod2
-
-    %% Agent MCP Enrichment
-    AgentPod1 -.->|Query Context| LearnerMCP
-    AgentPod1 -.->|Semantic Search| ContentMCP
-    AgentPod1 -.->|Graph Relations| GraphMCP
-    ContentMCP --> SupabaseDB
-    GraphMCP --> Neo4jDB
-
-    %% CI/CD Flow
-    AppDev -->|Trigger Dispatch| GH_Actions
-    GH_Actions --> Runner
-    Runner -->|Pull / Scan Image| Trivy
-    Runner -->|Fetch Image| GHCR
-    Runner -->|Apply Deployment / Service| Dev1
-    Runner -->|Status Webhooks| AppPipeline
-    AppPipeline -->|Publish Events| RedisPod
-    RedisPod -->|SSE Log Stream| Developer
+    %% CI/CD
+    CICD["GitHub Actions (CI/CD)"] -->|Deploy / Rollout| Agents
+    CICD -.->|Status Webhooks| Django
 ```
 
 ---
