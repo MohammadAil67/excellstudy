@@ -247,7 +247,7 @@ jobs:
           SLUG="${{ steps.identity.outputs.slug }}"
           IMAGE_TAG="${{ steps.extract.outputs.image_tag }}"
 
-          kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - || true
 
           kubectl create secret docker-registry gar-secret -n "$NAMESPACE" \
             --docker-server="${{ env.GAR_LOCATION }}-docker.pkg.dev" \
@@ -255,7 +255,8 @@ jobs:
             --docker-password="$GCP_SA_KEY" \
             --dry-run=client -o yaml | kubectl apply -f -
 
-          kubectl apply -f - <<EOF
+          # Apply ResourceQuota if permitted (non-fatal on managed platforms like Rahti)
+          kubectl apply -f - <<EOF || true
           apiVersion: v1
           kind: ResourceQuota
           metadata:
@@ -268,7 +269,10 @@ jobs:
               requests.cpu: "1"
               limits.memory: "2Gi"
               limits.cpu: "2"
-          ---
+          EOF
+
+          # Deploy agent Deployment and Service
+          kubectl apply -f - <<EOF
           apiVersion: apps/v1
           kind: Deployment
           metadata:
