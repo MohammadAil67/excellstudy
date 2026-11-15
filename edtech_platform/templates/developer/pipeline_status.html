@@ -244,14 +244,14 @@
         <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;"><i data-lucide="terminal" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Terminal Commands</span>
         <button class="copy-btn" onclick="copyCommand(this)" style="background:rgba(255,255,255,0.1); color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Copy</button>
       </div>
-      <pre id="docker-commands" style="margin:0; color:#E2E8F0; font-size:0.8rem; line-height:1.7; white-space:pre-wrap; word-break:break-all;"><span style="color:#64748B;"># 1. Log in to GitHub Container Registry</span>
-echo <span style="color:#FDE68A;">"YOUR_GITHUB_PAT_TOKEN"</span> | docker login ghcr.io -u <span style="color:#93C5FD;">{{ agent.developer.gh_username }}</span> --password-stdin
+      <pre id="docker-commands" style="margin:0; color:#E2E8F0; font-size:0.8rem; line-height:1.7; white-space:pre-wrap; word-break:break-all;"><span style="color:#64748B;"># 1. Log in to Google Artifact Registry</span>
+echo "YOUR_GCP_SERVICE_KEY" | docker login asia-south1-docker.pkg.dev -u _json_key --password-stdin
 
 <span style="color:#64748B;"># 2. Build your container image</span>
-docker build -t <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username }}/{{ agent.slug }}:{{ agent.version }}</span> .
+docker build -t <span style="color:#93C5FD;">asia-south1-docker.pkg.dev/excellstudy/excellstudy/{{ agent.slug }}:{{ agent.version }}</span> .
 
-<span style="color:#64748B;"># 3. Push container image to GHCR</span>
-docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username }}/{{ agent.slug }}:{{ agent.version }}</span></pre>
+<span style="color:#64748B;"># 3. Push container image to Google Artifact Registry</span>
+docker push <span style="color:#93C5FD;">asia-south1-docker.pkg.dev/excellstudy/excellstudy/{{ agent.slug }}:{{ agent.version }}</span></pre>
     </div>
   </div>
 
@@ -372,8 +372,8 @@ docker push <span style="color:#93C5FD;">ghcr.io/{{ agent.developer.gh_username 
     <!-- Push commands -->
     <div class="command-block">
       <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-      <div><span style="color:#FFE000;">docker</span> tag your-local-image <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
-      <div style="margin-top:4px;"><span style="color:#FFE000;">docker</span> push <span style="color:#BA7517;">ghcr.io/mohammadail67/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div><span style="color:#FFE000;">docker</span> tag your-local-image <span style="color:#BA7517;">asia-south1-docker.pkg.dev/excellstudy/excellstudy/{{ agent.slug }}:{{ agent.version }}</span></div>
+      <div style="margin-top:4px;"><span style="color:#FFE000;">docker</span> push <span style="color:#BA7517;">asia-south1-docker.pkg.dev/excellstudy/excellstudy/{{ agent.slug }}:{{ agent.version }}</span></div>
     </div>
 
     <!-- Trigger Form -->

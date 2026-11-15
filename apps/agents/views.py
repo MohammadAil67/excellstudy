@@ -18,6 +18,7 @@ from apps.core.input_output_types import validate_input_payload
 logger = logging.getLogger("apps.agents.views")
 
 
+
 def _error_envelope(error_code: str, message: str, detail: str, request_id: str, status: int) -> JsonResponse:
     return JsonResponse(
         {
@@ -30,6 +31,7 @@ def _error_envelope(error_code: str, message: str, detail: str, request_id: str,
         status=status,
     )
 
+#take a look at the rate limiting function, it seems to be a bit inefficient.
 
 def _is_rate_limited(ip_address: str, limit: int = 60, window_seconds: int = 60) -> bool:
     """Check if client IP has exceeded the allowed invoke requests per minute in Redis."""
@@ -45,17 +47,19 @@ def _is_rate_limited(ip_address: str, limit: int = 60, window_seconds: int = 60)
         return False
 
 
+#take a look at this, there maybe some latency issues here.
 @csrf_exempt
 async def invoke_agent(request, agent_slug):
     """
     Plain HTTP relay: learner UI -> a SPECIFIC agent chosen explicitly
-    by the learner (agent_slug comes from the URL they're already on).
+    by the learner (agent_slug comes from the URL they're already on)
     """
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
     request_id = getattr(request, "request_id", "unknown")
 
+    #some issues here.
     # ── Rate Limiting (60 requests / minute / IP) ──
     client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '127.0.0.1')).split(',')[0].strip()
     is_limited = await sync_to_async(_is_rate_limited)(client_ip, limit=60, window_seconds=60)
@@ -77,6 +81,7 @@ async def invoke_agent(request, agent_slug):
         )
 
     input_payload = body.get("input")
+    #didn't add this yet
     learner_context = body.get("context", {})
 
     if not input_payload:
@@ -107,6 +112,7 @@ async def invoke_agent(request, agent_slug):
         request.mcp_status = "success"
 
         # Record learner progress dynamically
+        # Dead code or we can implement it later
         try:
             from django.utils import timezone
             from apps.core.models import Learner, LearnerProgress, AgentRegistry

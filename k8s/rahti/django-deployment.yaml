@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-web
+  namespace: sdx-assignment-mmahdi
+  labels:
+    app: django-web
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-web
+  template:
+    metadata:
+      labels:
+        app: django-web
+        component: web
+    spec:
+      containers:
+        - name: django-web
+          image: mahdides1234/excellstudy-django:latest
+          imagePullPolicy: Always
+          command:
+            - gunicorn
+            - ExcellStudy.wsgi:application
+            - --bind
+            - 0.0.0.0:8000
+            - --workers
+            - "2"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: PORT
+              value: "8000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+  namespace: sdx-assignment-mmahdi
+spec:
+  selector:
+    app: django-web
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

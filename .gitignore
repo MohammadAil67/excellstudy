@@ -157,3 +157,8 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# GCP / Cloud Credentials
+*key*.json
+*-key.json
+gcp-key.json

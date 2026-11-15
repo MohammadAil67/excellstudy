@@ -20,12 +20,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-cache MiniLM ONNX model into container so it starts offline instantly
+ENV FASTEMBED_CACHE_PATH=/app/.fastembed_cache
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
+
 # Copy application source code
 COPY . /app/
 
-# Security check: create non-root user
-RUN useradd -m -u 1000 mcpuser && chown -R mcpuser:mcpuser /app
-USER mcpuser
+# Security check: create non-root user and grant group 0 access for OpenShift (Rahti) arbitrary UID execution
+RUN useradd -m -u 1000 mcpuser && \
+    chown -R mcpuser:mcpuser /app && \
+    chgrp -R 0 /app && \
+    chmod -R g=u /app
+
+USER 1000
 
 # Default CMD - overridden in K8s deployment spec for each MCP server
 CMD ["python", "services/mcp_servers/learner_context_server.py"]

@@ -55,6 +55,7 @@ def get_agent(slug: str) -> dict | None:
     if not agent:
         return None
 
+    #It might be improved further.
     agent_dict = dict(agent)
     cache.set(key, json.dumps(agent_dict), timeout=CACHE_TTL_SECONDS)
     return agent_dict

@@ -24,9 +24,11 @@ spec:
         app: django-web
         component: web
     spec:
+      imagePullSecrets:
+        - name: gar-secret
       containers:
         - name: django-web
-          image: ghcr.io/mohammadail67/excellstudy-django:latest
+          image: asia-south1-docker.pkg.dev/excellstudy/excellstudy/excellstudy-django:latest
           imagePullPolicy: Always
           command:
             - gunicorn

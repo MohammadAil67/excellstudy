@@ -19,17 +19,14 @@ def dashboard(request):
     learner_profile, _ = Learner.objects.get_or_create(user=request.user)
     
     # Only show agents that this learner has actually interacted with
-    interacted_agent_ids = LearnerProgress.objects.filter(
-        learner=learner_profile,
-        agent_used__status='live'
-    ).values_list('agent_used_id', flat=True).distinct()
+    interacted_agent_ids = LearnerProgress.objects.filter(learner=learner_profile, agent_used__status='live').values_list('agent_used_id', flat=True).distinct()
 
     active_agents = AgentRegistry.objects.filter(
         id__in=interacted_agent_ids,
         status='live'
     )
     
-    # Query progress records for live agents used by this learner
+    # Query progress records for live agents used by this learner. Although the progress entry is something that has been mostly blank in the Beta Version, It needs to be enforced.
     progress_entries = LearnerProgress.objects.filter(
         learner=learner_profile,
         agent_used__status='live'
@@ -46,27 +43,12 @@ def dashboard(request):
         })
 
     # Query current module if assigned
-    current_module_data = None
-    if learner_profile.current_module:
-        agent_name = "AI Tutor"
-        if learner_profile.current_module.course:
-            agents = learner_profile.current_module.course.agents.filter(status='live')
-            if agents.exists():
-                agent_name = agents.first().name
-        
-        current_module_data = {
-            'title': learner_profile.current_module.title,
-            'course': learner_profile.current_module.course.name if learner_profile.current_module.course else 'General Course',
-            'agent_name': agent_name,
-            'estimated_time': '25 min',
-        }
 
     context = {
         'user_type': 'learner',
         'learner': {
             'user': request.user,
         },
-        'current_module': current_module_data,
         'active_agents': active_agents,
         'recent_activity': recent_activity,
     }

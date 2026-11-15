@@ -62,11 +62,12 @@ class RegisterAgentView(LoginRequiredMixin, View):
             agent.save()
             form.save_m2m()
 
-            org = "mohammadail67"
+            gar_repo_url = getattr(settings, 'GAR_REPOSITORY_URL', 'asia-south1-docker.pkg.dev/excellstudy/excellstudy')
             return render(request, 'developer/register_confirm.html', {
                 'agent': agent,
                 'slug': agent.slug,
-                'org': org,
+                'org': gar_repo_url,
+                'gar_repo_url': gar_repo_url,
             })
 
         return render(request, 'developer/register_agent.html', {'form': form})
@@ -231,8 +232,7 @@ class TriggerPipelineView(LoginRequiredMixin, View):
 
         from apps.developer.github_dispatch import image_exists_in_registry, trigger_pipeline
 
-        dev_username = agent.developer.gh_username if agent.developer else ""
-        if not image_exists_in_registry(agent.slug, version, dev_username):
+        if not image_exists_in_registry(agent.slug, version):
             messages.error(
                 request,
                 f"No image found tagged '{version}' for slug '{agent.slug}'. Push it first, then click this button."
@@ -242,7 +242,7 @@ class TriggerPipelineView(LoginRequiredMixin, View):
                 return redirect(referer)
             return redirect('developer:pipeline_status', job_id=agent.slug)
 
-        success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace, dev_username)
+        success, msg = trigger_pipeline(agent.slug, version, agent.developer.namespace)
         if success:
             # Set active run indicator in Redis
             try:

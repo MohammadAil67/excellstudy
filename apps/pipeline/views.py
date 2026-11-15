@@ -23,7 +23,7 @@ def _verify_signature(request) -> bool:
 
 
 
-
+#this is of course needs to change with celery and async tasks, but for now this is a simple way to handle the webhook from the pipeline.
 @csrf_exempt
 def pipeline_webhook(request):
     """
@@ -79,7 +79,7 @@ def pipeline_webhook(request):
         except ValidationError as e:
             return JsonResponse({'error': f'Validation failed: {e.message_dict if hasattr(e, "message_dict") else str(e)}'}, status=400)
 
-        # Cache in Redis for active routing lookup
+        # Cache in Redis for active routing lookup but needs to change the structure of data.
         agent_data = {
             'name': agent.name,
             'slug': agent.slug,
@@ -101,7 +101,7 @@ def pipeline_webhook(request):
         except Exception as e:
             logger.error(f"Failed to cache registered agent {slug} in Redis: {e}")
 
-        # Publish final completion event to Redis Pub/Sub
+        # Publish final completion event to Redis Pub/Sub. Feels unnecessary but could be useful for SSE streaming of events to the browser.
         try:
             r = redis.Redis.from_url(settings.REDIS_URL)
             event_data = {
@@ -114,6 +114,7 @@ def pipeline_webhook(request):
         except Exception as e:
             logger.error(f"Failed to publish success event to Redis: {e}")
 
+        #so this function also saves the agent slug to redis for active lookup and routing.
         logger.info(f"Agent {slug} successfully activated and cached.")
 
     elif status == 'failure':
@@ -125,7 +126,7 @@ def pipeline_webhook(request):
         except ValidationError as e:
             return JsonResponse({'error': f'Validation failed: {e.message_dict if hasattr(e, "message_dict") else str(e)}'}, status=400)
 
-        # Publish final completion event to Redis Pub/Sub
+        # Publish final completion event to Redis Pub/Sub, unncessary but could be useful for SSE streaming of events to the browser.
         try:
             r = redis.Redis.from_url(settings.REDIS_URL)
             event_data = {
@@ -146,6 +147,7 @@ def pipeline_webhook(request):
     return JsonResponse({'slug': slug, 'status': agent.status})
 
 
+#This is directly looking up from the database, how about pulling in from redis cache for faster response time? This is a good candidate for caching in Redis.
 def agent_pipeline_status(request, slug):
     """GET - Query the database for the current pipeline validation status of an agent."""
     try:

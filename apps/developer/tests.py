@@ -240,6 +240,62 @@ class DeveloperPortalTests(TestCase):
         self.assertEqual(second_call_args[3], f"{agent.slug}-svc")
 
 
+class GARRegistryDispatchTests(TestCase):
+    @patch('apps.developer.github_dispatch._get_gcp_access_token')
+    @patch('requests.get')
+    def test_image_exists_in_registry_found(self, mock_requests_get, mock_get_token):
+        from apps.developer.github_dispatch import image_exists_in_registry
+        mock_get_token.return_value = "ya29.test-token"
+        mock_requests_get.return_value.status_code = 200
+
+        exists = image_exists_in_registry("test-agent", "1.0.0")
+        self.assertTrue(exists)
+        mock_requests_get.assert_called_once()
+        args, kwargs = mock_requests_get.call_args
+        self.assertIn("packages/test-agent/tags/1.0.0", args[0])
+        self.assertEqual(kwargs['headers']['Authorization'], "Bearer ya29.test-token")
+
+    @patch('apps.developer.github_dispatch._get_gcp_access_token')
+    @patch('requests.get')
+    def test_image_exists_in_registry_not_found(self, mock_requests_get, mock_get_token):
+        from apps.developer.github_dispatch import image_exists_in_registry
+        mock_get_token.return_value = "ya29.test-token"
+        mock_requests_get.return_value.status_code = 404
+
+        exists = image_exists_in_registry("test-agent", "1.0.0")
+        self.assertFalse(exists)
+
+    @patch('apps.developer.github_dispatch.settings')
+    def test_image_exists_in_registry_unconfigured(self, mock_settings):
+        from apps.developer.github_dispatch import image_exists_in_registry
+        mock_settings.GCP_PROJECT_ID = None
+        mock_settings.GAR_REPOSITORY = None
+        self.assertTrue(image_exists_in_registry("test-agent", "1.0.0"))
+
+    @patch('apps.developer.github_dispatch._get_gcp_access_token')
+    def test_image_exists_in_registry_no_token(self, mock_get_token):
+        from apps.developer.github_dispatch import image_exists_in_registry
+        mock_get_token.return_value = None
+        self.assertTrue(image_exists_in_registry("test-agent", "1.0.0"))
+
+    @patch('apps.developer.github_dispatch._get_gcp_access_token')
+    @patch('requests.get')
+    def test_image_exists_in_registry_network_error(self, mock_requests_get, mock_get_token):
+        import requests
+        from apps.developer.github_dispatch import image_exists_in_registry
+        mock_get_token.return_value = "ya29.test-token"
+        mock_requests_get.side_effect = requests.RequestException("Network timeout")
+        self.assertTrue(image_exists_in_registry("test-agent", "1.0.0"))
+
+    @patch('apps.developer.github_dispatch.cache')
+    def test_get_gcp_access_token_uses_cache(self, mock_cache):
+        from apps.developer.github_dispatch import _get_gcp_access_token, GCP_TOKEN_CACHE_KEY
+        mock_cache.get.return_value = "cached-access-token"
+        token = _get_gcp_access_token()
+        self.assertEqual(token, "cached-access-token")
+        mock_cache.get.assert_called_once_with(GCP_TOKEN_CACHE_KEY)
+
+
 
 
 import sys
@@ -284,6 +340,7 @@ class ManifestScriptTests(LiveServerTestCase):
             result = subprocess.run(
                 [sys.executable, 'scripts/validate_manifest.py', temp_path, self.agent.slug],
                 env=env,
+                stdin=subprocess.DEVNULL,
                 capture_output=True,
                 text=True
             )
@@ -315,6 +372,7 @@ class ManifestScriptTests(LiveServerTestCase):
             result = subprocess.run(
                 [sys.executable, 'scripts/validate_manifest.py', temp_path, self.agent.slug],
                 env=env,
+                stdin=subprocess.DEVNULL,
                 capture_output=True,
                 text=True
             )

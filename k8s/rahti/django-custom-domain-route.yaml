@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: django-custom-domain
+  namespace: sdx-assignment-mmahdi
+  labels:
+    app: django-web
+spec:
+  host: www.excellstudy.site
+  to:
+    kind: Service
+    name: django-service
+    weight: 100
+  port:
+    targetPort: 8000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

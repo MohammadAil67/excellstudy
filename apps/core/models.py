@@ -24,14 +24,7 @@ class Learner(models.Model):
         ('kinesthetic', 'Kinesthetic'),
         ('reading_writing', 'Reading/Writing'),
     ]
-
-    MOOD_CHOICES = [
-        ('neutral', 'Neutral'),
-        ('engaged', 'Engaged'),
-        ('frustrated', 'Frustrated'),
-        ('confused', 'Confused'),
-    ]
-
+    
     PACE_CHOICES = [
         ('slow', 'Slow'),
         ('normal', 'Normal'),
@@ -57,9 +50,6 @@ class Learner(models.Model):
 
     current_module = models.ForeignKey(
         'Module', on_delete=models.SET_NULL, null=True, blank=True,
-    )
-    mood_signal = models.CharField(
-        max_length=20, choices=MOOD_CHOICES, default='neutral',
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -119,7 +109,7 @@ class Developer(models.Model):
     )
     github_username = models.CharField(
         max_length=100, blank=True, default='',
-        help_text="Developer's exact GitHub handle for GHCR image tags (e.g. ShafayatHossain423).",
+        help_text="Developer's exact GitHub handle (e.g. ShafayatHossain423).",
     )
     registry_token_added_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -171,7 +161,7 @@ class Course(models.Model):
     age_group_min = models.PositiveIntegerField(default=6)
     age_group_max = models.PositiveIntegerField(default=18)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         constraints = [
             models.CheckConstraint(

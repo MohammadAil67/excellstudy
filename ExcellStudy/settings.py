@@ -116,9 +116,12 @@ ASGI_APPLICATION = 'ExcellStudy.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import sys
+IS_TESTING = 'test' in sys.argv or 'pytest' in sys.modules or any('pytest' in arg for arg in sys.argv) or os.environ.get('DJANGO_TESTING') == '1'
+
 DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('SUPABASE_DB_URL')
 
-if DATABASE_URL and 'YOURPASSWORD' not in DATABASE_URL and '[' not in DATABASE_URL:
+if not IS_TESTING and DATABASE_URL and 'YOURPASSWORD' not in DATABASE_URL and '[' not in DATABASE_URL:
     import urllib.parse
     parsed = urllib.parse.urlparse(DATABASE_URL)
     DATABASES = {
@@ -175,7 +178,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # ── Cloud / Media Storage ──
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 
-if AWS_STORAGE_BUCKET_NAME:
+if IS_TESTING:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
+elif AWS_STORAGE_BUCKET_NAME:
     AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
@@ -273,9 +285,18 @@ PIPELINE_WEBHOOK_SECRET = os.environ.get(
     '4b46d87104cc2781abba66504e6e7c5c2854da0f77bed0d2a6fe5bac6f42c2ba'
 )
 
+# ── Google Artifact Registry ──
+GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "excellstudy")
+GAR_LOCATION = os.environ.get("GAR_LOCATION", "asia-south1")
+GAR_REPOSITORY = os.environ.get("GAR_REPOSITORY", "excellstudy")
+GAR_REGISTRY_HOST = f"{GAR_LOCATION}-docker.pkg.dev"
+GAR_REPOSITORY_URL = f"{GAR_REGISTRY_HOST}/{GCP_PROJECT_ID}/{GAR_REPOSITORY}"
+GCP_SERVICE_ACCOUNT_KEY_PATH = os.environ.get("GCP_SERVICE_ACCOUNT_KEY_PATH", "")
+
 # ── GitHub Actions Workflow Dispatch API ──
 GITHUB_DISPATCH_TOKEN = os.environ.get("GITHUB_DISPATCH_TOKEN")
 GITHUB_REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER")
 GITHUB_REPO_NAME = os.environ.get("GITHUB_REPO_NAME")
+
 
 

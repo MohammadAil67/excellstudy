@@ -1,0 +1,193 @@
+# ── Content MCP Server ────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content-mcp-server
+  namespace: sdx-assignment-mmahdi
+  labels:
+    app: content-mcp-server
+    component: mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: content-mcp-server
+  template:
+    metadata:
+      labels:
+        app: content-mcp-server
+        component: mcp-server
+    spec:
+      containers:
+        - name: content-mcp
+          image: mahdides1234/mcp-base:latest
+          command: ["python", "services/mcp_servers/content_server.py"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8003
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+          livenessProbe:
+            tcpSocket:
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: MCP_SERVER_PORT
+              value: "8003"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content-mcp-server
+  namespace: sdx-assignment-mmahdi
+spec:
+  selector:
+    app: content-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8003
+      targetPort: 8003
+
+---
+# ── Knowledge Graph MCP Server (Disabled / Replicas: 0) ────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knowledge-graph-mcp-server
+  namespace: sdx-assignment-mmahdi
+  labels:
+    app: knowledge-graph-mcp-server
+    component: mcp-server
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: knowledge-graph-mcp-server
+  template:
+    metadata:
+      labels:
+        app: knowledge-graph-mcp-server
+        component: mcp-server
+    spec:
+      containers:
+        - name: knowledge-graph-mcp
+          image: mahdides1234/mcp-base:latest
+          command: ["python", "services/mcp_servers/knowledge_graph_server.py"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+          livenessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: MCP_SERVER_PORT
+              value: "8002"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knowledge-graph-mcp-server
+  namespace: sdx-assignment-mmahdi
+spec:
+  selector:
+    app: knowledge-graph-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+
+---
+# ── Learner Context MCP Server ──────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learner-context-mcp-server
+  namespace: sdx-assignment-mmahdi
+  labels:
+    app: learner-context-mcp-server
+    component: mcp-server
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: learner-context-mcp-server
+  template:
+    metadata:
+      labels:
+        app: learner-context-mcp-server
+        component: mcp-server
+    spec:
+      containers:
+        - name: learner-context-mcp
+          image: mahdides1234/mcp-base:latest
+          command: ["python", "services/mcp_servers/learner_context_server.py"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+          livenessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - secretRef:
+                name: platform-credentials
+          env:
+            - name: MCP_SERVER_PORT
+              value: "8001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learner-context-mcp-server
+  namespace: sdx-assignment-mmahdi
+spec:
+  selector:
+    app: learner-context-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001

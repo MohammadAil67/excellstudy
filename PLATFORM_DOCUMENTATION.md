@@ -19,7 +19,7 @@ ExcellStudy is an AI-powered educational marketplace and runtime platform where 
 │ Agent Protocols        │ FastMCP 2.0+ (Model Context Protocol)         │
 │ AI / LLM Models        │ Google Gemini (2.5 Flash/Pro), Anthropic      │
 │ Container Orchestration│ Kubernetes (DOKS), Ingress-NGINX, Cert-Manager│
-│ Container Registry     │ GitHub Container Registry (GHCR)              │
+│ Container Registry     │ Google Artifact Registry (GAR)                │
 │ CI/CD Pipeline         │ GitHub Actions (Self-hosted GCP runner)       │
 │ File & Media Storage   │ S3-compatible Object Storage (Supabase / S3)  │
 │ Frontend Interface     │ Django Templates, Tailwind CSS, Vanilla JS    │
@@ -207,7 +207,7 @@ flowchart LR
 ---
 
 #### 2. The Developer Agent Deployment Journey
-1. **Submission**: A developer registers an agent at `/developer/agents/new/`, providing their container image tag on GHCR (`ghcr.io/<developer>/<agent-name>:<version>`).
+1. **Submission**: A developer registers an agent at `/developer/agents/new/`, providing their container image tag on Google Artifact Registry (`asia-south1-docker.pkg.dev/<project>/excellstudy/<agent-name>:<version>`).
 2. **Quota Verification**: `apps.developer` ensures the developer has not exceeded their pod quota (e.g., maximum 3 pods) or memory allocations.
 3. **Dispatch**: The platform triggers a GitHub Actions `workflow_dispatch` call to `.github/workflows/agent-pipeline.yml`.
 4. **Automated Pipeline**:

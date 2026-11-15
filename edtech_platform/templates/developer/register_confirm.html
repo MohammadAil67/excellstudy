@@ -76,10 +76,10 @@
         <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> <span id="copy-btn-text">Copy Commands</span>
       </button>
       <pre id="docker-commands-text"><span class="comment"># Build container image tagged with slug</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/{{ org }}/{{ slug }}:v1</span> .
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">{{ gar_repo_url|default:org }}/{{ slug }}:v1</span> .
 
 <span class="comment"># Push the image to package registry</span>
-<span class="cmd">docker</span> push <span class="url">ghcr.io/{{ org }}/{{ slug }}:v1</span></pre>
+<span class="cmd">docker</span> push <span class="url">{{ gar_repo_url|default:org }}/{{ slug }}:v1</span></pre>
     </div>
 
     <!-- Warning / Note -->
@@ -128,7 +128,7 @@
 
     copyBtn.addEventListener('click', () => {
       // Clean comments and format commands to copy
-      const textToCopy = `docker build -t ghcr.io/{{ org }}/{{ slug }}:v1 .\ndocker push ghcr.io/{{ org }}/{{ slug }}:v1`;
+      const textToCopy = `docker build -t {{ gar_repo_url|default:org }}/{{ slug }}:v1 .\ndocker push {{ gar_repo_url|default:org }}/{{ slug }}:v1`;
       
       navigator.clipboard.writeText(textToCopy).then(() => {
         btnText.textContent = 'Copied!';

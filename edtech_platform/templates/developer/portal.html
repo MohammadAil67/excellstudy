@@ -139,12 +139,12 @@
         <button class="copy-btn" onclick="copyCode()">
           <i data-lucide="clipboard" class="w-3.5 h-3.5"></i> Copy
         </button>
-        <pre id="quick-start-code"><span class="comment"># 1. Log in to GitHub Container Registry</span>
-<span class="cmd">echo</span> <span class="flag">"YOUR_GITHUB_PAT_TOKEN"</span> | <span class="cmd">docker</span> login <span class="url">ghcr.io</span> <span class="flag">-u</span> <span class="url">{{ developer.gh_username }}</span> <span class="flag">--password-stdin</span>
+        <pre id="quick-start-code"><span class="comment"># 1. Log in to Google Artifact Registry</span>
+<span class="cmd">echo</span> <span class="flag">"YOUR_GCP_SERVICE_KEY"</span> | <span class="cmd">docker</span> login <span class="url">asia-south1-docker.pkg.dev</span> <span class="flag">-u</span> <span class="url">_json_key</span> <span class="flag">--password-stdin</span>
 
 <span class="comment"># 2. Build and push your agent image</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">ghcr.io/{{ developer.gh_username }}/your-agent-slug:1.0.0</span> .
-<span class="cmd">docker</span> push <span class="url">ghcr.io/{{ developer.gh_username }}/your-agent-slug:1.0.0</span></pre>
+<span class="cmd">docker</span> build <span class="flag">-t</span> <span class="url">asia-south1-docker.pkg.dev/excellstudy/excellstudy/your-agent-slug:1.0.0</span> .
+<span class="cmd">docker</span> push <span class="url">asia-south1-docker.pkg.dev/excellstudy/excellstudy/your-agent-slug:1.0.0</span></pre>
       </div>
       <!-- Steps -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
@@ -281,7 +281,7 @@
         </div>
         <button type="submit" class="btn btn-primary text-xs py-2 px-3">Save</button>
       </form>
-      <p class="text-[11px] text-[#9CA3AF] mt-2">Used for image tags (`ghcr.io/&lt;handle&gt;/...`)</p>
+      <p class="text-[11px] text-[#9CA3AF] mt-2">Your GitHub username (optional developer identity)</p>
     </div>
 
     <!-- Documentation Links -->

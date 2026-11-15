@@ -25,9 +25,13 @@ COPY . /app/
 # Collect static files for WhiteNoise serving
 RUN python manage.py collectstatic --noinput || true
 
-# Security: Create non-root user
-RUN useradd -m -u 1000 djangouser && chown -R djangouser:djangouser /app
-USER djangouser
+# Security: Create non-root user and grant group 0 access for OpenShift (Rahti) arbitrary UID execution
+RUN useradd -m -u 1000 djangouser && \
+    chown -R djangouser:djangouser /app && \
+    chgrp -R 0 /app && \
+    chmod -R g=u /app
+
+USER 1000
 
 EXPOSE 8000
 

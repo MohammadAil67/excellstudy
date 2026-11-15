@@ -1,8 +1,6 @@
 name: Agent Pipeline Validation
 
 on:
-  registry_package:
-    types: [published, updated]
   workflow_dispatch:
     inputs:
       agent_slug:
@@ -20,15 +18,18 @@ on:
         type: string
         default: ''
       developer_username:
-        description: 'GitHub username of developer (e.g. shafayat-hossain)'
+        description: 'GitHub username of developer (optional)'
         required: false
         type: string
         default: ''
 
 env:
-  PLATFORM_API_URL: "https://excellstudy.site"
-  EXCELLSTUDY_HOST: "https://excellstudy.site"
+  PLATFORM_API_URL: "https://www.excellstudy.site"
+  EXCELLSTUDY_HOST: "https://www.excellstudy.site"
   PIPELINE_WEBHOOK_SECRET: ${{ secrets.PIPELINE_WEBHOOK_SECRET }}
+  GCP_PROJECT_ID: "project-098924cb-e28c-4177-901"
+  GAR_LOCATION: "asia-south1"
+  GAR_REPOSITORY: "excellstudy"
 
 jobs:
   validate-and-deploy:
@@ -42,24 +43,10 @@ jobs:
       - name: Resolve agent identity
         id: identity
         run: |
-          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          echo "owner_lower=$OWNER_LOWER" >> $GITHUB_OUTPUT
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
-            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-            echo "developer_namespace=${{ inputs.developer_namespace }}" >> $GITHUB_OUTPUT
-            DEV_USER="${{ inputs.developer_username }}"
-            if [ -z "$DEV_USER" ]; then
-              DEV_USER="$OWNER_LOWER"
-            fi
-            echo "developer_username=$(echo "$DEV_USER" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" >> $GITHUB_OUTPUT
-          else
-            echo "slug=${{ github.event.registry_package.name }}" >> $GITHUB_OUTPUT
-            echo "version=${{ github.event.registry_package.package_version.container_metadata.tag.name }}" >> $GITHUB_OUTPUT
-            echo "developer_namespace=dev-${{ github.actor }}" >> $GITHUB_OUTPUT
-            echo "developer_username=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" >> $GITHUB_OUTPUT
-          fi
+          echo "slug=${{ inputs.agent_slug }}" >> $GITHUB_OUTPUT
+          echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          echo "developer_namespace=${{ inputs.developer_namespace }}" >> $GITHUB_OUTPUT
+          echo "developer_username=${{ inputs.developer_username }}" >> $GITHUB_OUTPUT
 
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -94,18 +81,14 @@ jobs:
       # ─────────────────────────────────────────────
       # 1. Pull the image and extract its manifest
       # ─────────────────────────────────────────────
-      - name: Docker login to ghcr.io
+      - name: Docker login to Google Artifact Registry
         run: |
-          TOKEN="${{ secrets.GHCR_PULL_TOKEN }}"
-          if [ -z "$TOKEN" ]; then
-            TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          fi
-          echo "$TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "${{ secrets.GCP_SA_KEY }}" | docker login "${{ env.GAR_LOCATION }}-docker.pkg.dev" -u _json_key --password-stdin
 
       - name: Pull image and extract manifest
         id: extract
         run: |
-          IMAGE_TAG="ghcr.io/${{ steps.identity.outputs.developer_username }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
+          IMAGE_TAG="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }}"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
           docker pull "$IMAGE_TAG"
@@ -116,7 +99,7 @@ jobs:
       - name: Pull image — notify failure
         if: failure() && steps.extract.outcome == 'failure'
         run: |
-          MSG="Image pull failed: ghcr.io/${{ steps.identity.outputs.developer_username }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }} could not be pulled from registry or /app/manifest.json was missing."
+          MSG="Image pull failed: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ steps.identity.outputs.slug }}:${{ steps.identity.outputs.version }} could not be pulled from Google Artifact Registry or /app/manifest.json was missing."
           echo "$MSG" > error_reason.txt
           python3 scripts/notify_step.py "${{ steps.identity.outputs.slug }}" extract failure "$MSG"
 
@@ -262,10 +245,10 @@ jobs:
 
           kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-          kubectl create secret docker-registry ghcr-secret -n "$NAMESPACE" \
-            --docker-server=ghcr.io \
-            --docker-username="${{ github.actor }}" \
-            --docker-password="${{ secrets.GITHUB_TOKEN }}" \
+          kubectl create secret docker-registry gar-secret -n "$NAMESPACE" \
+            --docker-server="${{ env.GAR_LOCATION }}-docker.pkg.dev" \
+            --docker-username="_json_key" \
+            --docker-password='${{ secrets.GCP_SA_KEY }}' \
             --dry-run=client -o yaml | kubectl apply -f -
 
           kubectl apply -f - <<EOF
@@ -301,11 +284,11 @@ jobs:
                   app: $SLUG
               spec:
                 imagePullSecrets:
-                - name: ghcr-secret
+                - name: gar-secret
                 containers:
                 - name: $SLUG
                   image: $IMAGE_TAG
-                  imagePullPolicy: IfNotPresent
+                  imagePullPolicy: Always
                   ports:
                   - containerPort: 8080
                   resources:

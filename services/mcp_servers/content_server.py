@@ -36,6 +36,12 @@ django.setup()
 from django.conf import settings
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
+import asyncpg
+import asyncio
+from fastembed import TextEmbedding
+
+# Initialize lightweight local embedding model (all-MiniLM-L6-v2, 384 dims)
+embedding_model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
 
 # ── Server ────────────────────────────────────────────────────────────────────
 
@@ -53,10 +59,10 @@ mcp = FastMCP(
 @mcp.tool()
 async def search_content(query: str, limit: int = 5) -> list:
     """
-    Semantic search over course content chunks using pgvector.
+    Semantic search over course content chunks using pgvector and MiniLM embeddings.
 
     Steps:
-      1. Embeds the query via Voyage-2 (Anthropic client).
+      1. Embeds the query via all-MiniLM-L6-v2 (384 dimensions).
       2. Runs cosine-similarity search against content_chunks in Supabase.
       3. Returns the top `limit` chunks ranked by similarity.
 
@@ -73,20 +79,22 @@ async def search_content(query: str, limit: int = 5) -> list:
     Raises:
         ToolError: On embedding failure or database connection error.
     """
-    import asyncpg
-    from anthropic import AsyncAnthropic
+    if not query or not query.strip():
+        return []
 
-    limit = min(limit, 20)  # hard cap
+    limit = min(max(1, limit), 20)  # hard cap between 1 and 20
 
     try:
-        client = AsyncAnthropic()
-        response = await client.embeddings.create(model="voyage-2", input=query)
-        query_embedding = response.embeddings[0].values
+        # Run local CPU embedding inference asynchronously
+        def _embed():
+            return list(embedding_model.embed([query.strip()]))[0].tolist()
+
+        query_embedding = await asyncio.to_thread(_embed)
     except Exception as exc:
         raise ToolError(f"Embedding generation failed: {exc}")
 
     try:
-        conn = await asyncpg.connect(settings.SUPABASE_DB_URL)
+        conn = await asyncpg.connect(settings.SUPABASE_DB_URL, statement_cache_size=0)
         try:
             rows = await conn.fetch(
                 """
@@ -96,7 +104,7 @@ async def search_content(query: str, limit: int = 5) -> list:
                 ORDER BY embedding <=> $1::vector
                 LIMIT $2
                 """,
-                query_embedding,
+                str(query_embedding),
                 limit,
             )
         finally:

@@ -33,7 +33,7 @@ class AgentRegistrationForm(forms.ModelForm):
     github_username = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'e.g. ShafayatHossain423', 'class': 'form-input'}),
-        help_text="Your exact GitHub handle for GHCR image tags."
+        help_text="Your GitHub username (optional, used for platform identity)."
     )
 
     class Meta:

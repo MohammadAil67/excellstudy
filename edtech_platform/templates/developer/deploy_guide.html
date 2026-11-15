@@ -229,7 +229,7 @@
       <div class="hero-pills">
         <span class="hero-pill"><i data-lucide="rocket" style="width:13px;height:13px;"></i> Deploy Guide</span>
         <span class="hero-pill"><i data-lucide="git-branch" style="width:13px;height:13px;"></i> Register-first flow</span>
-        <span class="hero-pill"><i data-lucide="container" style="width:13px;height:13px;"></i> ghcr.io registry</span>
+        <span class="hero-pill"><i data-lucide="container" style="width:13px;height:13px;"></i> Google Artifact Registry</span>
       </div>
     </div>
 
@@ -278,15 +278,15 @@
       <div class="deploy-step" id="b2">
         <div class="step-bubble">2</div>
         <div class="step-card">
-          <div class="step-card-title">B.2 — Generate a registry push token</div>
-          <div class="step-card-desc">One-time, per developer. You'll use this to authenticate <code class="inline">docker push</code>.</div>
+          <div class="step-card-title">B.2 — Authenticate with Google Artifact Registry</div>
+          <div class="step-card-desc">One-time, per developer machine. Authenticate Docker with the GAR repository.</div>
 
           <ol class="register-steps" style="margin-top:12px;">
-            <li>Go to <code class="inline">github.com/settings/tokens?type=beta</code></li>
-            <li>Generate new token</li>
-            <li>Resource owner: the platform's GitHub org (or account)</li>
-            <li>Permissions → <strong>Packages: Read and write</strong></li>
-            <li>Copy the token — you'll use it in B.4</li>
+            <li>Configure Docker credential helper: <code class="inline">gcloud auth configure-docker asia-south1-docker.pkg.dev</code></li>
+            <li>Or authenticate using the platform service account key with Docker login</li>
+            <li>Command: <code class="inline">cat key.json | docker login asia-south1-docker.pkg.dev -u _json_key --password-stdin</code></li>
+            <li>Permissions: Ensure your identity has <strong>roles/artifactregistry.writer</strong></li>
+            <li>Your Docker client is now authorized to push agent images directly to the repository.</li>
           </ol>
         </div>
       </div>
@@ -333,18 +333,18 @@
         <div class="step-bubble">4</div>
         <div class="step-card">
           <div class="step-card-title">B.4 — Tag and push, using your exact slug from B.1</div>
-          <div class="step-card-desc" style="margin-bottom:4px;">Replace <code class="inline">{your-slug}</code>, <code class="inline">YOUR_GITHUB_USERNAME</code>, and <code class="inline">YOUR_TOKEN_FROM_B2</code> with your values.</div>
+          <div class="step-card-desc" style="margin-bottom:4px;">Replace <code class="inline">{your-slug}</code> with your registered agent slug.</div>
 
           <div class="code-block">
             <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
 <span class="comment"># Build</span>
-<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/mohammadail67/<span class="flag">{your-slug}</span>:v1 .
+<span class="cmd">docker</span> build <span class="flag">-t</span> asia-south1-docker.pkg.dev/excellstudy/excellstudy/<span class="flag">{your-slug}</span>:v1 .
 
 <span class="comment"># Authenticate</span>
-<span class="cmd">docker</span> login ghcr.io <span class="flag">-u</span> YOUR_GITHUB_USERNAME <span class="flag">-p</span> YOUR_TOKEN_FROM_B2
+<span class="cmd">gcloud</span> auth configure-docker asia-south1-docker.pkg.dev
 
 <span class="comment"># Push</span>
-<span class="cmd">docker</span> push ghcr.io/mohammadail67/<span class="flag">{your-slug}</span>:v1
+<span class="cmd">docker</span> push asia-south1-docker.pkg.dev/excellstudy/excellstudy/<span class="flag">{your-slug}</span>:v1
           </div>
 
           <div class="callout callout-warn">
@@ -455,8 +455,8 @@
 
       <div class="code-block">
         <button class="copy-btn" onclick="copyBlock(this)"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
-<span class="cmd">docker</span> build <span class="flag">-t</span> ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v2 .
-<span class="cmd">docker</span> push ghcr.io/<span class="flag">{platform-org}</span>/<span class="flag">{your-slug}</span>:v2
+<span class="cmd">docker</span> build <span class="flag">-t</span> asia-south1-docker.pkg.dev/excellstudy/excellstudy/<span class="flag">{your-slug}</span>:v2 .
+<span class="cmd">docker</span> push asia-south1-docker.pkg.dev/excellstudy/excellstudy/<span class="flag">{your-slug}</span>:v2
       </div>
     </section>
     <hr class="section-divider">

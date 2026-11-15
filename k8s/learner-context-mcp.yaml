@@ -24,9 +24,11 @@ spec:
         app: learner-context-mcp-server
         component: mcp-server
     spec:
+      imagePullSecrets:
+        - name: gar-secret
       containers:
         - name: learner-context-mcp
-          image: ghcr.io/mohammadail67/learner-context-mcp:v1
+          image: asia-south1-docker.pkg.dev/excellstudy/excellstudy/learner-context-mcp:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8001
