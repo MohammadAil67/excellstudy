@@ -31,6 +31,13 @@ class Learner(models.Model):
         ('fast', 'Fast'),
     ]
 
+    MOOD_SIGNAL_CHOICES = [
+        ('neutral', 'Neutral'),
+        ('engaged', 'Engaged'),
+        ('frustrated', 'Frustrated'),
+        ('confused', 'Confused'),
+    ]
+
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='learner_profile',
     )
@@ -46,6 +53,9 @@ class Learner(models.Model):
     )
     pace = models.CharField(
         max_length=10, choices=PACE_CHOICES, default='normal',
+    )
+    mood_signal = models.CharField(
+        max_length=20, choices=MOOD_SIGNAL_CHOICES, default='neutral', blank=True,
     )
 
     current_module = models.ForeignKey(
